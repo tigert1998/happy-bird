@@ -11,7 +11,9 @@ Happy Bird is similar to Angry Bird except that it introduce new game mechanics 
 * code review: [cpplint](https://pypi.org/project/cpplint/), [cppcheck](https://github.com/danmar/cppcheck), cppncss
 * unit test: [RenderDoc](https://renderdoc.org/), [GoogleTest](https://github.com/google/googletest)
 
+## Build
 
+Pre-requisite: google test, OpenGL glad
 
 
 
