@@ -3,7 +3,7 @@ SRC = main.cc
 SRC_PATH = src
 TEST_PATH = test
 FLAGS = -std=c++11
-TEST_FLAGS = -lgtest -std=c++11
+TEST_FLAGS = -lgtest -std=c++11 -I/usr/include
 # FLAGS = -lGL -lGLU -lglut -lglfw -lassimp
 
 all: $(SRC_PATH)/$(SRC)
