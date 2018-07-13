@@ -7,7 +7,7 @@ TEST_FLAGS = -lgtest -lgtest_main -pthread -std=c++11
 # FLAGS = -lGL -lGLU -lglut -lglfw -lassimp
 
 all: $(SRC_PATH)/$(SRC)
-	$(CC) $(SRC_PATH)/main.cc -o main $(FLAGS) & $(CC) $(TEST_PATH)/gtest_test.cc -o gtest $(TEST_FLAGS)
+	$(CC) $(SRC_PATH)/main.cc -o main $(FLAGS) & $(CC) $(TEST_PATH)/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml
 
 .PHONY: clean
 clean:
