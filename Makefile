@@ -1,14 +1,13 @@
-CC = g++
-SRC = main.cc
-SRC_PATH = src
-TEST_PATH = test
-FLAGS = -std=c++11
-TEST_FLAGS = -lgtest -lgtest_main -pthread -std=c++11
-# FLAGS = -lGL -lGLU -lglut -lglfw -lassimp
+INCLUDE_DIRS = $(shell find include -type d -depth 1)
+INCLUDE_DIR_FLAG = $(addprefix -I, $(INCLUDE_DIRS))
+LIB_DIR = lib
+LIB_DIR_FLAG = -L$(LIB_DIR)
+LIB_SRCS = $(shell find $(LIB_DIR) | grep "\.a")
+LIB_FLAGS = -framework OpenGL -lglfw $(subst lib/lib, -l, $(basename $(LIB_SRCS)))
+CC = clang++
+STD_FLAG = -std=c++11
 
-all: $(SRC_PATH)/$(SRC)
-	$(CC) $(SRC_PATH)/main.cc -o main $(FLAGS) & $(CC) $(TEST_PATH)/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml
+SRCS = $(wildcard src/*.c src/*.cpp)
 
-.PHONY: clean
-clean:
-	-rm main test
+all: $(SRCS)
+	$(CC) $(STD_FLAG) $(INCLUDE_DIR_FLAG) $(LIB_DIR_FLAG) $(SRCS) -o main $(LIB_FLAGS) 

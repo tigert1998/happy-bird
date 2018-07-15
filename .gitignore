@@ -1,0 +1,4 @@
+main
+lib/*
+include/bullet/*
+.DS_Store
