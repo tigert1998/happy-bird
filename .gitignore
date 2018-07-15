@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *_test
 *.o
 *.obj
@@ -7,3 +8,9 @@
 *.exe
 .tags*
 paxos
+=======
+main
+lib/*
+include/bullet/*
+.DS_Store
+>>>>>>> c34951e72e1874e6417b8adf8921f902bd3ac897
