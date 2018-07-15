@@ -5,8 +5,22 @@
 #include "world.h"
 #include "vec_converter.h"
 #include <iostream>
+#include <cstdio>
 using namespace std;
 // Base class //
+Object::Object(World* w, Shader* shader):
+	world_(w),
+	shader_(shader),
+	bt_object_(nullptr){
+		glGenVertexArrays(1, &vao_);
+		glGenBuffers(1, &vbo_);
+		glGenBuffers(1, &ebo_);
+	}
+Object::~Object(){
+	// delete world_;
+	delete shader_;
+	delete bt_object_;
+}
 void Object::ImportToPhysics(){
 	world_->bt_world_->addRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
@@ -14,10 +28,6 @@ void Object::DeleteFromPhysics(){
 	world_->bt_world_->removeRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
 void Object::ImportToGraphics(){
-	glGenVertexArrays(1, &vao_);
-
-	glGenBuffers(1, &vbo_);
-	glGenBuffers(1, &ebo_);
 
 	glBindVertexArray(vao_);
 
@@ -47,8 +57,12 @@ void Object::Draw(Camera* camera){
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uColor", color_);
 	btTransform transform;
-	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-
+	if(!is_soft_){
+		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
+	}
+	else{
+		transform.setIdentity();
+	}
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->GetViewMatrix());
 
@@ -60,23 +74,20 @@ void Object::Draw(Camera* camera){
 }
 
 void Object::InitMesh(void){
-	btTransform parent_transform;
-	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(parent_transform);
-	btCollisionShape* bt_shape = bt_object_->getCollisionShape();
-	InitMesh(bt_shape, parent_transform);
-	// cout << "Vertices: ";
-	// for(auto& i : vertices_){
-	// 	cout << i << ", ";
-	// }
-	// cout << endl;
-	// cout << "Indices: ";
-	// for(auto& i : indices_){
-	// 	cout << i << ", ";
-	// }
-	// cout << endl;
+	vertices_.clear();
+	indices_.clear();
+	if(!is_soft_){	
+		btTransform parent_transform;
+		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(parent_transform);
+		btCollisionShape* bt_shape = bt_object_->getCollisionShape();
+		InitRigidMesh(bt_shape, parent_transform);
+	}
+	else{
+		InitSoftMesh( dynamic_cast<btSoftBody*>(bt_object_) );
+	}
 }
 
-void Object::InitMesh(btCollisionShape* bt_shape, const btTransform& parent_transform){
+void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent_transform){
 	// todo: support all collision shape types
 	switch (bt_shape->getShapeType()) {
 		case SOFTBODY_SHAPE_PROXYTYPE: {
@@ -259,7 +270,7 @@ void Object::InitMesh(btCollisionShape* bt_shape, const btTransform& parent_tran
 					{
 
 						btTransform childWorldTrans = parent_transform * compound->getChildTransform(i);
-						InitMesh(compound->getChildShape(i),childWorldTrans);
+						InitRigidMesh(compound->getChildShape(i),childWorldTrans);
 					}
 				} else
 				{
@@ -276,11 +287,136 @@ void Object::InitMesh(btCollisionShape* bt_shape, const btTransform& parent_tran
 		}
 	};
 }
+void Object::InitSoftMesh(btSoftBody* psb){
+	int drawflags = 0x0004;
+	const btScalar		scl=(btScalar)0.1;
+	const btScalar		nscl=scl*5;
+	const btVector3		lcolor=btVector3(0,0,0);
+	const btVector3		ncolor=btVector3(1,1,1);
+	const btVector3		ccolor=btVector3(1,0,0);
+	int i,j,nj;
+	if(0!=(drawflags&fDrawFlags::Clusters))
+	{
+		srand(1806);
+		for(i=0;i<psb->m_clusters.size();++i)
+		{
+			if(psb->m_clusters[i]->m_collide)
+			{
+				btVector3						color(	rand()/(btScalar)RAND_MAX,
+					rand()/(btScalar)RAND_MAX,
+					rand()/(btScalar)RAND_MAX);
+				color=color.normalized()*0.75;
+				btAlignedObjectArray<btVector3>	vertices;
+				vertices.resize(psb->m_clusters[i]->m_nodes.size());
+				for(j=0,nj=vertices.size();j<nj;++j)
+				{				
+					vertices[j]=psb->m_clusters[i]->m_nodes[j]->m_x;
+				}
+				btConvexHullComputer	computer;
+				int stride = sizeof(btVector3);
+				int count = vertices.size();
+				btScalar shrink=0.f;
+				btScalar shrinkClamp=0.f;
+				computer.compute(&vertices[0].getX(),stride,count,shrink,shrinkClamp);
+				for (int i=0;i<computer.faces.size();i++)
+				{
+
+					int face = computer.faces[i];
+					//printf("face=%d\n",face);
+					const btConvexHullComputer::Edge*  firstEdge = &computer.edges[face];
+					const btConvexHullComputer::Edge*  edge = firstEdge->getNextEdgeOfFace();
+
+					int v0 = firstEdge->getSourceVertex();
+					int v1 = firstEdge->getTargetVertex();
+					while (edge!=firstEdge)
+					{
+						int v2 = edge->getTargetVertex();
+						addTriangle(computer.vertices[v0],computer.vertices[v1],computer.vertices[v2]);
+						edge = edge->getNextEdgeOfFace();
+						v0=v1;
+						v1=v2;
+					};
+				}
+			}
+		}
+	}
+	else
+	{
+		/* Faces	*/ 
+		if(0!=(drawflags&fDrawFlags::Faces))
+		{
+			const btScalar	scl=(btScalar)0.8;
+			const btScalar	alp=(btScalar)1;
+			const btVector3	col(0,(btScalar)0.7,0);
+			for(i=0;i<psb->m_faces.size();++i)
+			{
+				const btSoftBody::Face&	f=psb->m_faces[i];
+				if(0==(f.m_material->m_flags&btSoftBody::fMaterial::DebugDraw)) continue;
+				const btVector3			x[]={f.m_n[0]->m_x,f.m_n[1]->m_x,f.m_n[2]->m_x};
+				const btVector3			c=(x[0]+x[1]+x[2])/3;
+				addTriangle((x[0]-c)*scl+c,
+					(x[1]-c)*scl+c,
+					(x[2]-c)*scl+c);
+			}	
+		}
+		/* Tetras	*/ 
+		if(0!=(drawflags&fDrawFlags::Tetras))
+		{
+			const btScalar	scl=(btScalar)0.8;
+			const btScalar	alp=(btScalar)1;
+			const btVector3	col((btScalar)0.3,(btScalar)0.3,(btScalar)0.7);
+			for(int i=0;i<psb->m_tetras.size();++i)
+			{
+				const btSoftBody::Tetra&	t=psb->m_tetras[i];
+				if(0==(t.m_material->m_flags&btSoftBody::fMaterial::DebugDraw)) continue;
+				const btVector3				x[]={t.m_n[0]->m_x,t.m_n[1]->m_x,t.m_n[2]->m_x,t.m_n[3]->m_x};
+				const btVector3				c=(x[0]+x[1]+x[2]+x[3])/4;
+				addTriangle((x[0]-c)*scl+c,(x[1]-c)*scl+c,(x[2]-c)*scl+c);
+				addTriangle((x[0]-c)*scl+c,(x[1]-c)*scl+c,(x[3]-c)*scl+c);
+				addTriangle((x[1]-c)*scl+c,(x[2]-c)*scl+c,(x[3]-c)*scl+c);
+				addTriangle((x[2]-c)*scl+c,(x[0]-c)*scl+c,(x[3]-c)*scl+c);
+			}	
+		}
+	} // end of else if clause
+}
+// void Object::InitSoftMesh(btCollisionShape* shape){
+// 	if (shape->getUserPointer()==0){
+// 		cout << "No user pointer available." << endl;
+// 		return;
+// 	}
+// 	btSoftBody* psb = (btSoftBody*)shape->getUserPointer();
+// 	vertices_.resize(psb->m_faces.size() * 3 * 3);
+// 	normals_.resize(psb->m_faces.size() * 3 * 3);
+// 	int i, j, k;
+// 	for (i = 0; i < psb->m_faces.size(); i++)  // Foreach face
+// 	{
+// 		for (k = 0; k < 3; k++)  // Foreach vertex on a face
+// 		{
+// 			int currentIndex = i * 3 + k;
+// 			for (int j = 0; j < 3; j++)
+// 			{
+// 				vertices_[currentIndex + j] = psb->m_faces[i].m_n[k]->m_x[j];
+// 			}
+// 			for (int j = 0; j < 3; j++)
+// 			{
+// 				normals_[currentIndex + j] = psb->m_faces[i].m_n[k]->m_n[j];
+// 			}
+// 			// for (int j = 0; j < 2; j++)
+// 			// {
+// 			// 	gfxVertices[currentIndex].uv[j] = 0.5;  //we don't have UV info...
+// 			// }
+// 			indices_.push_back(currentIndex); // ?
+// 		}
+// 	}
+// }
+
+
 
 // Plain Object
 Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 half_extents, Color color):
 	DeadObject(world,shader),half_extents_(half_extents){
 	assert(world_);
+	is_soft_ = false;
 	color_ = color;
 	// initialize physics shape //
 	bt_object_ = world_->createRigidBody(
@@ -292,10 +428,9 @@ Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 h
 	ImportToGraphics();
 	// patch shader
 	if(!shader){
-		shader_ = new Shader("shader/cuboid.vert", "shader/cuboid.frag");
+		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	}
 }
-#include <cstdio>
 void Box::Draw(Camera* camera){
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
@@ -305,6 +440,7 @@ void Box::Draw(Camera* camera){
 Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float radius, Color color):
 	DeadObject(world,shader),radius_(radius){
 	assert(world_);
+	is_soft_ = false;
 	color_ = color;
 	// initialize physics shape //
 	bt_object_ = world_->createRigidBody(
@@ -315,7 +451,7 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 	InitMesh();
 	ImportToGraphics();
 	if(!shader){
-		shader_ = new Shader("shader/sphere.vert", "shader/sphere.frag");
+		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	}
 }
 void Sphere::Draw(Camera* camera){
@@ -340,7 +476,10 @@ void Sphere::Draw(Camera* camera){
 // }
 
 // Controller //
-// Head::Head(Character* character, float radius, Color color):character_(character), radius_(radiu),color_(color){
+// LivingObject::LivingObject(World* world, Shader* shader):
+// Head::Head(World* world, Shader* shader, const btTransform& transform, Character* character, float radius, Color color):
+// 	LivingObject(world, shader, )
+// 	character_(character), radius_(radiu),color_(color){
 // 	// initialize physics shape //
 // 	bt_object_ = world_->createRigidBody(
 // 		20,
@@ -351,28 +490,47 @@ void Sphere::Draw(Camera* camera){
 // 	InitControl();
 // }
 
-
+typedef Sphere Head;
 // Soft Body //
-// void Cloth::Cloth(float attachWid, float clothLen, uint32_t subd, Head* head){
+Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint32_t subd, Head* head):
+	DeadObject(world, shader), 
+	width_(attachWid),length_(clothLen),subdivide_(subd){
+	assert(world);
+	is_soft_ = true;
+	if(!shader)shader_ = new Shader("shader/common.vert", "shader/common.frag");
+	// Create patch //
+	btSoftBody* softBody = btSoftBodyHelpers::CreatePatch(world_->bt_soft_info_,btVector3(-attachWid,clothLen,-attachWid),
+		btVector3(+attachWid,clothLen,-attachWid),
+		btVector3(-attachWid,clothLen,+attachWid),
+		btVector3(+attachWid,clothLen,+attachWid),subd,subd,0,false); // 4 + 8
+	// Soft Body config
+	// softBody->m_cfg.kVC = 0.5;
+	// softBody->m_materials[0]->m_kLST = 0.5;
+	// softBody->setTotalMass(5);
+	// softBody->setPose(true, false);
+	world_->bt_world_->addSoftBody(softBody);
+	// Attachment //
+	float radius = head->getRadius();
+	btVector3 left(-radius,0,0.2);
+	btVector3 fleft(-0.5*radius,0.866*radius,0.2);
+	btVector3 right(radius,0,0.2);
+	btVector3 fright(0.5*radius,0.866*radius,0.2);
+	btVector3 back(0,-2,0.2);
+	softBody->appendAnchor(0, static_cast<btRigidBody*>(head->bt_object_), fright);
+	softBody->appendAnchor((subd-1)/2, static_cast<btRigidBody*>(head->bt_object_), back);
+	softBody->appendAnchor(subd-1, static_cast<btRigidBody*>(head->bt_object_), fleft);
+	softBody->appendAnchor(1, static_cast<btRigidBody*>(head->bt_object_), left);
+	softBody->appendAnchor(subd- 2, static_cast<btRigidBody*>(head->bt_object_), right);
 
-// 	bt_object_ = btSoftBodyHelpers::CreatePatch(world_->m_softBodyWorldInfo,btVector3(-attachWid,clothLen,-attachWid),
-// 		btVector3(+attachWid,clothLen,-attachWid),
-// 		btVector3(-attachWid,clothLen,+attachWid),
-// 		btVector3(+attachWid,clothLen,+attachWid),subd,subd,0,false); // 4 + 8
-// 	world_->getSoftDynamicsWorld()->addSoftBody(bt_object_);
+	softBody->getCollisionShape()->setUserPointer((void*)softBody);
 
-// 	// Attachment
-// 	float radius = head->getRadius();
-// 	btVector3 left(-radius,0,0.2);
-// 	btVector3 fleft(-0.5*radius,0.866*radius,0.2);
-// 	btVector3 right(radius,0,0.2);
-// 	btVector3 fright(0.5*radius,0.866*radius,0.2);
-// 	btVector3 back(0,-2,0.2);
-// 	bt_object_->appendAnchor(0,head->bt_object_, fright);
-// 	bt_object_->appendAnchor((subd-1)/2,head->bt_object_, back);
-// 	bt_object_->appendAnchor(subd-1,head->bt_object_, fleft);
-// 	bt_object_->appendAnchor(1,head->bt_object_, left);
-// 	bt_object_->appendAnchor(subd-2,head->bt_object_, right);
+	bt_object_ = softBody;
 
-// 	return ;
-// }
+	// Init at draw
+	return ;
+}
+void Cloth::Draw(Camera* camera){
+	InitMesh();
+	ImportToGraphics();
+	Object::Draw(camera);
+}

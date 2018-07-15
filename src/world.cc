@@ -2,7 +2,20 @@
 
 int World::height_ = 600;
 int World::width_ = 800;
+bool keys_pressed_[1024];
 Camera* World::camera_ = new Camera(glm::vec3(25, 51, 25), (double) World::width_ / (double) World::height_);
+World::World(){
+	InitPhysics();
+	InitGraphics();
+	InitScene();
+}
+World::~World(){
+	delete bt_world_;
+	delete bt_solver_;
+	delete bt_overlapping_paircache_;
+	delete bt_dispatcher_;
+	delete bt_configure_;
+}
 
 btRigidBody* World::createRigidBody (btScalar mass, const btTransform& startTransform, btCollisionShape* shape)
 {
@@ -33,23 +46,30 @@ void World::InitGraphics(void){
 	glfwMakeContextCurrent(window_);
 	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
-	// camera_ = new Camera(glm::vec3(5, 51, 5), (double) width_ / (double) height_);
-	// glfwSetCursorPosCallback(window_, std::bind(World::CursorPosCallback, _1,_2,_3,camera_,width_,height_) );
 	glfwSetCursorPosCallback(window_, World::CursorPosCallback );
+	glfwSetKeyCallback(window_, World::KeyCallback);
 	glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	memset(keys_pressed_, 0, sizeof(keys_pressed_));
 }
 
 void World::InitPhysics(void){
-	bt_configure_ = new btDefaultCollisionConfiguration();
+	bt_configure_ = new btSoftBodyRigidBodyCollisionConfiguration();
 	bt_dispatcher_ = new btCollisionDispatcher(bt_configure_);
 	bt_overlapping_paircache_ = new btDbvtBroadphase();
 	bt_solver_ = new btSequentialImpulseConstraintSolver;
-	bt_world_ = new btDiscreteDynamicsWorld(bt_dispatcher_,
+	bt_soft_solver_ = new btDefaultSoftBodySolver;
+	bt_world_ = new btSoftRigidDynamicsWorld(bt_dispatcher_,
 		bt_overlapping_paircache_,
 		bt_solver_, 
-		bt_configure_);
+		bt_configure_,
+		bt_soft_solver_);
 
 	bt_world_->setGravity(btVector3(0, -10, 0));
+	bt_soft_info_.m_dispatcher = bt_dispatcher_;
+	bt_soft_info_.m_broadphase = bt_overlapping_paircache_;
+	bt_soft_info_.m_sparsesdf.Initialize();
+
+	character_ = nullptr;
 }
 void World::InitScene(void){
 	// Ground aka Box
@@ -61,8 +81,12 @@ void World::InitScene(void){
 	btTransform start_transform;
 	start_transform.setIdentity();
 	start_transform.setOrigin(btVector3(2, 10, 0));
-	objects_.push_back( new Sphere(this, nullptr, start_transform, 1) );
+	objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
+	// Cloth
+	objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
 }
+#include <iostream>
+using namespace std;
 void World::Update(void){ // sync mesh and render
 	static float last_time = glfwGetTime(), current_time = 0;
 	glClearColor(0, 0, 0, 1);
@@ -98,4 +122,25 @@ void World::CursorPosCallback(GLFWwindow *window, double x, double y) {
 	mouse_x = new_x;
 	mouse_y = new_y;
 	entered = true;
+}
+void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, GL_TRUE);
+  else
+  	keys_pressed_[key] = (action != GLFW_RELEASE);
+}
+void World::ProcessInput(void){
+	static float current_time, last_time;
+	current_time = glfwGetTime();
+	float delta_time = current_time - last_time;
+	last_time = current_time;
+	btTransform baseTrans;
+	if (keys_pressed_[GLFW_KEY_W]) // Forward
+      character_->Move( baseTrans.getBasis()[2], delta_time);
+  if (keys_pressed_[GLFW_KEY_S])
+      character_->Move( -1*baseTrans.getBasis()[2], delta_time);
+  if (keys_pressed_[GLFW_KEY_A]) // Left
+      character_->Move( -1*baseTrans.getBasis()[1], delta_time);
+  if (keys_pressed_[GLFW_KEY_D])
+      character_->Move( baseTrans.getBasis()[1], delta_time);
 }

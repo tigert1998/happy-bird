@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 
 #include "opengl_common.h"
 #include "bullet_common.h"
@@ -17,6 +18,7 @@ class Object{
 	Shader* shader_;
 	uint32_t vao_, vbo_, ebo_;
 	// Bullet shape
+	bool is_soft_;
 	btCollisionObject* bt_object_;
 	// objet data
 	Color color_;
@@ -24,23 +26,33 @@ class Object{
 	std::vector<float> normals_;
 	std::vector<uint32_t> indices_;
 
-	Object(World* w, Shader* shader):
-		world_(w),
-		shader_(shader),
-		bt_object_(nullptr){ }
-	virtual ~Object(){
-		// delete world_;
-		delete shader_;
-		delete bt_object_;
-	}
+	Object(World* w, Shader* shader);
+	virtual ~Object();
 	virtual void ImportToPhysics();
 	virtual void DeleteFromPhysics();
 	virtual void ImportToGraphics();
 	virtual void Draw(Camera* camera, const btTransform& transform);
 	virtual void Draw(Camera* camera);
 	virtual void InitMesh(void); // init from shape
-	virtual void InitMesh(btCollisionShape* shape, const btTransform& trans);
+	virtual void InitRigidMesh(btCollisionShape* shape, const btTransform& trans);
 	virtual void InitMesh(std::string path){ } // init from assimp
+	virtual void InitSoftMesh(btSoftBody* shape);
+	// virtual void InitSoftMesh(btCollisionShape* shape);
+	inline bool isSoft(void){return is_soft_;}
+	inline void addTriangle(const btVector3& a, const btVector3& b, const btVector3& c){
+		indices_.push_back(vertices_.size() / 3);
+		indices_.push_back(vertices_.size() / 3 + 1);
+		indices_.push_back(vertices_.size() / 3 + 2);
+		vertices_.push_back(a[0]);
+		vertices_.push_back(a[1]);
+		vertices_.push_back(a[2]);
+		vertices_.push_back(b[0]);
+		vertices_.push_back(b[1]);
+		vertices_.push_back(b[2]);
+		vertices_.push_back(c[0]);
+		vertices_.push_back(c[1]);
+		vertices_.push_back(c[2]);
+	}
 };
 
 typedef Object DeadObject;
@@ -49,10 +61,8 @@ typedef Object DeadObject;
 // 		btPairCachingGhostObject* ghost_delegate;
 // 		btKinematicCharacterController* controller;
 // 	} *character_;
-// 	LivingObject(Character* character):character_(character){ }
-// 	virtual void InitControl(){
-
-// 	}
+// 	LivingObject(World* world, Shader* shader, Character* character);
+// 	virtual void InitControl();
 // };
 
 
@@ -72,6 +82,8 @@ class Sphere: public DeadObject{
 	Sphere(World* world, Shader* shader, const btTransform& trans, float radius, Color color = color::Red());
 	void Draw(Camera* camera);
 	~Sphere(){ }
+	// accessor
+	inline float getRadius(void){return radius_;}
 };
 
 // Complex Model: assimp->mesh->boundingBox->physics
@@ -81,54 +93,22 @@ class Sphere: public DeadObject{
 
 
 // Plain Object with control
+typedef Sphere Head;
 // class Head: public LivingObject{
 // 	Head(World* world, Shader* shader, Character* character, float radius, Color color = color::Red());
+// 	~Head(){ }
+// };
 
-// };
-// class Arrow: public LivingObject{
-// 	Arrow() = delete;
-// 	Arrow(Character* character, float len, Color color):
-// 		LivingObject(character),length_(len),color_(color){ }
-// };
 
 // Attached Object: physicsShape->mesh(mutable)->graphics
-// class Cloth: public DeadObject{
-// 	Cloth() = delete;
-// 	Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint32_t subdivide, Head* head );
-// 	~Cloth(){ }
-// };
-// class Particles: public DeadObject{
-// 	Particles() = delete;
-// 	Particles(Arrow* arrow, Color color);
-// };
-// class Leaf: public DeadObject{
-// 	Leaf() = delete;
-// 	Leaf(float length);
-// 	~Leaf(){ }
-// };
+class Cloth: public DeadObject{
+	float width_;
+	float length_;
+	int subdivide_;
+ public:
+	Cloth() = delete;
+	Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint32_t subdivide, Head* head );
+	~Cloth(){ }
+	void Draw(Camera*);
+};
 
-
-// struct	btSoftBodyWorldInfo
-// {
-// 	btScalar				air_density;
-// 	btScalar				water_density;
-// 	btScalar				water_offset;
-// 	btScalar				m_maxDisplacement;
-// 	btVector3				water_normal;
-// 	btBroadphaseInterface*	m_broadphase;
-// 	btDispatcher*	m_dispatcher;
-// 	btVector3				m_gravity;
-// 	btSparseSdf<3>			m_sparsesdf;
-
-// 	btSoftBodyWorldInfo()
-// 		:air_density((btScalar)1.2),
-// 		water_density(0),
-// 		water_offset(0),
-// 		m_maxDisplacement(1000.f),//avoid soft body from 'exploding' so use some upper threshold of maximum motion that a node can travel per frame
-// 		water_normal(0,0,0),
-// 		m_broadphase(0),
-// 		m_dispatcher(0),
-// 		m_gravity(0,-10,0)
-// 	{
-// 	}
-// };	

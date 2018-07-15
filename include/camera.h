@@ -12,7 +12,7 @@ enum class MoveDirectionType {
 class Camera {
 public:
 	Camera() = delete;
-	Camera(glm::vec3 position, double width_height_ratio, double alpha = -M_PI / 2, double beta = 0);
+	Camera(glm::vec3 position, double width_height_ratio, double alpha = -3.1415926535 / 2, double beta = 0);
 	void Rotate(double delta_alpha, double delta_beta);
 	void Move(MoveDirectionType, float time);
 	glm::vec3 position() const;

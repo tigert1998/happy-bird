@@ -1,41 +1,43 @@
 #pragma once
+#include <vector>
+
 #include "opengl_common.h"
 #include "bullet_common.h"
 #include "object.h"
 #include "camera.h"
 #include "shader.h"
-
-#include <functional>
-using namespace std::placeholders;
+#include "character.h"
 
 class World{
+	enum {
+		kLeft = 0,
+		kRight = 1,
+		kFront = 2,
+		kBack = 3
+	} MoveDirectionType;
 	friend Object;
+	friend Character;
  public:
 	// OpenGl util
 	static int height_, width_;
 	GLFWwindow* window_;
 	static Camera* camera_;
 	// Bullet util
-	btDiscreteDynamicsWorld* bt_world_;
-	btDefaultCollisionConfiguration* bt_configure_;
+	btSoftRigidDynamicsWorld* bt_world_;
+	btSoftBodyRigidBodyCollisionConfiguration* bt_configure_;
+	// btDefaultCollisionConfiguration* bt_configure_;
 	btCollisionDispatcher* bt_dispatcher_;
 	btBroadphaseInterface* bt_overlapping_paircache_;
 	btSequentialImpulseConstraintSolver* bt_solver_;
+	btSoftBodySolver* bt_soft_solver_;
+	btSoftBodyWorldInfo bt_soft_info_;
 	// Object collections
 	std::vector<Object*> objects_;
+	// controller
+	Character* character_;
 
-	World(){
-		InitPhysics();
-		InitGraphics();
-		InitScene();
-	}
-	~World(){
-		delete bt_world_;
-		delete bt_solver_;
-		delete bt_overlapping_paircache_;
-		delete bt_dispatcher_;
-		delete bt_configure_;
-	}
+	World();
+	~World();
 	btRigidBody* createRigidBody (btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
 
 	void InitGraphics(void);
@@ -45,5 +47,6 @@ class World{
 	void Update(void);
 	void Run(void);
 	static void CursorPosCallback(GLFWwindow *window, double x, double y);
-
+	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+	void ProcessInput(void);
 };
