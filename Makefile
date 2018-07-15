@@ -1,4 +1,4 @@
-INCLUDE_DIRS = $(shell find include -type d -depth 1)
+INCLUDE_DIRS = $(shell find include -type d -maxdepth 1)
 INCLUDE_DIR_FLAG = $(addprefix -I, $(INCLUDE_DIRS))
 LIB_DIR = lib
 LIB_DIR_FLAG = -L$(LIB_DIR)
@@ -8,3 +8,6 @@ CC = clang++
 STD_FLAG = -std=c++11
 
 SRCS = $(wildcard src/*.c src/*.cpp)
+
+all:
+	$(CC) $(LIB_DIR_FLAG) $(INCLUDE_DIR_FLAG) $(STD_FLAG) $(SRCS) -o main $(LIB_FLAGS)
