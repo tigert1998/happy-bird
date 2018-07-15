@@ -30,10 +30,5 @@
 #define GLM_ZERO	glm::vec3(0.0f,0.0f,0.0f)
 #define GLM_UP		glm::vec3(0.0f,1.0f,0.0f)
 
-#include <filesystem>
-
 #define _USE_MATH_DEFINES
 #include <cmath>
-// #ifndef M_PI
-// #define M_PI 	(3.1415926535897932384626533)
-// #endif
