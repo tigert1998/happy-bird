@@ -1,0 +1,9 @@
+*_test
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.exe
+.tags*
+paxos

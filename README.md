@@ -1,8 +1,8 @@
-# Happy-Bird : Angry Bird game in 3D
+# Happy-Bird : A Journey seeking for light
 
 This collaborative repository implements a 3D game called Happy Bird based on OpenGL.
 
-Happy Bird is similar to Angry Bird except that it introduce new game mechanics by adding 3D control dimension.
+It tells a story of a lonely bird man, travelling through land of darkness in pursuit of his delight of light.
 
 ## Feature
 
@@ -33,7 +33,7 @@ Happy Bird is similar to Angry Bird except that it introduce new game mechanics 
 
 ## Build
 
-Prerequisite: google test, OpenGL
+Prerequisite: google test, OpenGL 3.3.0, assimp.
 
 
 
