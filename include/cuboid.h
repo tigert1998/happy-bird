@@ -2,14 +2,13 @@
 
 #include "shader.h"
 #include "camera.h"
+#include "bullet_common.h"
 
 #include <vector>
 #include <iostream>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
-#include <btBulletDynamicsCommon.h>
 
 class Cuboid {
 private:
@@ -25,6 +24,6 @@ public:
 	Cuboid(btVector3 half_extents, glm::vec3 color = glm::vec3(1, 1, 1));
 	~Cuboid();
 	btCollisionShape *shape() const;
-	void Draw(Camera *camera) const;
+	void Draw(const Camera *camera, btTransform transform) const;
 
 };

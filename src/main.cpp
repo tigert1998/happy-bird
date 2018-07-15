@@ -1,4 +1,5 @@
 #include "cuboid.h"
+#include "sphere.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -6,7 +7,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <btBulletDynamicsCommon.h>
+#include "bullet_common.h"
 
 using namespace std;
 using namespace glm;
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(width, height, "", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
@@ -46,91 +47,84 @@ int main(int argc, char** argv)
 	btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
 	btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
 	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+	btDiscreteDynamicsWorld* dynamic_world = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+	dynamic_world->setGravity(btVector3(0, -10, 0));
 
-	btAlignedObjectArray<btCollisionShape*> collisionShapes;
+	btAlignedObjectArray<btCollisionShape*> collision_shapes;
 
 	glfwSetCursorPosCallback(window, CursorPosCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	auto ground = Cuboid(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
+	auto sphere = Sphere(1, glm::vec3(1, 0, 0));
 
 	{
-		collisionShapes.push_back(ground.shape());
+		collision_shapes.push_back(ground.shape());
 
-		btTransform groundTransform;
-		groundTransform.setIdentity();
-		groundTransform.setOrigin(btVector3(0, -56, 0));
+		btTransform ground_transform;
+		ground_transform.setIdentity();
+		ground_transform.setOrigin(btVector3(0, -56, 0));
 
 		btScalar mass(0.);
 
 		bool isDynamic = (mass != 0.f);
 
-		btVector3 localInertia(0, 0, 0);
+		btVector3 local_inertia(0, 0, 0);
 		if (isDynamic)
-			ground.shape()->calculateLocalInertia(mass, localInertia);
+			ground.shape()->calculateLocalInertia(mass, local_inertia);
 
-		btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, ground.shape(), localInertia);
-		btRigidBody* body = new btRigidBody(rbInfo);
+		btDefaultMotionState* motion_state = new btDefaultMotionState(ground_transform);
+		btRigidBody::btRigidBodyConstructionInfo rb_info(mass, motion_state, ground.shape(), local_inertia);
+		btRigidBody* body = new btRigidBody(rb_info);
 
-		dynamicsWorld->addRigidBody(body);
+		dynamic_world->addRigidBody(body);
 	}
 
 	{
-		btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-		collisionShapes.push_back(colShape);
 
-		btTransform startTransform;
-		startTransform.setIdentity();
+		collision_shapes.push_back(sphere.shape());
+
+		btTransform start_transform;
+		start_transform.setIdentity();
+		start_transform.setOrigin(btVector3(2, 10, 0));
 
 		btScalar mass(1.f);
 
 		bool isDynamic = (mass != 0.f);
 
-		btVector3 localInertia(0, 0, 0);
+		btVector3 local_inertia(0, 0, 0);
 		if (isDynamic)
-			colShape->calculateLocalInertia(mass, localInertia);
+			sphere.shape()->calculateLocalInertia(mass, local_inertia);
 
-		startTransform.setOrigin(btVector3(2, 10, 0));
+		btDefaultMotionState* motion_state = new btDefaultMotionState(start_transform);
+		btRigidBody::btRigidBodyConstructionInfo rb_info(mass, motion_state, sphere.shape(), local_inertia);
+		btRigidBody* body = new btRigidBody(rb_info);
 
-		btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-		btRigidBody* body = new btRigidBody(rbInfo);
-
-		dynamicsWorld->addRigidBody(body);
+		dynamic_world->addRigidBody(body);
 	}
 
+	float last_time = 0, current_time = 0;
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		ground.Draw(camera);
+		current_time = glfwGetTime();
+		float delta_time = current_time - last_time;
+		last_time = current_time;
+
+		dynamic_world->stepSimulation(delta_time);
+		btTransform transform;
+
+		btRigidBody::upcast(dynamic_world->getCollisionObjectArray()[0])->getMotionState()->getWorldTransform(transform);
+		ground.Draw(camera, transform);
+
+		btRigidBody::upcast(dynamic_world->getCollisionObjectArray()[1])->getMotionState()->getWorldTransform(transform);
+		sphere.Draw(camera, transform);
+
+		printf("sphere %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-	}
-
-	for (i = 0; i < 150; i++)
-	{
-		dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-
-		for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-		{
-			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-			btRigidBody* body = btRigidBody::upcast(obj);
-			btTransform trans;
-			if (body && body->getMotionState())
-			{
-				body->getMotionState()->getWorldTransform(trans);
-			}
-			else
-			{
-				trans = obj->getWorldTransform();
-			}
-			printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
-		}
 	}
 }

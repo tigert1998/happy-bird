@@ -22,7 +22,6 @@ Cuboid::Cuboid(btVector3 half_extents, glm::vec3 color): color_(color) {
 	shader_ = new Shader("shader/cuboid.vert", "shader/cuboid.frag");
 
 	glGenVertexArrays(1, &vao);
-
 	glGenBuffers(1, &vbo);
 	glGenBuffers(1, &ebo);
 
@@ -49,11 +48,11 @@ btCollisionShape *Cuboid::shape() const {
 	return shape_;
 }
 
-void Cuboid::Draw(Camera* camera) const {
+void Cuboid::Draw(const Camera *camera, btTransform transform) const {
 	using namespace glm;
 	shader_->Use();
 	shader_->SetUniform<vec3>("uColor", color_);
-	shader_->SetUniform<mat4>("uModelMatrix", mat4(1));
+	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<mat4>("uViewMatrix", camera->GetViewMatrix());
 	shader_->SetUniform<mat4>("uProjectionMatrix", camera->GetProjectionMatrix());
 

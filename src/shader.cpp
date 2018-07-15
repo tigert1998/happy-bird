@@ -48,6 +48,17 @@ void Shader::Use() const {
 	glUseProgram(id);
 }
 
+template <>
+void Shader::SetUniform(const std::string &identifier, btTransform value) const {
+	auto location = glGetUniformLocation(id, identifier.c_str());
+#ifdef DEBUG
+	if (location < 0) throw ShaderSettingError(identifier);	
+#endif
+	btScalar data[16];
+	value.getOpenGLMatrix(data);
+	glUniformMatrix4fv(location, 1, GL_FALSE, data);
+}
+
 template <> 
 void Shader::SetUniform(const std::string &identifier, glm::vec3 value) const {
 	auto location = glGetUniformLocation(id, identifier.c_str());

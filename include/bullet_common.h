@@ -20,3 +20,4 @@
 #endif
 
 #include "bullet/btBulletDynamicsCommon.h"
+#include "bullet/BulletCollision/CollisionShapes/btShapeHull.h"
