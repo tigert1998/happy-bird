@@ -24,12 +24,12 @@ btRigidBody* World::createRigidBody (btScalar mass, const btTransform& startTran
 
 void World::InitGraphics(void){
 	glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  window_ = glfwCreateWindow(width_, height_, "Window", nullptr, nullptr);
+	window_ = glfwCreateWindow(width_, height_, "Window", nullptr, nullptr);
 	glfwMakeContextCurrent(window_);
 	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
@@ -64,7 +64,7 @@ void World::InitScene(void){
 	objects_.push_back( new Sphere(this, nullptr, start_transform, 1) );
 }
 void World::Update(void){ // sync mesh and render
-	float last_time, current_time;
+	static float last_time = glfwGetTime(), current_time = 0;
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

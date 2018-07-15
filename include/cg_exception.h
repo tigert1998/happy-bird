@@ -4,12 +4,12 @@
 
 class FileNotExistsError: public std::exception {
 public:
-    FileNotExistsError() = delete;
-    FileNotExistsError(const std::string &path);
-    const char *what() const noexcept;
-    
+		FileNotExistsError() = delete;
+		FileNotExistsError(const std::string &path);
+		const char *what() const noexcept;
+		
 private:
-    std::string error_message;
+		std::string error_message;
 };
 
 class ShaderCompileError: public std::exception {

@@ -64,8 +64,14 @@ void Object::InitMesh(void){
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(parent_transform);
 	btCollisionShape* bt_shape = bt_object_->getCollisionShape();
 	InitMesh(bt_shape, parent_transform);
+	// cout << "Vertices: ";
 	// for(auto& i : vertices_){
-		// cout << i << ", ";
+	// 	cout << i << ", ";
+	// }
+	// cout << endl;
+	// cout << "Indices: ";
+	// for(auto& i : indices_){
+	// 	cout << i << ", ";
 	// }
 	// cout << endl;
 }
@@ -92,7 +98,6 @@ void Object::InitMesh(btCollisionShape* bt_shape, const btTransform& parent_tran
 			verts[1] = plane_origin - vec0*vecLen + vec1*vecLen;
 			verts[2] = plane_origin - vec0*vecLen - vec1*vecLen;
 			verts[3] = plane_origin + vec0*vecLen - vec1*vecLen;
-				
 			int startIndex = vertices_.size();
 			indices_.push_back(startIndex+0);
 			indices_.push_back(startIndex+1);
@@ -186,7 +191,7 @@ void Object::InitMesh(btCollisionShape* bt_shape, const btTransform& parent_tran
 						{
 
 							btVector3 pos = parent_transform*triangleVerts[v];
-							indices_.push_back(vertices_.size());
+							indices_.push_back(vertices_.size() / 3);
 							vertices_.push_back(pos[0]);
 							vertices_.push_back(pos[1]);
 							vertices_.push_back(pos[2]);
@@ -233,7 +238,7 @@ void Object::InitMesh(btCollisionShape* bt_shape, const btTransform& parent_tran
 							{
 								int index = hull->getIndexPointer()[t*3+v];
 								btVector3 pos =parent_transform*hull->getVertexPointer()[index];
-								indices_.push_back(vertices_.size());
+								indices_.push_back(vertices_.size() / 3);
 								vertices_.push_back(pos[0]);
 								vertices_.push_back(pos[1]);
 								vertices_.push_back(pos[2]);
@@ -284,6 +289,7 @@ Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 h
 		new btBoxShape( ToBtVec(half_extents) ) );
 	// create mesh //
 	InitMesh();
+	ImportToGraphics();
 	// patch shader
 	if(!shader){
 		shader_ = new Shader("shader/cuboid.vert", "shader/cuboid.frag");
@@ -307,6 +313,7 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 		new btSphereShape( btScalar(radius) ));
 	// create mesh //
 	InitMesh();
+	ImportToGraphics();
 	if(!shader){
 		shader_ = new Shader("shader/sphere.vert", "shader/sphere.frag");
 	}

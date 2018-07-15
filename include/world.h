@@ -43,7 +43,7 @@ class World{
 	void InitPhysics(void);
 	void InitScene(void);
 	void Update(void);
- 	void Run(void);
+	void Run(void);
 	static void CursorPosCallback(GLFWwindow *window, double x, double y);
 
 };
