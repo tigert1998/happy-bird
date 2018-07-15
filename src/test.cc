@@ -99,6 +99,11 @@ int main(int argc, char** argv)
 	ghost_object->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT)
 
 	controller = new btKinematicCharacterController(ghost_object, sphere_shape, 0.4); // steo height ?
+	dynamicsWorld->addCollisionObject(ghost_object, 
+		btBroadphaseProxy::CharacterFilter, 
+		btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter,
+		dynamicsWorld->addAction(controller)
+		)
 
 	// {
 	// 	//create a dynamic rigidbody

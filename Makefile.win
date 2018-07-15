@@ -1,9 +1,11 @@
 CC = cl
-FLAGS = /MTd /I./include
+FLAGS = /MTd /I./include /I./include/bullet /std:c++latest
+SRC_PATH = ./src
+SRC = $(SRC_PATH)/main.cpp $(SRC_PATH)/camera.cpp $(SRC_PATH)/cg_exception.cpp $(SRC_PATH)/file_manager.cpp $(SRC_PATH)/glad_win.c $(SRC_PATH)/object.cc $(SRC_PATH)/shader.cpp $(SRC_PATH)/world.cc
 
-
-all: $(SRC_PATH)/$(SRC)
-	$(CC) $(SRC_PATH)/main.cc -o main $(FLAGS) & $(CC) $(TEST_PATH)/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml
+# & $(CC) $(TEST_PATH)/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml
+all: $(SRC)
+	$(CC) $(SRC) $(FLAGS) 
 
 bullet: ./src/test.cc
 	$(CC) ./src/test.cc $(FLAGS)

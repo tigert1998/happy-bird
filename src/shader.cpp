@@ -49,7 +49,7 @@ void Shader::Use() const {
 }
 
 template <>
-void Shader::SetUniform(const std::string &identifier, btTransform value) const {
+void Shader::SetUniform(const std::string &identifier, const btTransform& value) const {
 	auto location = glGetUniformLocation(id, identifier.c_str());
 #ifdef DEBUG
 	if (location < 0) throw ShaderSettingError(identifier);	
@@ -60,7 +60,7 @@ void Shader::SetUniform(const std::string &identifier, btTransform value) const 
 }
 
 template <> 
-void Shader::SetUniform(const std::string &identifier, glm::vec3 value) const {
+void Shader::SetUniform(const std::string &identifier, const glm::vec3& value) const {
 	auto location = glGetUniformLocation(id, identifier.c_str());
 #ifdef DEBUG
 	if (location < 0) throw ShaderSettingError(identifier);	
@@ -69,7 +69,7 @@ void Shader::SetUniform(const std::string &identifier, glm::vec3 value) const {
 }
 
 template <> 
-void Shader::SetUniform(const std::string &identifier, glm::mat4 value) const {
+void Shader::SetUniform(const std::string &identifier, const glm::mat4& value) const {
 	auto location = glGetUniformLocation(id, identifier.c_str());
 #ifdef DEBUG
 	if (location < 0) throw ShaderSettingError(identifier);	
@@ -78,7 +78,7 @@ void Shader::SetUniform(const std::string &identifier, glm::mat4 value) const {
 }
 
 template <> 
-void Shader::SetUniform(const std::string &identifier, int32_t value) const {
+void Shader::SetUniform(const std::string &identifier, const int32_t& value) const {
 	auto location = glGetUniformLocation(id, identifier.c_str());
 #ifdef DEBUG
 	if (location < 0) throw ShaderSettingError(identifier);	
@@ -87,7 +87,7 @@ void Shader::SetUniform(const std::string &identifier, int32_t value) const {
 }
 
 template <> 
-void Shader::SetUniform(const std::string &identifier, float value) const {
+void Shader::SetUniform(const std::string &identifier, const float& value) const {
 	auto location = glGetUniformLocation(id, identifier.c_str());
 #ifdef DEBUG
 	if (location < 0) throw ShaderSettingError(identifier);	

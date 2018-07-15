@@ -17,7 +17,7 @@ public:
 	Shader() = delete;
 	Shader(const std::string &vs_path, const std::string &fs_path);
 	void Use() const;
-	template <typename T> void SetUniform(const std::string &identifier, T) const;
+	template <typename T> void SetUniform(const std::string &identifier, const T&) const;
 
 private:
 	const FileManager file_manager = FileManager();
