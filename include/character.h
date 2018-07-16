@@ -16,6 +16,4 @@ class Character{
 	void Rotate(bool left, float step);;
 	void Jump(float step);
 	void ResetMove(void);
-	btTransform GetTransform(void);
-	// void GetTransform(const btTransform& trans);
 };

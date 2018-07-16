@@ -90,7 +90,7 @@ void World::InitScene(void){
   character_ = man->character_;
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   // Cloth
-  // objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
+  objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
 }
 void World::Update(void){ // sync mesh and render
   ProcessInput();

@@ -14,6 +14,8 @@ Head::Head(World* world, Shader* shader,
 		20,
 		transform,
 		new btSphereShape( btScalar(radius) ));
+	delegate_ = world_->createRigidBody(1, transform, new btSphereShape(btScalar(0.1)));
+	delegate_->setCollisionFlags(64); // CF_DISABLE_SPU_COLLISION_PROCESSING = 64 
 	// create mesh //
 	InitMesh();
 	ImportToGraphics();
@@ -32,6 +34,8 @@ void Head::Draw(Camera* camera){
 	// Object::Draw(camera);
 	// return ;
 	btTransform trans = character_->ghost_object_->getWorldTransform();
-	// printf("Head %f, %f, %f\n", float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+	delegate_->setWorldTransform(trans);
+	// bt_object_->setWorldTransform(trans);
+	printf("Head %f, %f, %f\n", float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 	Object::Draw(camera, trans);
 }

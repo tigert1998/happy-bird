@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "world.h"
 #include "cloth.h"
 
@@ -22,16 +25,21 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	world_->bt_world_->addSoftBody(softBody);
 	// Attachment //
 	float radius = head->getRadius();
+	// attached_ = head->bt_object_;
+	attached_ = head->delegate_;
+	auto trans = attached_->getWorldTransform();
+	std::cout << "Attached object: " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
+	// btCollisionObject* object = head->character_->ghost_object_;
 	btVector3 left(-radius,0,0.2);
 	btVector3 fleft(-0.5*radius,0.866*radius,0.2);
 	btVector3 right(radius,0,0.2);
 	btVector3 fright(0.5*radius,0.866*radius,0.2);
 	btVector3 back(0,-2,0.2);
-	softBody->appendAnchor(0, static_cast<btRigidBody*>(head->bt_object_), fright);
-	softBody->appendAnchor((subd-1)/2, static_cast<btRigidBody*>(head->bt_object_), back);
-	softBody->appendAnchor(subd-1, static_cast<btRigidBody*>(head->bt_object_), fleft);
-	softBody->appendAnchor(1, static_cast<btRigidBody*>(head->bt_object_), left);
-	softBody->appendAnchor(subd- 2, static_cast<btRigidBody*>(head->bt_object_), right);
+	softBody->appendAnchor(0, static_cast<btRigidBody*>(attached_), fright);
+	softBody->appendAnchor((subd-1)/2, static_cast<btRigidBody*>(attached_), back);
+	softBody->appendAnchor(subd-1, static_cast<btRigidBody*>(attached_), fleft);
+	softBody->appendAnchor(1, static_cast<btRigidBody*>(attached_), left);
+	softBody->appendAnchor(subd- 2, static_cast<btRigidBody*>(attached_), right);
 
 	softBody->getCollisionShape()->setUserPointer((void*)softBody);
 
@@ -41,6 +49,8 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	return ;
 }
 void Cloth::Draw(Camera* camera){
+	auto trans = attached_->getWorldTransform();
+	std::cout << "Attached object: " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
 	InitMesh();
 	ImportToGraphics();
 	Object::Draw(camera);

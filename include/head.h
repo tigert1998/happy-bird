@@ -8,6 +8,7 @@ class Camera;
 class Head: public LivingObject{
 	float radius_;
  public:
+	btRigidBody* delegate_;
  	Head() = delete;
 	Head(World*, Shader*,	const btTransform&, float, Color color = color::Red());
 	~Head(){ }

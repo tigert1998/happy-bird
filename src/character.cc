@@ -51,7 +51,7 @@ void Character::Rotate(bool left, float step){
 	// std::cout << "Basis: " << orn[0][0] << ", " << orn[0][1] << ", " << orn[0][2] << std::endl 
 	// 	<< "       " << orn[1][0] << ", " << orn[1][1] << ", " << orn[1][2] << std::endl
 	// 	<< "       " << orn[2][0] << ", " << orn[2][1] << ", " << orn[2][2] << std::endl;
-	orn *= btMatrix3x3(btQuaternion(btVector3(0,1,0),0.01 * (left?1:-1) ));
+	orn *= btMatrix3x3(btQuaternion(btVector3(0,1,0),0.01 * (left?-1:1) ));
 	step = 1;
 	ghost_object_->getWorldTransform().setBasis(orn);
 }
