@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "world.h"
 
 int World::height_ = 600;
@@ -49,6 +52,7 @@ void World::InitGraphics(void){
   glfwSetCursorPosCallback(window_, World::CursorPosCallback );
   glfwSetKeyCallback(window_, World::KeyCallback);
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glEnable(GL_DEPTH_TEST);
   memset(keys_pressed_, 0, sizeof(keys_pressed_));
 }
 
@@ -81,14 +85,13 @@ void World::InitScene(void){
   btTransform start_transform;
   start_transform.setIdentity();
   start_transform.setOrigin(btVector3(2, 10, 0));
-  objects_.push_back( new Head(this, nullptr, start_transform, 2) );
+  LivingObject* man = new Head(this, nullptr, start_transform, 2);
+  objects_.push_back(man);
+  character_ = man->character_;
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
-  character_ = new Character(this, objects_.back()->bt_object_->getCollisionShape());
   // Cloth
   // objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
 }
-#include <iostream>
-using namespace std;
 void World::Update(void){ // sync mesh and render
   ProcessInput();
   static float last_time = glfwGetTime(), current_time = 0;
@@ -139,11 +142,13 @@ void World::ProcessInput(void){
   last_time = current_time;
   if (keys_pressed_[GLFW_KEY_W]) // Forward
     character_->Move(true, delta_time);
-  if (keys_pressed_[GLFW_KEY_S])
+  else if (keys_pressed_[GLFW_KEY_S])
     character_->Move(false, delta_time);
+  else
+    character_->ResetMove();   
   if (keys_pressed_[GLFW_KEY_A]) // Left
     character_->Rotate(true, delta_time);
-  if (keys_pressed_[GLFW_KEY_D])
+  else if (keys_pressed_[GLFW_KEY_D])
     character_->Rotate(false, delta_time);
   if (keys_pressed_[GLFW_KEY_SPACE])
     character_->Jump(delta_time);

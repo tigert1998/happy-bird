@@ -28,10 +28,10 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	btVector3 fright(0.5*radius,0.866*radius,0.2);
 	btVector3 back(0,-2,0.2);
 	softBody->appendAnchor(0, static_cast<btRigidBody*>(head->bt_object_), fright);
-	// softBody->appendAnchor((subd-1)/2, static_cast<btRigidBody*>(head->bt_object_), back);
-	// softBody->appendAnchor(subd-1, static_cast<btRigidBody*>(head->bt_object_), fleft);
-	// softBody->appendAnchor(1, static_cast<btRigidBody*>(head->bt_object_), left);
-	// softBody->appendAnchor(subd- 2, static_cast<btRigidBody*>(head->bt_object_), right);
+	softBody->appendAnchor((subd-1)/2, static_cast<btRigidBody*>(head->bt_object_), back);
+	softBody->appendAnchor(subd-1, static_cast<btRigidBody*>(head->bt_object_), fleft);
+	softBody->appendAnchor(1, static_cast<btRigidBody*>(head->bt_object_), left);
+	softBody->appendAnchor(subd- 2, static_cast<btRigidBody*>(head->bt_object_), right);
 
 	softBody->getCollisionShape()->setUserPointer((void*)softBody);
 

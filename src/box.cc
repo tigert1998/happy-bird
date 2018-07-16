@@ -24,6 +24,6 @@ Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 h
 void Box::Draw(Camera* camera){
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	printf("Box %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
+	// printf("Box %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
 	Object::Draw(camera, transform);
 }

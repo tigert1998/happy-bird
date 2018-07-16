@@ -12,10 +12,10 @@ Object::Object(World* w, Shader* shader):
 	world_(w),
 	shader_(shader),
 	bt_object_(nullptr){
-		glGenVertexArrays(1, &vao_);
-		glGenBuffers(1, &vbo_);
-		glGenBuffers(1, &ebo_);
-	}
+	glGenVertexArrays(1, &vao_);
+	glGenBuffers(1, &vbo_);
+	glGenBuffers(1, &ebo_);
+}
 Object::~Object(){
 	// delete world_;
 	delete shader_;
@@ -48,7 +48,7 @@ void Object::Draw(Camera* camera, const btTransform& transform){
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->GetViewMatrix());
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->GetProjectionMatrix());
-	cout << camera->position()[0] << ", "<< camera->position()[1] <<", "<< camera->position()[2] << endl;
+	// cout << camera->position()[0] << ", "<< camera->position()[1] <<", "<< camera->position()[2] << endl;
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -380,3 +380,5 @@ void Object::InitSoftMesh(btSoftBody* psb){
 	} // end of else if clause
 }
 
+LivingObject::LivingObject(World* world, Shader* shader):
+	Object(world, shader), character_(nullptr){ }
