@@ -2,14 +2,17 @@
 using namespace std;
 
 #include "world.h"
+#include "color.h"
 #include "object_common.h"
 
-int World::height_ = 600;
-int World::width_ = 800;
-bool keys_pressed_[1024];
+int World::height = 600;
+int World::width = 800;
+bool World::keys_pressed[1024];
 
-Camera* World::camera_ = new Camera(glm::vec3(25, 51, 25), (double) World::width_ / (double) World::height_);
-Light* World::light_ = new Light(glm::vec3(-1, -1, -1), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.7f, 0.7f, 0.7f));
+Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
+Light* World::light = new Light(glm::vec3(-1, -1, -1), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.7f, 0.7f, 0.7f));
+btVector3 World::origin(0,0,0);
+btScalar World::character_height(8);
 
 World::World() {
   InitPhysics();
@@ -23,6 +26,16 @@ World::~World() {
   delete bt_overlapping_paircache_;
   delete bt_dispatcher_;
   delete bt_configure_;
+}
+
+btSoftRigidDynamicsWorld* World::bt_world(void) const {
+  return bt_world_;
+}
+btBroadphaseInterface* World::bt_broadphase(void) const{
+  return bt_overlapping_paircache_;
+}
+btSoftBodyWorldInfo& World::bt_info() {
+  return bt_soft_info_;
 }
 
 btRigidBody* World::CreateRigidBody(btScalar mass, const btTransform& transform, btCollisionShape* shape) {
@@ -50,7 +63,7 @@ void World::InitGraphics(void) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  window_ = glfwCreateWindow(width_, height_, "Window", nullptr, nullptr);
+  window_ = glfwCreateWindow(width, height, "Window", nullptr, nullptr);
   glfwMakeContextCurrent(window_);
   gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
@@ -59,7 +72,7 @@ void World::InitGraphics(void) {
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glEnable(GL_DEPTH_TEST);
-  memset(keys_pressed_, 0, sizeof(keys_pressed_));
+  memset(keys_pressed, 0, sizeof(keys_pressed));
 }
 
 void World::InitPhysics(void) {
@@ -88,18 +101,24 @@ void World::InitScene(void) {
   // Ground aka Box
   cout << "[World::InitScene()]" << endl;
   btTransform ground_transform;
+  btScalar half_bound = 50;
   ground_transform.setIdentity();
-  ground_transform.setOrigin(btVector3(0, -56, 0));
-  objects_.push_back( new Box(this, nullptr, ground_transform, glm::vec3(50,50,50))  );
+  ground_transform.setOrigin(btVector3(0, -half_bound , 0));
+  objects_.push_back( new Box(this, nullptr, 0, ground_transform, glm::vec3(half_bound, half_bound, half_bound))  );
+  btTransform box_transform;
+  btScalar box_half = World::character_height;
+  box_transform.setIdentity();
+  box_transform.setOrigin(btVector3(box_half * 2, box_half, 0));
+  objects_.push_back( new Box(this, nullptr, 35, box_transform, glm::vec3(box_half, box_half, box_half), color::Purple()) );
   // Sphere
   btTransform start_transform;
   start_transform.setIdentity();
-  start_transform.setOrigin(btVector3(2, 10, 0));
-  LivingObject* man = new Head(this, nullptr, start_transform, 2);
+  start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0) );
+  LivingObject* man = new Head(this, nullptr, start_transform, World::character_height / 4);
   objects_.push_back(man);
   character_ = man->character_;
 
-  camera_->set_accompany_object(man, 50);
+  camera->set_accompany_object(man, 50);
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   // Cloth
   objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
@@ -116,10 +135,9 @@ void World::Update(void) { // sync mesh and render
   last_time = current_time;
 
   bt_world_->stepSimulation(delta_time);
-  btTransform transform;
 
   for(auto& obj: objects_) {
-    obj->Draw(camera_, light_);
+    obj->Draw(camera, light);
   }
   glfwSwapBuffers(window_);
   glfwPollEvents();
@@ -133,10 +151,10 @@ void World::Run(void) {
 void World::CursorPosCallback(GLFWwindow *window, double x, double y) {
   static double mouse_x, mouse_y;
   static bool entered = false;
-  double new_x = x / World::width_ - 0.5;
-  double new_y = y / World::height_ - 0.5;
+  double new_x = x / World::width - 0.5;
+  double new_y = y / World::height - 0.5;
   if (entered) {
-    World::camera_->Rotate(mouse_x - new_x, mouse_y - new_y);
+    World::camera->Rotate(mouse_x - new_x, mouse_y - new_y);
   }
   mouse_x = new_x;
   mouse_y = new_y;
@@ -146,7 +164,7 @@ void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, i
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
   else
-    keys_pressed_[key] = (action != GLFW_RELEASE);
+    keys_pressed[key] = (action != GLFW_RELEASE);
 }
 void World::ProcessInput(void) {
   if(!character_)return ;
@@ -154,16 +172,15 @@ void World::ProcessInput(void) {
   current_time = glfwGetTime();
   float delta_time = current_time - last_time;
   last_time = current_time;
-  if (keys_pressed_[GLFW_KEY_W]) // Forward
+  character_->ResetMove();
+  if (keys_pressed[GLFW_KEY_W]) // Forward
     character_->Move(true, delta_time);
-  else if (keys_pressed_[GLFW_KEY_S])
+  else if (keys_pressed[GLFW_KEY_S])
     character_->Move(false, delta_time);
-  else
-    character_->ResetMove();   
-  if (keys_pressed_[GLFW_KEY_A]) // Left
+  if (keys_pressed[GLFW_KEY_A]) // Left
     character_->Rotate(true, delta_time);
-  else if (keys_pressed_[GLFW_KEY_D])
+  else if (keys_pressed[GLFW_KEY_D])
     character_->Rotate(false, delta_time);
-  if (keys_pressed_[GLFW_KEY_SPACE])
+  if (keys_pressed[GLFW_KEY_SPACE])
     character_->Jump(delta_time);
 }

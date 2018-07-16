@@ -30,6 +30,23 @@ Head::Head(World* world, Shader* shader,
 	}
 	// Bind to new character
 	character_ = new CharacterImpl(world_, transform, bt_object_);
+	// Add constraint
+	btVector3 pivotInA(0, World::character_height, 0);
+	btTransform tmpTrans(btTransform::getIdentity());
+	// tmpTrans.setOrigin(pivotInA);
+		// whether ref to frameInB
+	btGeneric6DofConstraint* level_constraint = new btGeneric6DofConstraint(*(dynamic_cast<btRigidBody*>(bt_object_)), tmpTrans, true);
+	btVector3 translation_lower(1, 0, 1);
+	btVector3 translation_upper(-1, World::character_height / 2, -1);
+	btVector3 rotation_lower(0, 0, 0);
+	btVector3 rotation_upper(0, 0, 0);
+	level_constraint->setLinearLowerLimit(translation_lower);
+	level_constraint->setLinearUpperLimit(translation_upper);
+	level_constraint->setAngularLowerLimit(rotation_lower);
+	level_constraint->setAngularUpperLimit(rotation_upper);
+	// btTypedConstraint* level_constraint = new btPoint2PointConstraint(*body, pivotInA);
+	world_->bt_world()->addConstraint((btTypedConstraint*)level_constraint);
+
 }
 btVector3 Head::GetOrigin(void){
 	return character_->GetDelegate()->getWorldTransform().getOrigin();

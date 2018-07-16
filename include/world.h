@@ -18,13 +18,9 @@ class World{
 		kBack = 3
 	} MoveDirectionType;
 	friend Object;
-	friend Character;
- public:
-	// OpenGl util
-	static int height_, width_;
+ protected:
+ 	// OpenGL util
 	GLFWwindow* window_;
-	static Camera* camera_;
-	static Light* light_;
 	// Bullet util
 	btSoftRigidDynamicsWorld* bt_world_;
 	btSoftBodyRigidBodyCollisionConfiguration* bt_configure_;
@@ -38,13 +34,19 @@ class World{
 	std::vector<Object*> objects_;
 	// controller
 	Character* character_;
+ public:
+ 	// shared
+ 	static bool keys_pressed [1024];
+	static int height, width;
+	static Camera* camera;
+	static Light* light;
+	static btVector3 origin;
+	static btScalar character_height; 
 
 	World();
 	~World();
 	btRigidBody* CreateRigidBody(btScalar mass, const btTransform&, btCollisionShape* shape);
-
 	void InitGraphics(void);
-
 	void InitPhysics(void);
 	void InitScene(void);
 	void Update(void);
@@ -52,4 +54,8 @@ class World{
 	static void CursorPosCallback(GLFWwindow *window, double x, double y);
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 	void ProcessInput(void);
+	btSoftRigidDynamicsWorld* bt_world(void) const ;
+	btBroadphaseInterface* bt_broadphase(void) const;
+	btSoftBodyWorldInfo& bt_info() ;
+
 };

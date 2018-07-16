@@ -14,7 +14,7 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 		shader_ = new Shader("shader/cloth.vert", "shader/cloth.frag");
 	// Create patch //
 	btSoftBody* softBody = btSoftBodyHelpers::CreatePatch(
-		world_->bt_soft_info_,
+		world_->bt_info(),
 		btVector3(- attachWid, clothLen, - attachWid),
 		btVector3(+ attachWid, clothLen, - attachWid),
 		btVector3(- attachWid, clothLen, + attachWid),
@@ -26,7 +26,7 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	// softBody->m_materials[0]->m_kLST = 0.5;
 	// softBody->setTotalMass(5);
 	// softBody->setPose(true, false);
-	world_->bt_world_->addSoftBody(softBody);
+	world_->bt_world()->addSoftBody(softBody);
 	// Attachment //
 	float radius = head->radius();
 	// attached_ = head->bt_object_;
@@ -34,11 +34,11 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	auto trans = attached_->getWorldTransform();
 	std::cout << "[Cloth::Cloth(World*, Shader*, float, float, uint32_t, Head*, Color)] " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
 	// btCollisionObject* object = head->character_->ghost_object_;
-	btVector3 left(-radius, 0, 0.2);
-	btVector3 fleft(-0.5 * radius, 0.866 * radius, 0.2);
-	btVector3 right(radius, 0, 0.2);
-	btVector3 fright(0.5 * radius, 0.866 * radius, 0.2);
-	btVector3 back(0, -2, 0.2);
+	btVector3 left(-radius, 0.2, 0);
+	btVector3 fleft(-0.5 * radius, 0.2, 0.866 * radius);
+	btVector3 right(radius, 0.2, 0);
+	btVector3 fright(0.5 * radius, 0.2, 0.866 * radius);
+	btVector3 back(0, 0.2, -2);
 
 	softBody->appendAnchor(0, static_cast<btRigidBody*>(attached_), fright);
 	softBody->appendAnchor((subd - 1) / 2, static_cast<btRigidBody*>(attached_), back);
