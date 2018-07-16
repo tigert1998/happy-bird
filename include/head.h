@@ -14,8 +14,8 @@ class Head: public LivingObject{
 	btRigidBody* delegate_;
  	Head() = delete;
 	Head(World*, Shader*, const btTransform&, float, Color color = color::Red());
-	~Head(){ }
-	void Draw(Camera*);
-	inline float getRadius(void) const {return radius_;}
+	~Head();
+	void Draw(Camera* camera, const Light* light);
+	float getRadius(void) const;
 };
 

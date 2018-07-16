@@ -8,14 +8,15 @@ int World::width_ = 800;
 bool keys_pressed_[1024];
 
 Camera* World::camera_ = new Camera(glm::vec3(25, 51, 25), (double) World::width_ / (double) World::height_);
+Light* World::light_ = new Light(glm::vec3(-1, -1, -1), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.7f, 0.7f, 0.7f));
 
-World::World(){
+World::World() {
   InitPhysics();
   InitGraphics();
   InitScene();
 }
 
-World::~World(){
+World::~World() {
   delete bt_world_;
   delete bt_solver_;
   delete bt_overlapping_paircache_;
@@ -23,8 +24,7 @@ World::~World(){
   delete bt_configure_;
 }
 
-btRigidBody* World::createRigidBody (btScalar mass, const btTransform& transform, btCollisionShape* shape)
-{
+btRigidBody* World::CreateRigidBody(btScalar mass, const btTransform& transform, btCollisionShape* shape) {
   bool isDynamic = (mass != 0.f);
 
   btVector3 localInertia(0,0,0);
@@ -41,7 +41,8 @@ btRigidBody* World::createRigidBody (btScalar mass, const btTransform& transform
   return body;
 }
 
-void World::InitGraphics(void){
+void World::InitGraphics(void) {
+  cout << "[World::InitGraphics()]" << endl;
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -60,17 +61,20 @@ void World::InitGraphics(void){
   memset(keys_pressed_, 0, sizeof(keys_pressed_));
 }
 
-void World::InitPhysics(void){
+void World::InitPhysics(void) {
+  cout << "[World::InitPhysics()]" << endl;
   bt_configure_ = new btSoftBodyRigidBodyCollisionConfiguration();
   bt_dispatcher_ = new btCollisionDispatcher(bt_configure_);
   bt_overlapping_paircache_ = new btDbvtBroadphase();
   bt_solver_ = new btSequentialImpulseConstraintSolver;
   bt_soft_solver_ = new btDefaultSoftBodySolver;
-  bt_world_ = new btSoftRigidDynamicsWorld(bt_dispatcher_,
+  bt_world_ = new btSoftRigidDynamicsWorld(
+    bt_dispatcher_,
     bt_overlapping_paircache_,
     bt_solver_, 
     bt_configure_,
-    bt_soft_solver_);
+    bt_soft_solver_
+  );
 
   bt_world_->setGravity(btVector3(0, -10, 0));
   bt_soft_info_.m_dispatcher = bt_dispatcher_;
@@ -79,9 +83,9 @@ void World::InitPhysics(void){
 
   character_ = nullptr;
 }
-void World::InitScene(void){
+void World::InitScene(void) {
   // Ground aka Box
-
+  cout << "[World::InitScene()]" << endl;
   btTransform ground_transform;
   ground_transform.setIdentity();
   ground_transform.setOrigin(btVector3(0, -56, 0));
@@ -99,7 +103,8 @@ void World::InitScene(void){
   // Cloth
   objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
 }
-void World::Update(void){ // sync mesh and render
+void World::Update(void) { // sync mesh and render
+  cout << "[World::Update()]" << endl;
   ProcessInput();
   static float last_time = glfwGetTime(), current_time = 0;
   glClearColor(0, 0, 0, 1);
@@ -112,14 +117,15 @@ void World::Update(void){ // sync mesh and render
   bt_world_->stepSimulation(delta_time);
   btTransform transform;
 
-  for(auto& obj: objects_){
-    obj->Draw(camera_);
+  for(auto& obj: objects_) {
+    obj->Draw(camera_, light_);
   }
   glfwSwapBuffers(window_);
   glfwPollEvents();
 }
-void World::Run(void){
-  while (!glfwWindowShouldClose(window_)){
+void World::Run(void) {
+  cout << "[World::Run()]" << endl;
+  while (!glfwWindowShouldClose(window_)) {
     Update();
   }
 }
@@ -141,7 +147,7 @@ void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, i
   else
     keys_pressed_[key] = (action != GLFW_RELEASE);
 }
-void World::ProcessInput(void){
+void World::ProcessInput(void) {
   if(!character_)return ;
   static float current_time, last_time;
   current_time = glfwGetTime();

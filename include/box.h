@@ -7,6 +7,6 @@ class Box: public DeadObject{
  public:
 	Box() = delete;
 	Box(World* world, Shader* shader, const btTransform& trans, glm::vec3 half_extents, Color color = color::Yellow());
-	void Draw(Camera* camera);
+	void Draw(Camera* camera, const Light* light);
 	~Box(){ }
 };
