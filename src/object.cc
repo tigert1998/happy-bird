@@ -1,3 +1,7 @@
+#include <iostream>
+using std::cout;
+using std::endl;
+
 #include "opengl_common.h"
 #include "bullet_common.h"
 
@@ -6,18 +10,41 @@
 #include "camera.h"
 
 // Base class //
+bool Object::isSoft(void) {
+	return is_soft_;
+}
+
+void Object::addTriangle(const btVector3& a, const btVector3& b, const btVector3& c) {
+	indices_.push_back(vertices_.size() / 3);
+	indices_.push_back(vertices_.size() / 3 + 1);
+	indices_.push_back(vertices_.size() / 3 + 2);
+	vertices_.push_back(a[0]);
+	vertices_.push_back(a[1]);
+	vertices_.push_back(a[2]);
+	vertices_.push_back(b[0]);
+	vertices_.push_back(b[1]);
+	vertices_.push_back(b[2]);
+	vertices_.push_back(c[0]);
+	vertices_.push_back(c[1]);
+	vertices_.push_back(c[2]);
+}
+
 Object::Object(World* w, Shader* shader):
 	world_(w),
 	shader_(shader),
 	bt_object_(nullptr){
 	glGenVertexArrays(1, &vao_);
-	glGenBuffers(1, &vbo_);
+	glGenBuffers(2, vbos_);
 	glGenBuffers(1, &ebo_);
 }
+
 Object::~Object(){
 	// delete world_;
 	delete shader_;
 	delete bt_object_;
+	glDeleteVertexArrays(1, &vao_);
+	glDeleteBuffers(2, vbos_);
+	glDeleteBuffers(1, &ebo_);
 }
 void Object::ImportToPhysics(){
 	world_->bt_world_->addRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
@@ -25,22 +52,32 @@ void Object::ImportToPhysics(){
 void Object::DeleteFromPhysics(){
 	world_->bt_world_->removeRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
-void Object::ImportToGraphics(){
+void Object::ImportToGraphics() {
+	cout << "[Object::ImportToGraphics()]" << endl;
 	glBindVertexArray(vao_);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbos_[0]);
 	glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(btScalar), vertices_.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbos_[1]);
+	glBufferData(GL_ARRAY_BUFFER, normals_.size() * sizeof(btScalar), normals_.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uint32_t), indices_.data(), GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
+	assert(vertices_.size() == normals_.size());
 
 	glBindVertexArray(0);
 }
-void Object::Draw(Camera* camera, const btTransform& transform){
+void Object::Draw(Camera* camera, const btTransform& transform, const Light* light) {
+	cout << "[Object::Draw(Camera*, const btTransform&)]" << endl;
 	shader_->Use();
+	light->Feed("uLight", shader_);
 	shader_->SetUniform<glm::vec3>("uColor", color_);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
@@ -49,19 +86,22 @@ void Object::Draw(Camera* camera, const btTransform& transform){
 	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
-void Object::Draw(Camera* camera){
+
+void Object::Draw(Camera* camera, const Light* light) {
+	cout << "[Object::Draw(Camera*)]" << endl;
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uColor", color_);
+	
 	btTransform transform;
-	if(!is_soft_){
+	if (!is_soft_) {
 		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	}
-	else{
+	} else {
 		transform.setIdentity();
 	}
+
+	light->Feed("uLight", shader_);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
-
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
 
 	glBindVertexArray(vao_);
@@ -70,9 +110,10 @@ void Object::Draw(Camera* camera){
 }
 
 void Object::InitMesh(void){
+	cout << "[Object::InitMesh()]" << endl;
 	vertices_.clear();
 	indices_.clear();
-	if(!is_soft_){
+	if (!is_soft_) {
 		btTransform parent_transform;
 		parent_transform.setIdentity();
 		// btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(parent_transform);

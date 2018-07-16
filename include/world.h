@@ -7,6 +7,8 @@
 #include "character.h"
 #include "camera.h"
 #include "shader.h"
+#include "character.h"
+#include "light.h"
 
 class World{
 	enum {
@@ -22,6 +24,7 @@ class World{
 	static int height_, width_;
 	GLFWwindow* window_;
 	static Camera* camera_;
+	static Light* light_;
 	// Bullet util
 	btSoftRigidDynamicsWorld* bt_world_;
 	btSoftBodyRigidBodyCollisionConfiguration* bt_configure_;

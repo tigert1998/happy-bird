@@ -6,6 +6,7 @@
 #include "character.h"
 #include "camera.h"
 #include "shader.h"
+#include "light.h"
 
 class World;
 class Cloth;
@@ -16,9 +17,9 @@ class Head: public LivingObject{
  public:
  	Head() = delete;
 	Head(World*, Shader*, const btTransform&, float, Color color = color::Red());
-	~Head(){ }
-	void Draw(Camera*);
+	~Head();
 	btVector3 GetOrigin(void);
-	inline float getRadius(void) const {return radius_;}
+	float radius(void) const;
+	void Draw(Camera* camera, const Light* light);
 };
 
