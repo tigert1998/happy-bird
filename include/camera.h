@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/constants.hpp>
 
 enum class MoveDirectionType {
 	FRONT, BACK, LEFT, RIGHT
@@ -12,7 +13,7 @@ enum class MoveDirectionType {
 class Camera {
 public:
 	Camera() = delete;
-	Camera(glm::vec3 position, double width_height_ratio, double alpha = -3.1415926535 / 2, double beta = 0);
+	Camera(glm::vec3 position, double width_height_ratio, double alpha = -glm::pi<double>() / 2, double beta = 0);
 	void Rotate(double delta_alpha, double delta_beta);
 	void Move(MoveDirectionType, float time);
 	glm::vec3 position() const;
@@ -24,11 +25,15 @@ public:
 	double beta() const;
 	void set_alpha(double alpha);
 	void set_beta(double beta);
+	glm::vec3 front() const;
+	void set_front(glm::vec3 new_front);
+	glm::vec3 center() const;
+	void set_center(glm::vec3 new_center);
 
 private:
 	const glm::vec3 up_ = glm::vec3(0, 1, 0);
 	glm::vec3 position_;
 	double alpha_, beta_, width_height_ratio_;
-	glm::vec3 front() const;
-
+	static const double MAX_ELEVATION;
+	
 };
