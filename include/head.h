@@ -11,10 +11,8 @@ class World;
 class Cloth;
 
 class Head: public LivingObject{
-	friend class Cloth;
+	friend Cloth;
 	float radius_;
- protected:
-	btRigidBody* delegate_;
  public:
  	Head() = delete;
 	Head(World*, Shader*, const btTransform&, float, Color color = color::Red());

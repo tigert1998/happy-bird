@@ -26,7 +26,7 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	// Attachment //
 	float radius = head->getRadius();
 	// attached_ = head->bt_object_;
-	attached_ = head->delegate_;
+	attached_ = head->character_->GetDelegate();
 	auto trans = attached_->getWorldTransform();
 	std::cout << "Attached object: " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
 	// btCollisionObject* object = head->character_->ghost_object_;
