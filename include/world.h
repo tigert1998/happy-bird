@@ -38,7 +38,7 @@ class World{
 
 	World();
 	~World();
-	btRigidBody* createRigidBody (btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
+	btRigidBody* createRigidBody (btScalar mass, const btTransform&, btCollisionShape* shape);
 
 	void InitGraphics(void);
 

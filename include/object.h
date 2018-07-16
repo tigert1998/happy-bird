@@ -5,10 +5,11 @@
 #include "opengl_common.h"
 #include "bullet_common.h"
 #include "color.h"
-#include "shader.h"
-#include "camera.h"
 
 class World;
+class Camera;
+class Shader;
+class Character;
 
 class Object{
  public:
@@ -34,7 +35,7 @@ class Object{
 	virtual void Draw(Camera* camera, const btTransform& transform);
 	virtual void Draw(Camera* camera);
 	virtual void InitMesh(void); // init from shape
-	virtual void InitRigidMesh(btCollisionShape* shape, const btTransform& trans);
+	virtual void InitRigidMesh(btCollisionShape* shape, const btTransform& transform);
 	virtual void InitMesh(std::string path){ } // init from assimp
 	virtual void InitSoftMesh(btSoftBody* shape);
 	// virtual void InitSoftMesh(btCollisionShape* shape);
@@ -56,12 +57,9 @@ class Object{
 };
 
 typedef Object DeadObject;
-// class LivingObject: public Object{
-// 	struct Character{
-// 		btPairCachingGhostObject* ghost_delegate;
-// 		btKinematicCharacterController* controller;
-// 	} *character_;
-// 	LivingObject(World* world, Shader* shader, Character* character);
-// 	virtual void InitControl();
-// };
+class LivingObject: public Object{
+ public:
+	Character *character_;
+	LivingObject(World* world, Shader* shader);
+};
 

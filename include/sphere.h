@@ -11,7 +11,6 @@ class Sphere: public DeadObject{
 	Sphere() = delete;
 	Sphere(World* world, Shader* shader, const btTransform& trans, float radius, Color color = color::Red());
 	void Draw(Camera* camera);
-	void CameraAccompany(Camera* camera);
 	~Sphere(){ }
 	// accessor
 	inline float getRadius(void){return radius_;}

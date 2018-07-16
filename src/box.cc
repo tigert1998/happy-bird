@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "world.h"
 #include "box.h"
 #include "vector_utility.h"
@@ -24,10 +27,8 @@ Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 h
 void Box::Draw(Camera* camera){
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	printf("Box %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
+	// printf("Box %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
 	Object::Draw(camera, transform);
 	btScalar data[16];
 	transform.getOpenGLMatrix(data);
-	printf("Box transform matrix:\n");
-	for (int i = 0; i < 16; i++) printf("data[%d] = %f\n", i, data[i]);
 }

@@ -1,5 +1,20 @@
 #pragma once
 
-#include "sphere.h"
+#include "color.h"
+#include "object.h"
 
-typedef Sphere Head;
+class World;
+class Character;
+class Camera;
+class Shader;
+
+class Head: public LivingObject{
+	float radius_;
+ public:
+ 	Head() = delete;
+	Head(World*, Shader*, const btTransform&, float, Color color = color::Red());
+	~Head(){ }
+	void Draw(Camera*);
+	inline float getRadius(void) const {return radius_;}
+};
+

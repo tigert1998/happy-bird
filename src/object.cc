@@ -12,10 +12,10 @@ Object::Object(World* w, Shader* shader):
 	world_(w),
 	shader_(shader),
 	bt_object_(nullptr){
-		glGenVertexArrays(1, &vao_);
-		glGenBuffers(1, &vbo_);
-		glGenBuffers(1, &ebo_);
-	}
+	glGenVertexArrays(1, &vao_);
+	glGenBuffers(1, &vbo_);
+	glGenBuffers(1, &ebo_);
+}
 Object::~Object(){
 	// delete world_;
 	delete shader_;
@@ -28,7 +28,6 @@ void Object::DeleteFromPhysics(){
 	world_->bt_world_->removeRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
 void Object::ImportToGraphics(){
-
 	glBindVertexArray(vao_);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
@@ -75,9 +74,10 @@ void Object::Draw(Camera* camera){
 void Object::InitMesh(void){
 	vertices_.clear();
 	indices_.clear();
-	if(!is_soft_){	
+	if(!is_soft_){
 		btTransform parent_transform;
-		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(parent_transform);
+		parent_transform.setIdentity();
+		// btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(parent_transform);
 		btCollisionShape* bt_shape = bt_object_->getCollisionShape();
 		InitRigidMesh(bt_shape, parent_transform);
 	}
@@ -108,7 +108,7 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 			verts[1] = plane_origin - vec0*vecLen + vec1*vecLen;
 			verts[2] = plane_origin - vec0*vecLen - vec1*vecLen;
 			verts[3] = plane_origin + vec0*vecLen - vec1*vecLen;
-			int startIndex = vertices_.size();
+			int startIndex = vertices_.size() / 3;
 			indices_.push_back(startIndex+0);
 			indices_.push_back(startIndex+1);
 			indices_.push_back(startIndex+2);
@@ -134,7 +134,6 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 		}
 		case TRIANGLE_MESH_SHAPE_PROXYTYPE:
 		{
-			
 
 			btBvhTriangleMeshShape* trimesh = (btBvhTriangleMeshShape*) bt_shape;
 			btVector3 trimeshScaling = trimesh->getLocalScaling();
@@ -379,3 +378,5 @@ void Object::InitSoftMesh(btSoftBody* psb){
 	} // end of else if clause
 }
 
+LivingObject::LivingObject(World* world, Shader* shader):
+	Object(world, shader), character_(nullptr){ }

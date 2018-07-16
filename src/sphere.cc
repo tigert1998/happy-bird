@@ -14,6 +14,7 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 	// create mesh //
 	InitMesh();
 	ImportToGraphics();
+	// bt_object_->setWorldTransform(transform);
 	if(!shader){
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	}
@@ -22,19 +23,6 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 void Sphere::Draw(Camera* camera) {
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	printf("Sphere %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
+	// printf("Sphere %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
 	Object::Draw(camera, transform);
-}
-
-void Sphere::CameraAccompany(Camera *camera) {
-	btTransform transform;
-	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	auto origin = BTVector3ToGLMVec3(transform.getOrigin());
-	camera->set_position(camera->position() + origin - camera->center());
-	camera->set_position(camera->position() - 2.0f * camera->front());
-	printf("sphere origin = %lf, %lf, %lf\n", origin[0], origin[1], origin[2]);
-	printf("camera center = %lf, %lf, %lf\n", camera->center()[0], camera->center()[1], camera->center()[2]);
-	printf("camera position = %lf, %lf, %lf\n", camera->position()[0], camera->position()[1], camera->position()[2]);
-	
-	fflush(stdout);
 }

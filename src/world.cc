@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "world.h"
 
 int World::height_ = 600;
@@ -20,7 +23,7 @@ World::~World(){
   delete bt_configure_;
 }
 
-btRigidBody* World::createRigidBody (btScalar mass, const btTransform& startTransform, btCollisionShape* shape)
+btRigidBody* World::createRigidBody (btScalar mass, const btTransform& transform, btCollisionShape* shape)
 {
   bool isDynamic = (mass != 0.f);
 
@@ -28,7 +31,7 @@ btRigidBody* World::createRigidBody (btScalar mass, const btTransform& startTran
   if (isDynamic)
     shape->calculateLocalInertia(mass,localInertia);
 
-  btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+  btDefaultMotionState* myMotionState = new btDefaultMotionState(transform);
   
   btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,shape,localInertia);
   btRigidBody* body = new btRigidBody(rbInfo);
@@ -87,14 +90,15 @@ void World::InitScene(void){
   btTransform start_transform;
   start_transform.setIdentity();
   start_transform.setOrigin(btVector3(2, 10, 0));
-  objects_.push_back( new Head(this, nullptr, start_transform, 2) );
+  LivingObject* man = new Head(this, nullptr, start_transform, 2);
+  objects_.push_back(man);
+  character_ = man->character_;
+
+  camera_->set_accompany_object(man, 10);
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
-  character_ = new Character(this, objects_.back()->bt_object_->getCollisionShape());
   // Cloth
   // objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
 }
-#include <iostream>
-using namespace std;
 void World::Update(void){ // sync mesh and render
   ProcessInput();
   static float last_time = glfwGetTime(), current_time = 0;
@@ -107,8 +111,6 @@ void World::Update(void){ // sync mesh and render
 
   bt_world_->stepSimulation(delta_time);
   btTransform transform;
-
-  dynamic_cast<Head*>(objects_[1])->CameraAccompany(camera_);
 
   for(auto& obj: objects_){
     obj->Draw(camera_);
@@ -147,11 +149,13 @@ void World::ProcessInput(void){
   last_time = current_time;
   if (keys_pressed_[GLFW_KEY_W]) // Forward
     character_->Move(true, delta_time);
-  if (keys_pressed_[GLFW_KEY_S])
+  else if (keys_pressed_[GLFW_KEY_S])
     character_->Move(false, delta_time);
+  else
+    character_->ResetMove();   
   if (keys_pressed_[GLFW_KEY_A]) // Left
     character_->Rotate(true, delta_time);
-  if (keys_pressed_[GLFW_KEY_D])
+  else if (keys_pressed_[GLFW_KEY_D])
     character_->Rotate(false, delta_time);
   if (keys_pressed_[GLFW_KEY_SPACE])
     character_->Jump(delta_time);

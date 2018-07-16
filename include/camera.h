@@ -1,6 +1,8 @@
 #pragma once
 #include "opengl_common.h"
 #include "bullet_common.h"
+#include "vector_utility.h"
+#include "object.h"
 #include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -29,11 +31,13 @@ public:
 	void set_front(glm::vec3 new_front);
 	glm::vec3 center() const;
 	void set_center(glm::vec3 new_center);
+	void set_accompany_object(Object* accompany_object, double surround_radius);
 
 private:
+	static const double MAX_ELEVATION;
 	const glm::vec3 up_ = glm::vec3(0, 1, 0);
 	glm::vec3 position_;
-	double alpha_, beta_, width_height_ratio_;
-	static const double MAX_ELEVATION;
+	double alpha_, beta_, width_height_ratio_, surround_radius_;
+	Object* accompany_object_;
 	
 };
