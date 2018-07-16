@@ -55,7 +55,7 @@ glm::vec3 Camera::front() const {
 
 void Camera::set_front(glm::vec3 new_front) {
 	new_front = glm::normalize(new_front);
-	beta_ = acos(new_front.y);
+	beta_ = asin(new_front.y);
 	alpha_ = acos(new_front.x / pow(pow(new_front.x, 2) + pow(new_front.z, 2), 0.5));
 	if (new_front.z < 0) alpha_ = 2 * glm::pi<double>() - alpha_;
 }

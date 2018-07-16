@@ -1,6 +1,6 @@
 #include "world.h"
 #include "box.h"
-#include "vec_converter.h"
+#include "vector_utility.h"
 
 // Plain Object
 Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 half_extents, Color color):
@@ -12,7 +12,7 @@ Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 h
 	bt_object_ = world_->createRigidBody(
 		0,
 		transform,
-		new btBoxShape( vector_converter::ToBtVec(half_extents) ) );
+		new btBoxShape( GLMVec3ToBTVector3(half_extents) ) );
 	// create mesh //
 	InitMesh();
 	ImportToGraphics();
@@ -26,4 +26,8 @@ void Box::Draw(Camera* camera){
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
 	printf("Box %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
 	Object::Draw(camera, transform);
+	btScalar data[16];
+	transform.getOpenGLMatrix(data);
+	printf("Box transform matrix:\n");
+	for (int i = 0; i < 16; i++) printf("data[%d] = %f\n", i, data[i]);
 }

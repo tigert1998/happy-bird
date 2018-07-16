@@ -3,12 +3,15 @@
 int World::height_ = 600;
 int World::width_ = 800;
 bool keys_pressed_[1024];
+
 Camera* World::camera_ = new Camera(glm::vec3(25, 51, 25), (double) World::width_ / (double) World::height_);
+
 World::World(){
   InitPhysics();
   InitGraphics();
   InitScene();
 }
+
 World::~World(){
   delete bt_world_;
   delete bt_solver_;
@@ -49,6 +52,8 @@ void World::InitGraphics(void){
   glfwSetCursorPosCallback(window_, World::CursorPosCallback );
   glfwSetKeyCallback(window_, World::KeyCallback);
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  glEnable(GL_DEPTH_TEST);
   memset(keys_pressed_, 0, sizeof(keys_pressed_));
 }
 
@@ -73,6 +78,7 @@ void World::InitPhysics(void){
 }
 void World::InitScene(void){
   // Ground aka Box
+
   btTransform ground_transform;
   ground_transform.setIdentity();
   ground_transform.setOrigin(btVector3(0, -56, 0));
@@ -101,6 +107,8 @@ void World::Update(void){ // sync mesh and render
 
   bt_world_->stepSimulation(delta_time);
   btTransform transform;
+
+  dynamic_cast<Head*>(objects_[1])->CameraAccompany(camera_);
 
   for(auto& obj: objects_){
     obj->Draw(camera_);

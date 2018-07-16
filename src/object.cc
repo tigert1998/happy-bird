@@ -3,7 +3,7 @@
 
 #include "object.h"
 #include "world.h"
-#include "vec_converter.h"
+#include "vector_utility.h"
 #include <iostream>
 #include <cstdio>
 using namespace std;
@@ -48,7 +48,6 @@ void Object::Draw(Camera* camera, const btTransform& transform){
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->GetViewMatrix());
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->GetProjectionMatrix());
-	cout << camera->position()[0] << ", "<< camera->position()[1] <<", "<< camera->position()[2] << endl;
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
