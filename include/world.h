@@ -3,7 +3,7 @@
 
 #include "opengl_common.h"
 #include "bullet_common.h"
-#include "object.h"
+#include "object_common.h"
 #include "camera.h"
 #include "shader.h"
 #include "character.h"
