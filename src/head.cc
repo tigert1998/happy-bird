@@ -28,14 +28,9 @@ Head::Head(World* world, Shader* shader,
 	character_ = new Character(world_, transform, bt_object_->getCollisionShape());
 }
 void Head::Draw(Camera* camera){
-	// btTransform transform;
-	// btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	// printf("Head %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
-	// Object::Draw(camera);
-	// return ;
 	btTransform trans = character_->ghost_object_->getWorldTransform();
 	delegate_->setWorldTransform(trans);
 	// bt_object_->setWorldTransform(trans);
-	printf("Head %f, %f, %f\n", float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+	// printf("Head %f, %f, %f\n", float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 	Object::Draw(camera, trans);
 }

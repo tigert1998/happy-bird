@@ -1,9 +1,12 @@
 #pragma once
 
 #include "object.h"
+#include "camera.h"
+#include "vector_utility.h"
 
 class Sphere: public DeadObject{
 	float radius_;
+
  public:
 	Sphere() = delete;
 	Sphere(World* world, Shader* shader, const btTransform& trans, float radius, Color color = color::Red());
@@ -11,4 +14,5 @@ class Sphere: public DeadObject{
 	~Sphere(){ }
 	// accessor
 	inline float getRadius(void){return radius_;}
+
 };

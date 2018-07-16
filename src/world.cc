@@ -6,12 +6,15 @@ using namespace std;
 int World::height_ = 600;
 int World::width_ = 800;
 bool keys_pressed_[1024];
+
 Camera* World::camera_ = new Camera(glm::vec3(25, 51, 25), (double) World::width_ / (double) World::height_);
+
 World::World(){
   InitPhysics();
   InitGraphics();
   InitScene();
 }
+
 World::~World(){
   delete bt_world_;
   delete bt_solver_;
@@ -52,6 +55,7 @@ void World::InitGraphics(void){
   glfwSetCursorPosCallback(window_, World::CursorPosCallback );
   glfwSetKeyCallback(window_, World::KeyCallback);
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
   glEnable(GL_DEPTH_TEST);
   memset(keys_pressed_, 0, sizeof(keys_pressed_));
 }
@@ -77,6 +81,7 @@ void World::InitPhysics(void){
 }
 void World::InitScene(void){
   // Ground aka Box
+
   btTransform ground_transform;
   ground_transform.setIdentity();
   ground_transform.setOrigin(btVector3(0, -56, 0));
@@ -88,6 +93,8 @@ void World::InitScene(void){
   LivingObject* man = new Head(this, nullptr, start_transform, 2);
   objects_.push_back(man);
   character_ = man->character_;
+
+  camera_->set_accompany_object(man, 10);
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   // Cloth
   objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
