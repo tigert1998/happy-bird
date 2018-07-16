@@ -379,38 +379,6 @@ void Object::InitSoftMesh(btSoftBody* psb){
 		}
 	} // end of else if clause
 }
-// void Object::InitSoftMesh(btCollisionShape* shape){
-// 	if (shape->getUserPointer()==0){
-// 		cout << "No user pointer available." << endl;
-// 		return;
-// 	}
-// 	btSoftBody* psb = (btSoftBody*)shape->getUserPointer();
-// 	vertices_.resize(psb->m_faces.size() * 3 * 3);
-// 	normals_.resize(psb->m_faces.size() * 3 * 3);
-// 	int i, j, k;
-// 	for (i = 0; i < psb->m_faces.size(); i++)  // Foreach face
-// 	{
-// 		for (k = 0; k < 3; k++)  // Foreach vertex on a face
-// 		{
-// 			int currentIndex = i * 3 + k;
-// 			for (int j = 0; j < 3; j++)
-// 			{
-// 				vertices_[currentIndex + j] = psb->m_faces[i].m_n[k]->m_x[j];
-// 			}
-// 			for (int j = 0; j < 3; j++)
-// 			{
-// 				normals_[currentIndex + j] = psb->m_faces[i].m_n[k]->m_n[j];
-// 			}
-// 			// for (int j = 0; j < 2; j++)
-// 			// {
-// 			// 	gfxVertices[currentIndex].uv[j] = 0.5;  //we don't have UV info...
-// 			// }
-// 			indices_.push_back(currentIndex); // ?
-// 		}
-// 	}
-// }
-
-
 
 // Plain Object
 Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 half_extents, Color color):
@@ -492,10 +460,11 @@ void Sphere::Draw(Camera* camera){
 
 typedef Sphere Head;
 // Soft Body //
-Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint32_t subd, Head* head):
+Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint32_t subd, Head* head, Color color):
 	DeadObject(world, shader), 
 	width_(attachWid),length_(clothLen),subdivide_(subd){
 	assert(world);
+	color_ = color;
 	is_soft_ = true;
 	if(!shader)shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	// Create patch //
@@ -517,10 +486,10 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	btVector3 fright(0.5*radius,0.866*radius,0.2);
 	btVector3 back(0,-2,0.2);
 	softBody->appendAnchor(0, static_cast<btRigidBody*>(head->bt_object_), fright);
-	softBody->appendAnchor((subd-1)/2, static_cast<btRigidBody*>(head->bt_object_), back);
-	softBody->appendAnchor(subd-1, static_cast<btRigidBody*>(head->bt_object_), fleft);
-	softBody->appendAnchor(1, static_cast<btRigidBody*>(head->bt_object_), left);
-	softBody->appendAnchor(subd- 2, static_cast<btRigidBody*>(head->bt_object_), right);
+	// softBody->appendAnchor((subd-1)/2, static_cast<btRigidBody*>(head->bt_object_), back);
+	// softBody->appendAnchor(subd-1, static_cast<btRigidBody*>(head->bt_object_), fleft);
+	// softBody->appendAnchor(1, static_cast<btRigidBody*>(head->bt_object_), left);
+	// softBody->appendAnchor(subd- 2, static_cast<btRigidBody*>(head->bt_object_), right);
 
 	softBody->getCollisionShape()->setUserPointer((void*)softBody);
 

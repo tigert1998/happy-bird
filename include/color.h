@@ -13,7 +13,10 @@ struct color{
 	}
 	static Color Yellow(void){
 		return glm::vec3(1,0.921569,0.231373);
-	}	
+	}
+	static Color Green(void){
+		return glm::vec3(0.803922,0.862745,0.223529);
+	}
 };
 
 

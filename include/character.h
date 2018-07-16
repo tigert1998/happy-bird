@@ -12,4 +12,5 @@ class Character{
 	Character(World*, btCollisionShape*);
 	~Character();
 	void Move(const btVector3&, float delta);
+	void Jump(float step);
 };
