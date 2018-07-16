@@ -35,7 +35,7 @@ class Object{
 	virtual void Draw(Camera* camera, const btTransform& transform);
 	virtual void Draw(Camera* camera);
 	virtual void InitMesh(void); // init from shape
-	virtual void InitRigidMesh(btCollisionShape* shape, const btTransform& trans);
+	virtual void InitRigidMesh(btCollisionShape* shape, const btTransform& transform);
 	virtual void InitMesh(std::string path){ } // init from assimp
 	virtual void InitSoftMesh(btSoftBody* shape);
 	// virtual void InitSoftMesh(btCollisionShape* shape);

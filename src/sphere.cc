@@ -14,6 +14,7 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 	// create mesh //
 	InitMesh();
 	ImportToGraphics();
+	// bt_object_->setWorldTransform(transform);
 	if(!shader){
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	}

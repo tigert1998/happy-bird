@@ -20,7 +20,7 @@ World::~World(){
   delete bt_configure_;
 }
 
-btRigidBody* World::createRigidBody (btScalar mass, const btTransform& startTransform, btCollisionShape* shape)
+btRigidBody* World::createRigidBody (btScalar mass, const btTransform& transform, btCollisionShape* shape)
 {
   bool isDynamic = (mass != 0.f);
 
@@ -28,7 +28,7 @@ btRigidBody* World::createRigidBody (btScalar mass, const btTransform& startTran
   if (isDynamic)
     shape->calculateLocalInertia(mass,localInertia);
 
-  btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+  btDefaultMotionState* myMotionState = new btDefaultMotionState(transform);
   
   btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,shape,localInertia);
   btRigidBody* body = new btRigidBody(rbInfo);

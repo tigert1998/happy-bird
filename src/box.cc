@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "world.h"
 #include "box.h"
 #include "vec_converter.h"

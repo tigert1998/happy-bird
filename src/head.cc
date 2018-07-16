@@ -17,6 +17,7 @@ Head::Head(World* world, Shader* shader,
 	// create mesh //
 	InitMesh();
 	ImportToGraphics();
+	// bt_object_->setWorldTransform(transform);
 	if(!shader){
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	}
@@ -31,6 +32,6 @@ void Head::Draw(Camera* camera){
 	// Object::Draw(camera);
 	// return ;
 	btTransform trans = character_->ghost_object_->getWorldTransform();
-	printf("Head %f, %f, %f\n", float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+	// printf("Head %f, %f, %f\n", float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 	Object::Draw(camera, trans);
 }
