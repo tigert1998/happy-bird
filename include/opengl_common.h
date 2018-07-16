@@ -26,6 +26,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #define GLM_ZERO	glm::vec3(0.0f,0.0f,0.0f)
 #define GLM_UP		glm::vec3(0.0f,1.0f,0.0f)

@@ -1,10 +1,8 @@
 #include "camera.h"
-#include "head.h"
-#include "character.h"
 
-const double Camera::MAX_ELEVATION = 5 * glm::pi<double>() / 12;
+const double Camera::kMaxElevation = 5 * glm::pi<double>() / 12;
 
-glm::mat4 Camera::GetProjectionMatrix() const {
+glm::mat4 Camera::projection_matrix() const {
 	using namespace glm;
 	return perspective(radians(45.0f), 1.0f * (float) width_height_ratio_, 0.1f, 1000.0f);
 }
@@ -40,15 +38,13 @@ void Camera::set_beta(double beta) {
 void Camera::Rotate(double delta_alpha, double delta_beta) {
 	alpha_ += delta_alpha;
 	beta_ += delta_beta;
-	beta_ = std::min(MAX_ELEVATION, beta_);
-	beta_ = std::max(-MAX_ELEVATION, beta_);
+	beta_ = std::min(kMaxElevation, beta_);
+	beta_ = std::max(-kMaxElevation, beta_);
 }
 
 glm::vec3 Camera::position() const {
 	if (accompany_object_ != nullptr) {
-		auto origin = BTVector3ToGLMVec3(
-			dynamic_cast<Head*>(accompany_object_)->character_->ghost_object_->getWorldTransform().getOrigin()
-		);
+		auto origin = BTVector3ToGLMVec3(accompany_object_->GetOrigin());
 		return origin - front() * (float) surround_radius_;
 	} else {
 		return position_;
@@ -74,22 +70,22 @@ void Camera::Move(MoveDirectionType direction, float time) {
 	auto left = glm::cross(up_, front());
 	auto right = -left;
 	switch (direction) {
-		case MoveDirectionType::FRONT:
+		case MoveDirectionType::kFront:
 			position_ += front() * time;
 			break;
-		case MoveDirectionType::BACK:
+		case MoveDirectionType::kBack:
 			position_ -= front() * time;
 			break;
-		case MoveDirectionType::LEFT:
+		case MoveDirectionType::kLeft:
 			position_ += left * time;
 			break;
-		case MoveDirectionType::RIGHT:
+		case MoveDirectionType::kRight:
 			position_ += right * time;
 			break;
 	}
 }
 
-glm::mat4 Camera::GetViewMatrix() const {
+glm::mat4 Camera::view_matrix() const {
 	return glm::lookAt(position(), position() + front(), up_);
 }
 

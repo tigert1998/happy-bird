@@ -1,6 +1,13 @@
 #pragma once
 
-#include "object.h"
+#include "opengl_common.h" // glm
+#include "bullet_common.h" // btTransform
+#include "object.h" // DeadObject
+#include "color.h" // Color, color::Yellow
+#include "shader.h"
+#include "camera.h"
+
+class World;
 
 class Box: public DeadObject{
 	glm::vec3 half_extents_;

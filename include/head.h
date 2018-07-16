@@ -1,21 +1,26 @@
 #pragma once
 
-#include "color.h"
-#include "object.h"
+#include "bullet_common.h" // btTransform
+#include "color.h" // Color, color::Red
+#include "object.h" // LivingObject
+#include "character.h"
+#include "camera.h"
+#include "shader.h"
 
 class World;
-class Character;
-class Camera;
-class Shader;
+class Cloth;
 
 class Head: public LivingObject{
+	friend class Cloth;
 	float radius_;
- public:
+ protected:
 	btRigidBody* delegate_;
+ public:
  	Head() = delete;
 	Head(World*, Shader*, const btTransform&, float, Color color = color::Red());
 	~Head(){ }
 	void Draw(Camera*);
+	btVector3 GetOrigin(void);
 	inline float getRadius(void) const {return radius_;}
 };
 

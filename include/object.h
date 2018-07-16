@@ -1,15 +1,16 @@
 #pragma once
+
 #include <vector>
 #include <string>
 
-#include "opengl_common.h"
-#include "bullet_common.h"
 #include "color.h"
+#include "bullet_common.h" // btCollisionObject
+#include "character.h"
+#include "shader.h"
+#include "vector_utility.h"
 
 class World;
 class Camera;
-class Shader;
-class Character;
 
 class Object{
  public:
@@ -21,7 +22,7 @@ class Object{
 	// Bullet shape
 	bool is_soft_;
 	btCollisionObject* bt_object_;
-	// objet data
+	// object data
 	Color color_;
 	std::vector<float> vertices_;
 	std::vector<float> normals_;
@@ -38,6 +39,7 @@ class Object{
 	virtual void InitRigidMesh(btCollisionShape* shape, const btTransform& transform);
 	virtual void InitMesh(std::string path){ } // init from assimp
 	virtual void InitSoftMesh(btSoftBody* shape);
+	virtual btVector3 GetOrigin(void); 
 	// virtual void InitSoftMesh(btCollisionShape* shape);
 	inline bool isSoft(void){return is_soft_;}
 	inline void addTriangle(const btVector3& a, const btVector3& b, const btVector3& c){

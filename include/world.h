@@ -3,10 +3,10 @@
 
 #include "opengl_common.h"
 #include "bullet_common.h"
-#include "object_common.h"
+#include "object.h"
+#include "character.h"
 #include "camera.h"
 #include "shader.h"
-#include "character.h"
 
 class World{
 	enum {
@@ -38,7 +38,7 @@ class World{
 
 	World();
 	~World();
-	btRigidBody* createRigidBody (btScalar mass, const btTransform&, btCollisionShape* shape);
+	btRigidBody* CreateRigidBody(btScalar mass, const btTransform&, btCollisionShape* shape);
 
 	void InitGraphics(void);
 

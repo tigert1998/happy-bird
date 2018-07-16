@@ -1,15 +1,12 @@
 #pragma once
 
+#include <string>
+
 #define DEBUG
 
 #include "file_manager.h"
+#include "opengl_common.h"
 #include "bullet_common.h"
-
-#include <string>
-
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 
 class Shader {

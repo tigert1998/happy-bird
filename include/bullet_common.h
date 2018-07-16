@@ -19,13 +19,13 @@
 #pragma comment(lib,"OpenGL_Window.lib ")
 #endif
 
+// Bullet essential
 #include "bullet/btBulletDynamicsCommon.h"
 #include "bullet/BulletCollision/CollisionShapes/btShapeHull.h"
-// Soft Body
+
+// Soft Body and helpers
 #include "bullet/BulletSoftBody/btSoftRigidDynamicsWorld.h"
 #include "bullet/LinearMath/btQuickprof.h"
-
-//softbody & helpers
 #include "bullet/BulletSoftBody/btSoftBody.h"
 #include "bullet/BulletSoftBody/btSoftBodyHelpers.h"
 #include "bullet/BulletSoftBody/btSoftBodySolvers.h"

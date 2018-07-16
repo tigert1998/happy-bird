@@ -1,5 +1,5 @@
-#include "world.h"
 #include "head.h"
+#include "world.h"
 #include "camera.h"
 
 Head::Head(World* world, Shader* shader,
@@ -10,11 +10,11 @@ Head::Head(World* world, Shader* shader,
 	is_soft_ = false;
 	color_ = color;
 	// initialize physics shape //
-	bt_object_ = world_->createRigidBody(
+	bt_object_ = world_->CreateRigidBody(
 		20,
 		transform,
 		new btSphereShape( btScalar(radius) ));
-	delegate_ = world_->createRigidBody(1, transform, new btSphereShape(btScalar(0.1)));
+	delegate_ = world_->CreateRigidBody(1, transform, new btSphereShape(btScalar(0.1)));
 	delegate_->setCollisionFlags(64); // CF_DISABLE_SPU_COLLISION_PROCESSING = 64 
 	// create mesh //
 	InitMesh();
@@ -26,6 +26,9 @@ Head::Head(World* world, Shader* shader,
 	// Bind to new character
 	delete character_;
 	character_ = new Character(world_, transform, bt_object_->getCollisionShape());
+}
+btVector3 Head::GetOrigin(void){
+	return character_->ghost_object_->getWorldTransform().getOrigin();
 }
 void Head::Draw(Camera* camera){
 	btTransform trans = character_->ghost_object_->getWorldTransform();

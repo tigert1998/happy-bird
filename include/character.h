@@ -3,12 +3,15 @@
 #include "bullet_common.h"
 
 class World;
+class Head;
 
 class Character{
- public:
+	friend Head;
+ protected:
 	World* world_;
 	btKinematicCharacterController* controller_;
 	btPairCachingGhostObject* ghost_object_;
+ public:
 	Character(World*, const btTransform&, btCollisionShape*);
 	~Character();
 	// void Move(const btVector3&, float delta);

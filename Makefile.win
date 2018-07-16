@@ -1,11 +1,11 @@
 CC = cl
-FLAGS = /MTd /I./include /I./include/bullet /std:c++latest
+FLAGS = /MTd /I./include /I./include/bullet /std:c++latest /EHsc
 SRC_PATH = ./src
-SRC = $(SRC_PATH)/main.cpp $(SRC_PATH)/camera.cpp $(SRC_PATH)/cg_exception.cpp \
-$(SRC_PATH)/file_manager.cpp $(SRC_PATH)/glad_win.c $(SRC_PATH)/object.cc \
-$(SRC_PATH)/shader.cpp $(SRC_PATH)/world.cc $(SRC_PATH)/character.cc \
+SRC = $(SRC_PATH)/main.cc $(SRC_PATH)/camera.cc $(SRC_PATH)/cg_exception.cc \
+$(SRC_PATH)/file_manager.cc $(SRC_PATH)/glad_win.c $(SRC_PATH)/object.cc \
+$(SRC_PATH)/shader.cc $(SRC_PATH)/world.cc $(SRC_PATH)/character.cc \
 $(SRC_PATH)/box.cc $(SRC_PATH)/sphere.cc $(SRC_PATH)/head.cc \
-$(SRC_PATH)/cloth.cc $(SRC_PATH)/vector_utility.cpp
+$(SRC_PATH)/cloth.cc $(SRC_PATH)/vector_utility.cc
 
 # & $(CC) $(TEST_PATH)	/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml
 all: $(SRC)

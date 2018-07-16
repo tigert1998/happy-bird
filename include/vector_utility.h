@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bullet_common.h"
-
 #include <glm/glm.hpp>
+
+#include "bullet_common.h"
 
 btVector3 GLMVec3ToBTVector3(glm::vec3 vector);
 

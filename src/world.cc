@@ -2,6 +2,7 @@
 using namespace std;
 
 #include "world.h"
+#include "object_common.h"
 
 int World::height_ = 600;
 int World::width_ = 800;
@@ -23,7 +24,7 @@ World::~World(){
   delete bt_configure_;
 }
 
-btRigidBody* World::createRigidBody (btScalar mass, const btTransform& transform, btCollisionShape* shape)
+btRigidBody* World::CreateRigidBody (btScalar mass, const btTransform& transform, btCollisionShape* shape)
 {
   bool isDynamic = (mass != 0.f);
 
@@ -81,7 +82,6 @@ void World::InitPhysics(void){
 }
 void World::InitScene(void){
   // Ground aka Box
-
   btTransform ground_transform;
   ground_transform.setIdentity();
   ground_transform.setOrigin(btVector3(0, -56, 0));
@@ -94,7 +94,7 @@ void World::InitScene(void){
   objects_.push_back(man);
   character_ = man->character_;
 
-  camera_->set_accompany_object(man, 10);
+  camera_->set_accompany_object(man, 50);
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   // Cloth
   objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );

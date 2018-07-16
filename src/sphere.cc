@@ -7,7 +7,7 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 	is_soft_ = false;
 	color_ = color;
 	// initialize physics shape //
-	bt_object_ = world_->createRigidBody(
+	bt_object_ = world_->CreateRigidBody(
 		20,
 		transform,
 		new btSphereShape( btScalar(radius) ));

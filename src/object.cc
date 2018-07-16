@@ -3,10 +3,8 @@
 
 #include "object.h"
 #include "world.h"
-#include "vector_utility.h"
-#include <iostream>
-#include <cstdio>
-using namespace std;
+#include "camera.h"
+
 // Base class //
 Object::Object(World* w, Shader* shader):
 	world_(w),
@@ -45,8 +43,8 @@ void Object::Draw(Camera* camera, const btTransform& transform){
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uColor", color_);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
-	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->GetViewMatrix());
-	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->GetProjectionMatrix());
+	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
+	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -62,9 +60,9 @@ void Object::Draw(Camera* camera){
 		transform.setIdentity();
 	}
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
-	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->GetViewMatrix());
+	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
 
-	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->GetProjectionMatrix());
+	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
 
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
@@ -377,6 +375,17 @@ void Object::InitSoftMesh(btSoftBody* psb){
 		}
 	} // end of else if clause
 }
+btVector3 Object::GetOrigin(void){
+	if(!is_soft_){
+		btTransform transform;
+		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
+		return transform.getOrigin();
+	}
+	else{
+		return btVector3(0,0,0);
+	}
+}
+
 
 LivingObject::LivingObject(World* world, Shader* shader):
 	Object(world, shader), character_(nullptr){ }

@@ -1,9 +1,5 @@
-#include <iostream>
-using namespace std;
-
-#include "world.h"
 #include "box.h"
-#include "vector_utility.h"
+#include "world.h"
 
 // Plain Object
 Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 half_extents, Color color):
@@ -12,7 +8,7 @@ Box::Box(World* world, Shader* shader, const btTransform& transform, glm::vec3 h
 	is_soft_ = false;
 	color_ = color;
 	// initialize physics shape //
-	bt_object_ = world_->createRigidBody(
+	bt_object_ = world_->CreateRigidBody(
 		0,
 		transform,
 		new btBoxShape( GLMVec3ToBTVector3(half_extents) ) );

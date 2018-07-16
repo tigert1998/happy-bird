@@ -1,6 +1,13 @@
 #pragma once
 
-#include "cloth.h"
+#include "bullet_common.h" // btCollisionObject
+#include "object.h" // DeadObject
+#include "color.h" // Color, color:::Green
+#include "shader.h"
+#include "camera.h"
+#include "head.h"
+
+class World;
 
 // Attached Object: physicsShape->mesh(mutable)->graphics
 class Cloth: public DeadObject{
