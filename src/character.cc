@@ -39,11 +39,21 @@ Character::~Character(){
 	delete controller_;
 	delete ghost_object_;
 }
-void Character::Move(const btVector3& dir, float step){
-	std::cout << "Moving towards: " << dir[0] << ", " << dir[1] << ", " <<dir[2] << " with time " << step << std::endl;
-	controller_->setWalkDirection(dir * step);
+void Character::Move(bool forward, float step){
+	std::cout << "Move" << std::endl;
+	btTransform trans = ghost_object_->getWorldTransform();
+	btVector3 forwardDir = trans.getBasis()[1];
+	controller_->setWalkDirection(forwardDir * step * (forward?1:-1));
+}
+void Character::Rotate(bool left, float step){
+	std::cout << "Rotate" << std::endl;
+	btMatrix3x3 orn = ghost_object_->getWorldTransform().getBasis();
+	orn *= btMatrix3x3(btQuaternion(btVector3(0,1,0),0.01 * (left?1:-1) ));
+	ghost_object_->getWorldTransform ().setBasis(orn);
 }
 void Character::Jump(float step){
 	std::cout << "Jumping" << std::endl;
+	// btTransform trans = ghost_object_->getWorldTransform();
+	// btVector3 upDir = trans.getBasis()[1];
 	controller_->jump();
 }

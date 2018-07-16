@@ -85,7 +85,7 @@ void World::InitScene(void){
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   character_ = new Character(this, objects_.back()->bt_object_->getCollisionShape());
   // Cloth
-  objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
+  // objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
 }
 #include <iostream>
 using namespace std;
@@ -105,7 +105,6 @@ void World::Update(void){ // sync mesh and render
   for(auto& obj: objects_){
     obj->Draw(camera_);
   }
-
   glfwSwapBuffers(window_);
   glfwPollEvents();
 }
@@ -139,13 +138,13 @@ void World::ProcessInput(void){
   float delta_time = current_time - last_time;
   last_time = current_time;
   if (keys_pressed_[GLFW_KEY_W]) // Forward
-    character_->Move( btVector3(0,0,1), delta_time);
+    character_->Move(true, delta_time);
   if (keys_pressed_[GLFW_KEY_S])
-    character_->Move( btVector3(0,0,-1), delta_time);
+    character_->Move(false, delta_time);
   if (keys_pressed_[GLFW_KEY_A]) // Left
-    character_->Move( btVector3(1,0,0), delta_time);
+    character_->Rotate(true, delta_time);
   if (keys_pressed_[GLFW_KEY_D])
-    character_->Move( btVector3(-1,0,0), delta_time);
-   if (keys_pressed_[GLFW_KEY_SPACE])
+    character_->Rotate(false, delta_time);
+  if (keys_pressed_[GLFW_KEY_SPACE])
     character_->Jump(delta_time);
 }
