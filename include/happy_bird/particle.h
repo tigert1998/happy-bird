@@ -5,10 +5,10 @@
 #include "bullet_common.h" // btCollisionObject
 #include "object.h" // DeadObject
 #include "color.h" // Color
-#include "shader.h"
+#include "shader_utility/shader.h"
 #include "camera.h"
 #include "head.h"
-#include "lighter.h"
+#include "shader_utility/light_collection.h"
 
 struct ParticleInfo{
 	glm::vec3 velocity;
@@ -70,10 +70,10 @@ class Particle: public DeadObject{
 	std::vector<ParticleInfo> particles_;
 	ParticleEmitter emitter_;
  public:
- 	Particle(World* world, Shader* shader, Object* object, int amount = 20);
+ 	Particle(World* world, Shader* shader, Material* material, Object* object, int amount = 20);
 	~Particle(){ }
 	void ImportToGraphics();
 	void InitParticles(void);
-	void Draw(Camera*, const Lighter*);
+	void Draw(Camera*, const LightCollection*);
 };
 

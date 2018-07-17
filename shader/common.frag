@@ -1,8 +1,33 @@
 #version 330 core
 
-struct Light {
+struct Attenuation {
+	float range;
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+struct ParallelLight {
 	vec3 direction;
+	vec3 color;
+	float intensity;
+};
+
+struct PointLight {
+	vec3 position;
+	Attenuation attenuation;
+	vec3 color;
+	float intensity;
+};
+
+struct LightCollection {
 	vec3 ambient;
+	ParallelLight parallel[1];
+	PointLight point[1];
+};
+
+struct Material {
+	float shininess;
 	vec3 diffuse;
 	vec3 specular;
 };
@@ -12,22 +37,57 @@ struct Eye {
 };
 
 uniform Eye uEye;
-uniform Light uLight;
-uniform vec3 uColor;
+uniform LightCollection uLightCollection;
+uniform Material uMaterial;
 
 in vec3 vPosition;
 in vec3 vNormal;
 
 out vec4 fragColor;
 
+vec3 CalculatePointlLight(Eye eye, PointLight light, Material material) {
+	vec3 lightDirection = normalize(light.position - vPosition);
+	float diffuseFactor = max(dot(vNormal, lightDirection), 0.0) * light.intensity;
+
+	vec3 reflectDirection = normalize(reflect(-lightDirection, vNormal));
+	vec3 viewDirection = normalize(eye.position - vPosition);
+	float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) * light.intensity;
+
+    float distance = length(light.position - vPosition);
+	float attenuation = 0.0f;
+	if (distance < light.attenuation.range) {
+		attenuation = 1.0f / (light.attenuation.constant + light.attenuation.linear * distance + light.attenuation.quadratic * pow(distance, 2));  
+	}
+	
+	vec3 diffuseColor = diffuseFactor * material.diffuse * light.color;
+	vec3 specularColor = specularFactor * material.specular * light.color ;
+	return attenuation * (diffuseColor + specularColor);
+}
+
+vec3 CalculateParallelLight(Eye eye, ParallelLight light, Material material) {
+	vec3 lightDirection = normalize(-light.direction);
+	float diffuseFactor = max(dot(vNormal, lightDirection), 0.0) * light.intensity;
+
+	vec3 reflectDirection = normalize(reflect(-lightDirection, vNormal));
+	vec3 viewDirection = normalize(eye.position - vPosition);
+	float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) * light.intensity;
+	
+	vec3 diffuseColor = diffuseFactor * material.diffuse * light.color;
+	vec3 specularColor = specularFactor * material.specular * light.color;
+	return diffuseColor + specularColor;
+}
+
+vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, Material material) {
+	vec3 color = lightCollection.ambient;
+	for (int i = 0; i < lightCollection.parallel.length(); i++) {
+		color += CalculateParallelLight(eye, lightCollection.parallel[i], material);
+	}
+	for (int i = 0; i < lightCollection.point.length(); i++) {
+		color += CalculatePointlLight(eye, lightCollection.point[i], material);
+	}
+	return color;
+}
+
 void main() {
-	vec3 eyeDirection = normalize(uEye.position - vPosition);
-  vec3 lightDirection = normalize(-uLight.direction);
-  vec3 normal = normalize(vNormal);
-
-	vec3 ambient = uLight.ambient * uColor;
-  vec3 diffuse = uLight.diffuse * uColor * max(0.0, dot(normal, lightDirection));
-  vec3 specular = uLight.specular * uColor * pow(max(0.0, dot(normalize(lightDirection + eyeDirection), normal)), 8.0);
-
-	fragColor = vec4(ambient + diffuse + specular, 1);
+	fragColor = vec4(CalculateFragmentColor(uEye, uLightCollection, uMaterial), 1);
 }

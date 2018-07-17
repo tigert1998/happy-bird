@@ -10,7 +10,7 @@ using std::endl;
 #include "camera.h"
 
 // Base class //
-bool Object::isSoft(void) {
+bool Object::is_soft(void) {
 	return is_soft_;
 }
 
@@ -29,10 +29,11 @@ void Object::addTriangle(const btVector3& a, const btVector3& b, const btVector3
 	vertices_.push_back(c[2]);
 }
 
-Object::Object(World* w, Shader* shader):
+Object::Object(World* w, Shader* shader, Material* material):
 	world_(w),
 	shader_(shader),
-	bt_object_(nullptr){
+	material_(material),
+	bt_object_(nullptr) {
 	glGenVertexArrays(1, &vao_);
 	glGenBuffers(2, vbos_);
 	glGenBuffers(1, &ebo_);
@@ -46,12 +47,15 @@ Object::~Object(){
 	glDeleteBuffers(2, vbos_);
 	glDeleteBuffers(1, &ebo_);
 }
+
 void Object::ImportToPhysics(){
 	world_->bt_world_->addRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
+
 void Object::DeleteFromPhysics(){
 	world_->bt_world_->removeRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
+
 void Object::ImportToGraphics() {
 	cout << "[Object::ImportToGraphics()]" << endl;
 	glBindVertexArray(vao_);
@@ -74,11 +78,13 @@ void Object::ImportToGraphics() {
 
 	glBindVertexArray(0);
 }
-void Object::Draw(Camera* camera, const btTransform& transform, const Lighter* lights) {
-	cout << "[Object::Draw(Camera*, const btTransform&)]" << endl;
+
+void Object::Draw(Camera* camera, const btTransform& transform, const LightCollection* light_collection) {
+	cout << "[Object::Draw(Camera*, const btTransform&, const LightCollection*)]" << endl;
 	shader_->Use();
-	lights->Feed("uLight", shader_);
-	shader_->SetUniform<glm::vec3>("uColor", color_);
+	shader_->SetUniform<glm::vec3>("uEye.position", camera->position());
+	shader_->SetUniform<LightCollection>("uLightCollection", *light_collection);
+	shader_->SetUniform<Material>("uMaterial", *material_);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
@@ -87,10 +93,10 @@ void Object::Draw(Camera* camera, const btTransform& transform, const Lighter* l
 	glBindVertexArray(0);
 }
 
-void Object::Draw(Camera* camera, const Lighter* lights) {
-	cout << "[Object::Draw(Camera*)]" << endl;
+void Object::Draw(Camera* camera, const LightCollection* light_collection) {
+	cout << "[Object::Draw(Camera*, const LightCollection*)]" << endl;
 	shader_->Use();
-	shader_->SetUniform<glm::vec3>("uColor", color_);
+	shader_->SetUniform<Material>("uMaterial", *material_);
 	
 	btTransform transform;
 	if (!is_soft_) {
@@ -99,7 +105,8 @@ void Object::Draw(Camera* camera, const Lighter* lights) {
 		transform.setIdentity();
 	}
 
-	lights->Feed("uLight", shader_);
+	shader_->SetUniform<glm::vec3>("uEye.position", camera->position());
+	shader_->SetUniform<LightCollection>("uLightCollection", *light_collection);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
@@ -416,6 +423,7 @@ void Object::InitSoftMesh(btSoftBody* psb){
 		}
 	} // end of else if clause
 }
+
 btVector3 Object::GetOrigin(void){
 	if(!is_soft_){
 		btTransform transform;
@@ -438,5 +446,5 @@ btTransform Object::GetTransform(void){
 	}
 }
 
-LivingObject::LivingObject(World* world, Shader* shader):
-	Object(world, shader), character_(nullptr){ }
+LivingObject::LivingObject(World* world, Shader* shader, Material* material):
+	Object(world, shader, material), character_(nullptr) { }

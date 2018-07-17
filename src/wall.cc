@@ -31,15 +31,15 @@ std::vector<float> Wall::brick_vertices_ = {
 
 Wall::Wall(
 	World* world, 
-	Shader* shader, 
+	Shader* shader,
+	Material* material,
 	const btTransform& trans, 
 	float scaling, 
-	glm::vec3 half_extents, 
-	Color color):
-	DeadObject(world,shader), half_extents_(half_extents), scaling_(scaling) {
+	glm::vec3 half_extents
+	):
+	DeadObject(world, shader, material), half_extents_(half_extents), scaling_(scaling) {
 	assert(world_);
 	is_soft_ = false;
-	color_ = color;
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		0,

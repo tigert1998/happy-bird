@@ -20,8 +20,8 @@ void ParticleEmitter::Emit(std::vector<ParticleInfo>& container, int head){
 	);
 }
 
-Particle::Particle(World* world, Shader* shader, Object* object, int amount):
-	DeadObject(world, shader),
+Particle::Particle(World* world, Shader* shader, Material* material, Object* object, int amount):
+	DeadObject(world, shader, material),
 	anchor_(object),
 	amount_(amount), 
 	particles_(amount), 
@@ -51,7 +51,7 @@ void Particle::ImportToGraphics(){
 
 	glBindVertexArray(0);
 }
-void Particle::Draw(Camera* camera, const Lighter* lights){
+void Particle::Draw(Camera* camera, const LightCollection* lights){
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update();
 		vertices_[3*i + 0] = particles_[i].position[0];
@@ -60,11 +60,10 @@ void Particle::Draw(Camera* camera, const Lighter* lights){
 		vertices_[3*i + 3] = particles_[i].radius;
 	}
 	shader_->Use();
-	shader_->SetUniform<glm::vec3>("uColor", color_);
+	shader_->SetUniform<glm::vec3>("uColor", material_->diffuse());
 	
 	btTransform transform = anchor_->GetTransform();
 
-	lights->Feed("uLight", shader_);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());

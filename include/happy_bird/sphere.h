@@ -3,7 +3,7 @@
 #include "object.h" // DeadObject
 #include "color.h" // Color, color::Red
 #include "camera.h"
-#include "shader.h"
+#include "shader_utility/shader.h"
 
 class World;
 
@@ -11,8 +11,8 @@ class Sphere: public DeadObject{
 	float radius_;
  public:
 	Sphere() = delete;
-	Sphere(World* world, Shader* shader, const btTransform& trans, float radius, Color color = color::Red());
-	void Draw(Camera* camera, const Lighter* lights);
+	Sphere(World* world, Shader* shader, Material* material, const btTransform& trans, float radius);
+	void Draw(Camera* camera, const LightCollection* light_collection);
 	~Sphere();
 	// accessor
 	inline float radius(void) const;

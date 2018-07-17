@@ -8,7 +8,6 @@
 #include "opengl_common.h"
 #include "bullet_common.h"
 
-
 class Shader {
 public:
 	Shader() = delete;

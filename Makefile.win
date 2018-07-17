@@ -1,12 +1,16 @@
 CC = cl
-FLAGS = /MTd /I./include /I./include/bullet /std:c++latest /EHsc
+FLAGS = /MTd /I./include /I./include/bullet /I./include/happy_bird /std:c++latest /EHsc
 SRC_PATH = ./src
 SRC = $(SRC_PATH)/main.cc $(SRC_PATH)/camera.cc $(SRC_PATH)/cg_exception.cc \
 $(SRC_PATH)/file_manager.cc $(SRC_PATH)/glad_win.c $(SRC_PATH)/object.cc \
-$(SRC_PATH)/shader.cc $(SRC_PATH)/world.cc $(SRC_PATH)/character.cc \
+$(SRC_PATH)/world.cc $(SRC_PATH)/character.cc \
 $(SRC_PATH)/box.cc $(SRC_PATH)/sphere.cc $(SRC_PATH)/head.cc \
-$(SRC_PATH)/cloth.cc $(SRC_PATH)/vector_utility.cc $(SRC_PATH)/light.cc\
-$(SRC_PATH)/lighter.cc $(SRC_PATH)/particle.cc  $(SRC_PATH)/wall.cc
+$(SRC_PATH)/cloth.cc $(SRC_PATH)/vector_utility.cc\
+$(SRC_PATH)/particle.cc  $(SRC_PATH)/wall.cc\
+$(SRC_PATH)/shader_utility/shader.cc $(SRC_PATH)/shader_utility/light.cc \
+$(SRC_PATH)/shader_utility/light_collection.cc $(SRC_PATH)/shader_utility/material.cc \
+$(SRC_PATH)/shader_utility/parallel_light.cc $(SRC_PATH)/shader_utility/point_light.cc \
+$(SRC_PATH)/shader_utility/attenuation.cc
 
 # & $(CC) $(TEST_PATH)	/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml
 all: $(SRC)

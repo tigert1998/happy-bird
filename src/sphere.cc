@@ -7,11 +7,10 @@ inline float Sphere::radius(void) const {
 
 Sphere::~Sphere() { }
 
-Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float radius, Color color):
-	DeadObject(world,shader), radius_(radius) {
+Sphere::Sphere(World* world, Shader* shader, Material* material, const btTransform& transform, float radius):
+	DeadObject(world, shader, material), radius_(radius) {
 	assert(world_);
 	is_soft_ = false;
-	color_ = color;
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		20,
@@ -26,9 +25,8 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 	}
 }
 
-void Sphere::Draw(Camera* camera, const Lighter* lights) {
+void Sphere::Draw(Camera* camera, const LightCollection* light_collection) {
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	// printf("Sphere %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
-	Object::Draw(camera, transform, lights);
+	Object::Draw(camera, transform, light_collection);
 }

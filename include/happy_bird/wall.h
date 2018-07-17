@@ -6,7 +6,7 @@
 #include "bullet_common.h" // btTransform
 #include "object.h" // DeadObject
 #include "color.h" // Color, color::Yellow
-#include "shader.h"
+#include "shader_utility/shader.h"
 #include "camera.h"
 #include "world.h"
 
@@ -21,7 +21,7 @@ class Wall: public DeadObject{
  public:
 	Wall() = delete;
 	// mass is set to 0, dummy input
-	Wall(World* world, Shader* shader, const btTransform& trans, float scaling, glm::vec3 half_extents, Color color = color::Yellow());
+	Wall(World* world, Shader* shader, Material*, const btTransform& trans, float scaling, glm::vec3 half_extents);
 	~Wall(){ }
 	void InitBricks(const btTransform& transform);
 };
