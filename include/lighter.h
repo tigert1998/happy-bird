@@ -2,6 +2,7 @@
 
 #include <string>
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "light.h"
 

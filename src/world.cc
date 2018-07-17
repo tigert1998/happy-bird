@@ -11,6 +11,7 @@ bool World::keys_pressed[1024];
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
 Lighter* World::lights = new Lighter();
+glm::vec3 World::global_ambient(0.2, 0.2, 0.2);
 btVector3 World::origin(0,0,0);
 btScalar World::character_height(8);
 
