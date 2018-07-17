@@ -130,6 +130,11 @@ void World::InitScene(void) {
   // Cloth
   objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
   objects_.push_back( new Particle(this, nullptr, man));
+  
+  btTransform wall_transform;
+  wall_transform.setIdentity();
+  wall_transform.setOrigin(btVector3(0, half_bound , 0));
+  objects_.push_back( new Wall(this, nullptr, wall_transform, 3, glm::vec3(half_bound, half_bound, half_bound)) );
 
   lights->AddLight(new PointLight(glm::vec3(0,10,0) ));
 }

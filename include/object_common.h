@@ -7,3 +7,4 @@
 #include "head.h"
 #include "cloth.h"
 #include "particle.h"
+#include "wall.h"
