@@ -8,13 +8,12 @@ float Head::radius(void) const {
 
 Head::~Head() { }
 
-Head::Head(World* world, Shader* shader,
-	const btTransform& transform, float radius, Color color):
-	LivingObject(world, shader),
+Head::Head(World* world, Shader* shader, Material* material,
+	const btTransform& transform, float radius):
+	LivingObject(world, shader, material),
 	radius_(radius) {
 	assert(world_);
 	is_soft_ = false;
-	color_ = color;
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		20,
@@ -24,7 +23,6 @@ Head::Head(World* world, Shader* shader,
 	// create mesh //
 	InitMesh();
 	ImportToGraphics();
-	// bt_object_->setWorldTransform(transform);
 	if (!shader) {
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	}
@@ -33,7 +31,6 @@ Head::Head(World* world, Shader* shader,
 	// Add constraint
 	btVector3 pivotInA(0, World::character_height, 0);
 	btTransform tmpTrans(btTransform::getIdentity());
-	// tmpTrans.setOrigin(pivotInA);
 		// whether ref to frameInB
 	btGeneric6DofConstraint* level_constraint = new btGeneric6DofConstraint(*(dynamic_cast<btRigidBody*>(bt_object_)), tmpTrans, true);
 	btVector3 translation_lower(1, 0, 1);
@@ -44,15 +41,14 @@ Head::Head(World* world, Shader* shader,
 	level_constraint->setLinearUpperLimit(translation_upper);
 	level_constraint->setAngularLowerLimit(rotation_lower);
 	level_constraint->setAngularUpperLimit(rotation_upper);
-	// btTypedConstraint* level_constraint = new btPoint2PointConstraint(*body, pivotInA);
 	world_->bt_world()->addConstraint((btTypedConstraint*)level_constraint);
 
 }
 btVector3 Head::GetOrigin(void){
 	return character_->GetDelegate()->getWorldTransform().getOrigin();
 }
-void Head::Draw(Camera* camera, const Lighter* lights) {
+void Head::Draw(Camera* camera, const LightCollection* light_collection) {
 	btCollisionObject* obj = character_->GetDelegate();
 	btTransform trans = obj->getWorldTransform();
-	Object::Draw(camera, trans, lights);
+	Object::Draw(camera, trans, light_collection);
 }

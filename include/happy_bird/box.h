@@ -4,8 +4,8 @@
 #include "bullet_common.h" // btTransform
 #include "object.h" // DeadObject
 #include "color.h" // Color, color::Yellow
-#include "shader.h"
 #include "camera.h"
+#include "shader_utility/shader.h"
 
 class World;
 
@@ -13,7 +13,7 @@ class Box: public DeadObject{
 	glm::vec3 half_extents_;
  public:
 	Box() = delete;
-	Box(World* world, Shader* shader, float mass, const btTransform& trans, glm::vec3 half_extents, Color color = color::Yellow());
-	void Draw(Camera* camera, const Lighter* lights);
+	Box(World*, Shader*, Material*, float, const btTransform&, glm::vec3);
+	void Draw(Camera* camera, const LightCollection* light_collection);
 	~Box(){ }
 };

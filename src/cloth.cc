@@ -5,10 +5,9 @@ using namespace std;
 #include "cloth.h"
 
 // Soft Body //
-Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint32_t subd, Head* head, Color color):
-	DeadObject(world, shader), width_(attachWid), length_(clothLen), subdivide_(subd) {
+Cloth::Cloth(World* world, Shader* shader, Material* material, float attachWid, float clothLen, uint32_t subd, Head* head):
+	DeadObject(world, shader, material), width_(attachWid), length_(clothLen), subdivide_(subd) {
 	assert(world);
-	color_ = color;
 	is_soft_ = true;
 	if (!shader)
 		shader_ = new Shader("shader/cloth.vert", "shader/cloth.frag");
@@ -32,7 +31,7 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	// attached_ = head->bt_object_;
 	attached_ = head->character_->GetDelegate();
 	auto trans = attached_->getWorldTransform();
-	std::cout << "[Cloth::Cloth(World*, Shader*, float, float, uint32_t, Head*, Color)] " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
+	std::cout << "[Cloth::Cloth(World*, Material*, Shader*, float, float, uint32_t, Head*)] " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
 	// btCollisionObject* object = head->character_->ghost_object_;
 	btVector3 left(-radius, 0.2, 0);
 	btVector3 fleft(-0.5 * radius, 0.2, 0.866 * radius);
@@ -51,14 +50,14 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	bt_object_ = softBody;
 }
 
-void Cloth::Draw(Camera* camera, const Lighter* lights){
+void Cloth::Draw(Camera* camera, const LightCollection* light_collection) {
+	std::cout << "[Cloth::Draw(Camera*, const light_collection*)]" << std::endl;
 	auto trans = attached_->getWorldTransform();
-	std::cout << "[Cloth::Draw(Camera*)] " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
 	InitMesh();
 	ImportToGraphics();
 
 	shader_->Use();
-	shader_->SetUniform<glm::vec3>("uColor", color_);
+	shader_->SetUniform<Material>("uMaterial", *material_);
 	btTransform transform;
 	transform.setIdentity();
 

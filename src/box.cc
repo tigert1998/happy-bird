@@ -1,12 +1,19 @@
 #include "box.h"
 #include "world.h"
 
+#include <iostream>
+
 // Plain Object
-Box::Box(World* world, Shader* shader, float mass, const btTransform& transform, glm::vec3 half_extents, Color color):
-	DeadObject(world,shader), half_extents_(half_extents) {
+Box::Box(
+	World* world,
+	Shader* shader,
+	Material* material,
+	float mass, 
+	const btTransform& transform, 
+	glm::vec3 half_extents
+): DeadObject(world, shader, material), half_extents_(half_extents) {
 	assert(world_);
 	is_soft_ = false;
-	color_ = color;
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		mass,
@@ -22,11 +29,9 @@ Box::Box(World* world, Shader* shader, float mass, const btTransform& transform,
 	}
 }
 
-void Box::Draw(Camera* camera, const Lighter* lights) {
+void Box::Draw(Camera* camera, const LightCollection* light_collection) {
+	std::cout << "[Box::Draw(Camera*, const LightCollection*)]" << std::endl;
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	// printf("Box %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
-	Object::Draw(camera, transform, lights);
-	btScalar data[16];
-	transform.getOpenGLMatrix(data);
+	Object::Draw(camera, transform, light_collection);
 }

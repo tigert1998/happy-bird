@@ -20,20 +20,20 @@
 #endif
 
 // Bullet essential
-#include "bullet/btBulletDynamicsCommon.h"
-#include "bullet/BulletCollision/CollisionShapes/btShapeHull.h"
+#include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionShapes/btShapeHull.h"
 
 // Soft Body and helpers
-#include "bullet/BulletSoftBody/btSoftRigidDynamicsWorld.h"
-#include "bullet/LinearMath/btQuickprof.h"
-#include "bullet/BulletSoftBody/btSoftBody.h"
-#include "bullet/BulletSoftBody/btSoftBodyHelpers.h"
-#include "bullet/BulletSoftBody/btSoftBodySolvers.h"
-#include "bullet/BulletSoftBody/btDefaultSoftBodySolver.h"
-#include "bullet/BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
-#include "bullet/LinearMath/btConvexHullComputer.h"
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "LinearMath/btQuickprof.h"
+#include "BulletSoftBody/btSoftBody.h"
+#include "BulletSoftBody/btSoftBodyHelpers.h"
+#include "BulletSoftBody/btSoftBodySolvers.h"
+#include "BulletSoftBody/btDefaultSoftBodySolver.h"
+#include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
+#include "LinearMath/btConvexHullComputer.h"
 
 // Character control
-#include "bullet/BulletDynamics/Character/btKinematicCharacterController.h"
-#include "bullet/BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletDynamics/Character/btKinematicCharacterController.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 

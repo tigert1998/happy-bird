@@ -6,9 +6,9 @@
 #include "object.h"
 #include "character.h"
 #include "camera.h"
-#include "shader.h"
 #include "character.h"
-#include "lighter.h"
+#include "shader_utility/shader.h"
+#include "shader_utility/light_collection.h"
 
 class World{
 	enum {
@@ -40,7 +40,7 @@ class World{
 	static int height, width;
 	static Camera* camera;
 	static glm::vec3 global_ambient;
-	static Lighter* lights;
+	static LightCollection* light_collection;
 	static btVector3 origin;
 	static btScalar character_height; 
 

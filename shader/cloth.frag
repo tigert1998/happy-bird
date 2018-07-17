@@ -1,9 +1,15 @@
 #version 330 core
 
-uniform vec3 uColor;
+struct Material {
+	float shininess;
+	vec3 diffuse;
+	vec3 specular;
+};
+
+uniform Material uMaterial;
 
 out vec4 fragColor;
 
 void main() {
-	fragColor = vec4(uColor, 1);
+	fragColor = vec4(uMaterial.diffuse, 1);
 }

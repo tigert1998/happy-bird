@@ -2,17 +2,17 @@
 using namespace std;
 
 #include "world.h"
-#include "color.h"
 #include "object_common.h"
+#include "shader_utility/point_light.h"
+#include "shader_utility/parallel_light.h"
 
 int World::height = 600;
 int World::width = 800;
 bool World::keys_pressed[1024];
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
-Lighter* World::lights = new Lighter();
-glm::vec3 World::global_ambient(0.2, 0.2, 0.2);
-btVector3 World::origin(0,0,0);
+LightCollection* World::light_collection = new LightCollection(glm::vec3(0.2, 0.2, 0.2));
+btVector3 World::origin(0, 0, 0);
 btScalar World::character_height(8);
 
 World::World() {
@@ -42,7 +42,7 @@ btSoftBodyWorldInfo& World::bt_info() {
 btRigidBody* World::CreateRigidBody(btScalar mass, const btTransform& transform, btCollisionShape* shape) {
   bool isDynamic = (mass != 0.f);
 
-  btVector3 localInertia(0,0,0);
+  btVector3 localInertia(0, 0, 0);
   if (isDynamic)
     shape->calculateLocalInertia(mass,localInertia);
 
@@ -105,26 +105,50 @@ void World::InitScene(void) {
   btScalar half_bound = 50;
   ground_transform.setIdentity();
   ground_transform.setOrigin(btVector3(0, -half_bound , 0));
-  objects_.push_back( new Box(this, nullptr, 0, ground_transform, glm::vec3(half_bound, half_bound, half_bound))  );
+  objects_.push_back(new Box(
+    this, nullptr, new Material(color::White(), color::White(), 8),
+    0, ground_transform, 
+    glm::vec3(half_bound, half_bound, half_bound)
+  ));
   btTransform box_transform;
   btScalar box_half = World::character_height;
   box_transform.setIdentity();
   box_transform.setOrigin(btVector3(box_half * 2, box_half, 0));
-  objects_.push_back( new Box(this, nullptr, 35, box_transform, glm::vec3(box_half, box_half, box_half), color::Purple()) );
+  objects_.push_back(new Box(
+    this, nullptr, new Material(color::White(), color::White(), 8),
+    35, box_transform, glm::vec3(box_half, box_half, box_half)
+  ));
   // Sphere
   btTransform start_transform;
   start_transform.setIdentity();
-  start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0) );
-  LivingObject* man = new Head(this, nullptr, start_transform, World::character_height / 4);
+  start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0));
+  LivingObject* man = new Head(
+    this, nullptr, new Material(color::White(), color::White(), 8),
+    start_transform, World::character_height / 4
+  );
   objects_.push_back(man);
   character_ = man->character_;
 
   camera->set_accompany_object(man, 50);
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   // Cloth
-  objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
-
-  lights->AddLight(new PointLight(glm::vec3(0,10,0) ));
+  objects_.push_back(new Cloth(
+    this, nullptr, new Material(color::White(), color::White(), 8), 
+    5, 6, 8, dynamic_cast<Head*>(objects_.back())
+  ));
+  light_collection->PushBack(
+    new PointLight(
+      glm::vec3(0, 15, 0), 
+      glm::vec3(0, 1, 0), 0.6, 
+      Attenuation(325, 1, 0.014, 0.0007)
+    )
+  );
+  light_collection->PushBack(
+    new ParallelLight(
+      glm::vec3(-1, -1, -1), 
+      glm::vec3(1, 0, 0), 0.4
+    )
+  );
 }
 void World::Update(void) { // sync mesh and render
   cout << "[World::Update()]" << endl;
@@ -140,7 +164,7 @@ void World::Update(void) { // sync mesh and render
   bt_world_->stepSimulation(delta_time);
 
   for(auto& obj: objects_) {
-    obj->Draw(camera, lights);
+    obj->Draw(camera, light_collection);
   }
   glfwSwapBuffers(window_);
   glfwPollEvents();
