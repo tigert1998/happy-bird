@@ -51,8 +51,8 @@ Head::Head(World* world, Shader* shader,
 btVector3 Head::GetOrigin(void){
 	return character_->GetDelegate()->getWorldTransform().getOrigin();
 }
-void Head::Draw(Camera* camera, const Light* light) {
+void Head::Draw(Camera* camera, const Lighter* lights) {
 	btCollisionObject* obj = character_->GetDelegate();
 	btTransform trans = obj->getWorldTransform();
-	Object::Draw(camera, trans, light);
+	Object::Draw(camera, trans, lights);
 }

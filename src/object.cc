@@ -74,10 +74,10 @@ void Object::ImportToGraphics() {
 
 	glBindVertexArray(0);
 }
-void Object::Draw(Camera* camera, const btTransform& transform, const Light* light) {
+void Object::Draw(Camera* camera, const btTransform& transform, const Lighter* lights) {
 	cout << "[Object::Draw(Camera*, const btTransform&)]" << endl;
 	shader_->Use();
-	light->Feed("uLight", shader_);
+	lights->Feed("uLight", shader_);
 	shader_->SetUniform<glm::vec3>("uColor", color_);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
@@ -87,7 +87,7 @@ void Object::Draw(Camera* camera, const btTransform& transform, const Light* lig
 	glBindVertexArray(0);
 }
 
-void Object::Draw(Camera* camera, const Light* light) {
+void Object::Draw(Camera* camera, const Lighter* lights) {
 	cout << "[Object::Draw(Camera*)]" << endl;
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uColor", color_);
@@ -99,7 +99,7 @@ void Object::Draw(Camera* camera, const Light* light) {
 		transform.setIdentity();
 	}
 
-	light->Feed("uLight", shader_);
+	lights->Feed("uLight", shader_);
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());

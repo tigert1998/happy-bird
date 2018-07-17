@@ -6,7 +6,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "head.h"
-#include "light.h"
+#include "lighter.h"
 
 class World;
 
@@ -21,5 +21,5 @@ class Cloth: public DeadObject{
 	Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint32_t subdivide, Head* head, Color color = color::Green());
 	void ImportToGraphics();
 	~Cloth();
-	void Draw(Camera* camera, const Light* light);
+	void Draw(Camera* camera, const Lighter* lights);
 };

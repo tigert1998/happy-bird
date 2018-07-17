@@ -10,7 +10,7 @@ int World::width = 800;
 bool World::keys_pressed[1024];
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
-Light* World::light = new Light(glm::vec3(-1, -1, -1), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.7f, 0.7f, 0.7f));
+Lighter* World::lights = new Lighter();
 btVector3 World::origin(0,0,0);
 btScalar World::character_height(8);
 
@@ -122,6 +122,8 @@ void World::InitScene(void) {
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   // Cloth
   objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
+
+  lights->AddLight(new PointLight(glm::vec3(0,10,0) ));
 }
 void World::Update(void) { // sync mesh and render
   cout << "[World::Update()]" << endl;
@@ -137,7 +139,7 @@ void World::Update(void) { // sync mesh and render
   bt_world_->stepSimulation(delta_time);
 
   for(auto& obj: objects_) {
-    obj->Draw(camera, light);
+    obj->Draw(camera, lights);
   }
   glfwSwapBuffers(window_);
   glfwPollEvents();

@@ -51,7 +51,7 @@ Cloth::Cloth(World* world, Shader* shader, float attachWid, float clothLen, uint
 	bt_object_ = softBody;
 }
 
-void Cloth::Draw(Camera* camera, const Light* light){
+void Cloth::Draw(Camera* camera, const Lighter* lights){
 	auto trans = attached_->getWorldTransform();
 	std::cout << "[Cloth::Draw(Camera*)] " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
 	InitMesh();

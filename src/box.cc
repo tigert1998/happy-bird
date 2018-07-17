@@ -22,11 +22,11 @@ Box::Box(World* world, Shader* shader, float mass, const btTransform& transform,
 	}
 }
 
-void Box::Draw(Camera* camera, const Light* light) {
+void Box::Draw(Camera* camera, const Lighter* lights) {
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
 	// printf("Box %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
-	Object::Draw(camera, transform, light);
+	Object::Draw(camera, transform, lights);
 	btScalar data[16];
 	transform.getOpenGLMatrix(data);
 }

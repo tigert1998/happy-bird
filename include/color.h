@@ -8,6 +8,9 @@ struct color{
 	static Color Black(void){
 		return glm::vec3(0,0,0);
 	}
+	static Color White(void){
+		return glm::vec3(1,1,1);
+	}
 	static Color Red(void){
 		return glm::vec3(0.956863,0.262745,0.211765);
 	}

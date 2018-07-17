@@ -8,7 +8,7 @@
 #include "character.h"
 #include "shader.h"
 #include "vector_utility.h"
-#include "light.h"
+#include "lighter.h"
 
 class World;
 class Camera;
@@ -34,8 +34,8 @@ class Object{
 	virtual void ImportToPhysics();
 	virtual void DeleteFromPhysics();
 	virtual void ImportToGraphics();
-	virtual void Draw(Camera* camera, const btTransform& transform, const Light* light);
-	virtual void Draw(Camera* camera, const Light* light);
+	virtual void Draw(Camera* camera, const btTransform& transform, const Lighter* lights);
+	virtual void Draw(Camera* camera, const Lighter* lights);
 	virtual void InitMesh(void); // init from shape
 	virtual void InitRigidMesh(btCollisionShape* shape, const btTransform& transform);
 	virtual void InitMesh(std::string path){ } // init from assimp

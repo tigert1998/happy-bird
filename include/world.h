@@ -8,7 +8,7 @@
 #include "camera.h"
 #include "shader.h"
 #include "character.h"
-#include "light.h"
+#include "lighter.h"
 
 class World{
 	enum {
@@ -17,7 +17,7 @@ class World{
 		kFront = 2,
 		kBack = 3
 	} MoveDirectionType;
-	friend Object;
+	friend class Object;
  protected:
  	// OpenGL util
 	GLFWwindow* window_;
@@ -39,7 +39,8 @@ class World{
  	static bool keys_pressed [1024];
 	static int height, width;
 	static Camera* camera;
-	static Light* light;
+	static glm::vec3 global_ambient;
+	static Lighter* lights;
 	static btVector3 origin;
 	static btScalar character_height; 
 

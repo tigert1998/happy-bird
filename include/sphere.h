@@ -12,7 +12,7 @@ class Sphere: public DeadObject{
  public:
 	Sphere() = delete;
 	Sphere(World* world, Shader* shader, const btTransform& trans, float radius, Color color = color::Red());
-	void Draw(Camera* camera, const Light* light);
+	void Draw(Camera* camera, const Lighter* lights);
 	~Sphere();
 	// accessor
 	inline float radius(void) const;

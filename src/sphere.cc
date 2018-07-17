@@ -26,9 +26,9 @@ Sphere::Sphere(World* world, Shader* shader, const btTransform& transform, float
 	}
 }
 
-void Sphere::Draw(Camera* camera, const Light* light) {
+void Sphere::Draw(Camera* camera, const Lighter* lights) {
 	btTransform transform;
 	btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
 	// printf("Sphere %f, %f, %f\n", float(transform.getOrigin().getX()), float(transform.getOrigin().getY()), float(transform.getOrigin().getZ()));
-	Object::Draw(camera, transform, light);
+	Object::Draw(camera, transform, lights);
 }

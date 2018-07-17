@@ -1,22 +1,55 @@
 #pragma once
 
-#include "shader.h"
-
 #include <string>
-
 #include <glm/glm.hpp>
 
-class Light {
-private:
-	glm::vec3 direction_, ambient_, diffuse_, specular_;
+#include "shader.h"
+#include "color.h"
 
+class Light {
+	struct Attenuation{
+		float range;
+		float constant;
+		float linear;
+		float quadratic;
+		Attenuation(float range = 100): range(range){
+			constant = 1;
+			linear = 0.5 / constant; // approximation
+			quadratic = 90.0 / constant / constant;
+		}
+		~Attenuation(){ }
+	} attenuation_;
 public:
-	Light() = delete;
-	Light(
-		glm::vec3 direction,
-		glm::vec3 ambient = glm::vec3(0.2, 0.2, 0.2), 
-		glm::vec3 diffuse = glm::vec3(0.5, 0.5, 0.5), 
-		glm::vec3 specular = glm::vec3(1, 1, 1)
-	);
+	enum{
+		kPointLight = 0,
+		kParallelLight = 1
+	} LightType;
+	Light() = default;
+	virtual ~Light(){ }
 	void Feed(const std::string& identifier, Shader *shader) const;
+	inline const Attenuation& attenuation(void) const { return attenuation_; }
+};
+
+class PointLight: public Light{
+	glm::vec3 position_;
+	glm::vec3 color_;
+	float intensity_;
+ public:
+ 	PointLight(glm::vec3 position, float intensity = 10, Color color = color::White()): 
+ 		position_(position), 
+ 		color_(color),
+ 		intensity_(intensity){ }
+	void Feed(const std::string& identifier, Shader * shader) const;
+};
+
+class ParallelLight: public Light{
+	glm::vec3 direction_;
+	Color color_;
+	float intensity_;
+ public:
+ 	ParallelLight(glm::vec3 direction, float intensity = 10, Color color = color::White()): 
+ 		direction_(direction), 
+ 		color_(color),
+ 		intensity_(intensity){ }
+	void Feed(const std::string& identifier, Shader * shader) const;
 };

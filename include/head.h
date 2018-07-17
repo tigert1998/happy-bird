@@ -6,7 +6,7 @@
 #include "character.h"
 #include "camera.h"
 #include "shader.h"
-#include "light.h"
+#include "lighter.h"
 
 class World;
 class Cloth;
@@ -20,6 +20,6 @@ class Head: public LivingObject{
 	~Head();
 	btVector3 GetOrigin(void);
 	float radius(void) const;
-	void Draw(Camera* camera, const Light* light);
+	void Draw(Camera* camera, const Lighter* lights);
 };
 
