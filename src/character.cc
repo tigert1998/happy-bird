@@ -101,9 +101,12 @@ void CharacterImpl::Rotate(bool left, float step){
 	body->setLinearVelocity(body->getLinearVelocity() + leftDir * step * (left?1:-1));
 }
 void CharacterImpl::Jump(float step){
+	btTransform trans = object_->getWorldTransform();
+	btVector3 upDir = trans.getBasis()[1].normalize();
+	// upDir = btVector3(0, 1, 0);
 	step = 10;
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
-	body->setLinearVelocity(body->getLinearVelocity() + btVector3(0,1,0) * step);
+	body->setLinearVelocity(body->getLinearVelocity() + upDir * step);
 }
 void CharacterImpl::ResetMove(void){
 	dynamic_cast<btRigidBody*>(object_)->setLinearVelocity(btVector3(0,0,0));

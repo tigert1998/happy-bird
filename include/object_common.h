@@ -6,3 +6,4 @@
 #include "sphere.h"
 #include "head.h"
 #include "cloth.h"
+#include "particle.h"

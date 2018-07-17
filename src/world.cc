@@ -73,6 +73,12 @@ void World::InitGraphics(void) {
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glEnable(GL_DEPTH_TEST);
+  // for sprite
+  glEnable(GL_POINT_SPRITE_ARB);
+  glEnable(GL_PROGRAM_POINT_SIZE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   memset(keys_pressed, 0, sizeof(keys_pressed));
 }
 
@@ -123,6 +129,7 @@ void World::InitScene(void) {
   // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
   // Cloth
   objects_.push_back( new Cloth(this, nullptr, 5, 6, 8, dynamic_cast<Head*>(objects_.back()) ) );
+  objects_.push_back( new Particle(this, nullptr, man));
 
   lights->AddLight(new PointLight(glm::vec3(0,10,0) ));
 }

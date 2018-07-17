@@ -41,6 +41,7 @@ class Object{
 	virtual void InitMesh(std::string path){ } // init from assimp
 	virtual void InitSoftMesh(btSoftBody* shape);
 	virtual btVector3 GetOrigin(void); 
+	virtual btTransform GetTransform(void);
 	// virtual void InitSoftMesh(btCollisionShape* shape);
 	inline bool isSoft(void);
 	inline void addTriangle(const btVector3& a, const btVector3& b, const btVector3& c);

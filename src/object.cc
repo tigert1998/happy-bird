@@ -426,7 +426,17 @@ btVector3 Object::GetOrigin(void){
 		return btVector3(0,0,0);
 	}
 }
-
+btTransform Object::GetTransform(void){
+	btTransform transform;
+	if(!is_soft_){
+		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
+		return transform;
+	}
+	else{
+		transform.setIdentity();
+		return transform;
+	}
+}
 
 LivingObject::LivingObject(World* world, Shader* shader):
 	Object(world, shader), character_(nullptr){ }
