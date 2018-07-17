@@ -16,6 +16,8 @@ class Wall: public DeadObject{
 	static float margin_ratio_;
 	static float brick_ratio_;
 	static std::vector<float> brick_vertices_;
+	static std::vector<uint32_t> brick_indices_;
+	static std::vector<float> brick_normals_;
 	glm::vec3 half_extents_; // the 2 component is abbrecated
 	float scaling_; // the brick unit scaling to normalized mesh
  public:
@@ -23,5 +25,7 @@ class Wall: public DeadObject{
 	// mass is set to 0, dummy input
 	Wall(World* world, Shader* shader, Material*, const btTransform& trans, float scaling, glm::vec3 half_extents);
 	~Wall(){ }
+	// void Draw(Camera* camera, const LightCollection* light_collection);
 	void InitBricks(const btTransform& transform);
+	// void ImportToGraphics(void);
 };

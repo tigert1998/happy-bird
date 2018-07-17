@@ -1,6 +1,8 @@
 #version 330 core  
 
-out vec4 FragColor;  
+uniform vec3 uColor;
+
+out vec4 FragColor;
   
 void main()  
 {  
@@ -15,5 +17,5 @@ void main()
         discard;  
     }
   
-    FragColor = mix(color1, color2, smoothstep(0.1, 0.25, f));  
+    FragColor = mix(vec4(uColor,1), color2, smoothstep(0.1, 0.25, f));  
 };

@@ -1,3 +1,7 @@
+#include <iostream>
+using std::cout;
+using std::endl;
+
 #include "particle.h"
 
 ParticleEmitter::ParticleEmitter(
@@ -11,7 +15,8 @@ ParticleEmitter::ParticleEmitter(
 	min_v_(minVelocity),
 	max_v_(maxVelocity),
 	min_r_(minRadius),
-	max_r_(maxRadius) { }
+	max_r_(maxRadius) {
+}
 void ParticleEmitter::Emit(std::vector<ParticleInfo>& container, int head){
 	container[head] = ParticleInfo(
 		direction_ * ((min_v_ + max_v_) / 2.0f), 
@@ -27,6 +32,7 @@ Particle::Particle(World* world, Shader* shader, Material* material, Object* obj
 	particles_(amount), 
 	emitter_(glm::vec3(1,0,0)){
 	assert(world_);
+	vertices_.resize(amount_ * 4);
 	if(!shader_)shader_ = new Shader("shader/particle.vert", "shader/particle.frag");
 	InitParticles();
 }
@@ -59,6 +65,7 @@ void Particle::Draw(Camera* camera, const LightCollection* lights){
 		vertices_[3*i + 2] = particles_[i].position[2];
 		vertices_[3*i + 3] = particles_[i].radius;
 	}
+	ImportToGraphics();
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uColor", material_->diffuse());
 	

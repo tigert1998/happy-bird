@@ -152,14 +152,22 @@ void World::InitScene(void) {
   light_collection->PushBack(
     new ParallelLight(
       glm::vec3(-1, -1, -1), 
-      glm::vec3(1, 0, 0), 0.4
+      glm::vec3(1, 0, 0), 0.7
     )
   );
   // objects_.push_back( new Particle(this, nullptr, new Material(color::White(), color::White(), 8), man));
-  // btTransform wall_transform;
-  // wall_transform.setIdentity();
-  // wall_transform.setOrigin(btVector3(0, half_bound , 0));
-  // objects_.push_back( new Wall(this, nullptr, wall_transform, 3, glm::vec3(half_bound, half_bound, half_bound)) );
+  float wallHeight = 10;
+  float wallWidth = 10;
+  btTransform wall_transform;
+  wall_transform.setIdentity();
+  wall_transform.setOrigin(btVector3(-box_half * 2, wallHeight / 2 , -box_half * 2));
+  objects_.push_back( new Wall(
+    this, nullptr, 
+    new Material(color::White(), color::White(), 8), 
+    wall_transform, 
+    1, 
+    glm::vec3(wallWidth/2, wallHeight/2, 0))
+  );
 }
 void World::Update(void) { // sync mesh and render
   cout << "[World::Update()]" << endl;

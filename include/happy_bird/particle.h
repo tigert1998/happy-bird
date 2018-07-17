@@ -30,7 +30,7 @@ struct ParticleInfo{
 		velocity(v),
 		position(0, 0, 0),
 		acceleration(a),
-		radius(1),
+		radius(radius),
 		color(color){ }
 	ParticleInfo(const ParticleInfo& rhs):
 		velocity(rhs.velocity),
@@ -54,10 +54,10 @@ class ParticleEmitter{
  public:
 	ParticleEmitter(
 		glm::vec3 direction, 
-		float minVelocity = 0, 
+		float minVelocity = 1, 
 		float maxVelocity = 2, 
 		float minRadius = 1, 
-		float maxRadius = 3
+		float maxRadius = 2
 	);
 	~ParticleEmitter(){ }
 	void Emit(std::vector<ParticleInfo>& container, int head);
@@ -70,7 +70,7 @@ class Particle: public DeadObject{
 	std::vector<ParticleInfo> particles_;
 	ParticleEmitter emitter_;
  public:
- 	Particle(World* world, Shader* shader, Material* material, Object* object, int amount = 20);
+ 	Particle(World* world, Shader* shader, Material* material, Object* object, int amount = 8);
 	~Particle(){ }
 	void ImportToGraphics();
 	void InitParticles(void);

@@ -1,3 +1,7 @@
+#include <iostream>
+using std::cout;
+using std::endl;
+
 #include "shader_utility/shader.h"
 #include "shader_utility/material.h"
 #include "shader_utility/parallel_light.h"
