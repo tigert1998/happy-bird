@@ -6,7 +6,7 @@
 #include "color.h"
 #include "bullet_common.h" // btCollisionObject
 #include "character.h"
-#include "vector_utility.h"
+#include "math_utility.h"
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
 #include "shader_utility/material.h"

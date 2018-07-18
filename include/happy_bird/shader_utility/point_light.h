@@ -1,7 +1,7 @@
 #include "shader_utility/light.h"
 #include "shader_utility/attenuation.h"
 
-class PointLight: public Light {
+class PointLight: virtual public Light {
 private:
 	glm::vec3 position_;
 	Attenuation attenuation_;

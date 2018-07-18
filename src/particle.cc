@@ -3,7 +3,7 @@ using std::cout;
 using std::endl;
 
 #include "particle.h"
-#include "vector_utility.h"
+#include "math_utility.h"
 
 ParticleEmitter::ParticleEmitter(
 	glm::vec3 direction, 

@@ -3,7 +3,7 @@
 
 #include "opengl_common.h"
 #include "bullet_common.h"
-#include "vector_utility.h"
+#include "math_utility.h"
 #include "object.h"
 #include "head.h"
 #include "character.h"
