@@ -10,7 +10,7 @@ $(SRC_PATH)/particle.cc  $(SRC_PATH)/wall.cc\
 $(SRC_PATH)/shader_utility/shader.cc $(SRC_PATH)/shader_utility/light.cc \
 $(SRC_PATH)/shader_utility/light_collection.cc $(SRC_PATH)/shader_utility/material.cc \
 $(SRC_PATH)/shader_utility/parallel_light.cc $(SRC_PATH)/shader_utility/point_light.cc \
-$(SRC_PATH)/shader_utility/attenuation.cc
+$(SRC_PATH)/shader_utility/attenuation.cc $(SRC_PATH)/hero.cc
 
 # & $(CC) $(TEST_PATH)	/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml
 all: $(SRC)

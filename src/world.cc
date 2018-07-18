@@ -100,7 +100,7 @@ void World::InitPhysics(void) {
     bt_soft_solver_
   );
 
-  bt_world_->setGravity(btVector3(0, -50, 0));
+  bt_world_->setGravity(btVector3(0, -200, 0));
   bt_soft_info_.m_dispatcher = bt_dispatcher_;
   bt_soft_info_.m_broadphase = bt_overlapping_paircache_;
   bt_soft_info_.m_sparsesdf.Initialize();
@@ -154,9 +154,13 @@ void World::InitScene(void) {
   btTransform start_transform;
   start_transform.setIdentity();
   start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0));
-  LivingObject* man = new Head(
+  // LivingObject* man = new Head(
+  //   this, nullptr, new Material(color::White(), color::White(), 8),
+  //   start_transform, World::character_height / 4
+  // );
+  LivingObject* man = new Hero(
     this, nullptr, new Material(color::White(), color::White(), 8),
-    start_transform, World::character_height / 4
+    start_transform, World::character_height / 2, World::character_height
   );
   objects_.push_back(man);
   character_ = man->character_;

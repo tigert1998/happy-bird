@@ -5,7 +5,7 @@ using std::endl;
 #include "character.h"
 #include "world.h"
 
-float Character::static_pace_(300);
+float Character::static_pace_(500);
 
 // MUST input a ConvexShape pointer
 CharacterBullet::CharacterBullet(World* world, const btTransform& startTransform, btCollisionObject* obj){
@@ -105,7 +105,7 @@ void CharacterImpl::Jump(float step){
 	// btTransform trans = object_->getWorldTransform();
 	// btVector3 upDir = trans.getBasis()[1].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
-	body->setLinearVelocity(body->getLinearVelocity() + World::up * step / 2 * Character::static_pace_);
+	body->setLinearVelocity(body->getLinearVelocity() + World::up * step / 3 * Character::static_pace_);
 }
 void CharacterImpl::ResetMove(void){ // Error
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
