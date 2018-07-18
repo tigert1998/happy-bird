@@ -16,6 +16,8 @@ btVector3 World::forward(0,0,1);
 btVector3 World::left(1,0,0);
 btVector3 World::up(0,1,0);
 btScalar World::character_height(8);
+btScalar World::bounding_height(100);
+btScalar World::max_speed(15.0);
 
 World::World() {
   InitPhysics();
@@ -259,9 +261,8 @@ void World::ProcessInput(void) {
   if(!character_)return ;
   static float current_time, last_time = glfwGetTime();
   current_time = glfwGetTime();
-  float delta_time = current_time - last_time;
+  float delta_time = (current_time - last_time);
   last_time = current_time;
-  // character_->ResetMove();
   if (keys_pressed[GLFW_KEY_W]) // Forward
     character_->Move(true, delta_time);
   else if (keys_pressed[GLFW_KEY_S])

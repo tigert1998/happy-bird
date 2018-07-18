@@ -37,8 +37,8 @@ Hero::Hero(World* world, Shader* shader, Material* material,
 	btTransform tmpTrans(btTransform::getIdentity());
 	// tmpTrans.setOrigin(btVector3(0, World::character_height, 0));
 	btGeneric6DofConstraint* level_constraint = new btGeneric6DofConstraint(*(dynamic_cast<btRigidBody*>(bt_object_)), tmpTrans, true);
-	btVector3 translation_lower(1, 0, 1);
-	btVector3 translation_upper(-1, World::character_height, -1);
+	btVector3 translation_lower(1, 1, 1);
+	btVector3 translation_upper(-1, -1, -1);
 	btVector3 rotation_lower(0, 0, 0);
 	btVector3 rotation_upper(0, 0, 0);
 	level_constraint->setLinearLowerLimit(translation_lower);

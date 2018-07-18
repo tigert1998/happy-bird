@@ -46,6 +46,8 @@ class World{
 	static btVector3 left;
 	static btVector3 up;
 	static btScalar character_height; 
+	static btScalar bounding_height;
+	static btScalar max_speed;
 
 	World();
 	~World();

@@ -5,7 +5,7 @@ using std::endl;
 #include "character.h"
 #include "world.h"
 
-float Character::static_pace_(500);
+float Character::static_pace_(100);
 
 // MUST input a ConvexShape pointer
 CharacterBullet::CharacterBullet(World* world, const btTransform& startTransform, btCollisionObject* obj){
@@ -85,33 +85,46 @@ CharacterImpl::~CharacterImpl(){ }
 btCollisionObject* CharacterImpl::GetDelegate(void){
 	return object_;
 }
-void CharacterImpl::Move(bool forward, float step){
+void CharacterImpl::Move(bool forward, float step){ // position 2
 	// btTransform trans = object_->getWorldTransform();
 	// btVector3 forwardDir = trans.getBasis()[2].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
 	body->setActivationState(ACTIVE_TAG);
-	body->setLinearVelocity(body->getLinearVelocity() + World::forward * step * Character::static_pace_ * (forward?1:-1));
+	// ResetMove();
+	btVector3 v = body->getLinearVelocity() + World::forward * step * Character::static_pace_ * (forward?1:-1);
+	if(v[2] > World::max_speed)v[2] = World::max_speed;
+	if(v[2] < -World::max_speed)v[2] = -World::max_speed;
+	body->setLinearVelocity(v);
 }
 void CharacterImpl::Rotate(bool left, float step){
-	// Try rotating
+	// Try rotating //
 	// btMatrix3x3 orn = object_->getWorldTransform().getBasis();
 	// orn *= btMatrix3x3(btQuaternion(btVector3(0,1,0),0.01 * (left?-1:1) ));
 	// step = 10;
-	// Try move left-right
+	// Try move left-right //
 	// object_->getWorldTransform().setBasis(orn);
 	// btTransform trans = object_->getWorldTransform();
 	// btVector3 leftDir = trans.getBasis()[0].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
-	// Move by world standard
+	// Move by world standard //
 	body->setActivationState(ACTIVE_TAG);
-	body->setLinearVelocity(body->getLinearVelocity() + World::left * step * Character::static_pace_ * (left?1:-1));
+	// ResetRotate();
+	btVector3 v = body->getLinearVelocity() + World::left * step * Character::static_pace_ * (left?1:-1);
+	if(v[0] > World::max_speed)v[0] = World::max_speed;
+	if(v[0] < -World::max_speed)v[0] = -World::max_speed;
+	body->setLinearVelocity(v);
+	// body->setLinearVelocity(body->getLinearVelocity() + World::left * step * Character::static_pace_ * (left?1:-1));
 }
 void CharacterImpl::Jump(float step){
 	// btTransform trans = object_->getWorldTransform();
 	// btVector3 upDir = trans.getBasis()[1].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
 	body->setActivationState(ACTIVE_TAG);
-	body->setLinearVelocity(body->getLinearVelocity() + World::up * step / 3 * Character::static_pace_);
+	btVector3 velocity = body->getLinearVelocity();
+	if(fabs(velocity[1]) > 0.1)return ; // in a jump
+	// ignore step
+	step = 0.32;
+	body->setLinearVelocity(body->getLinearVelocity() + World::up * step * Character::static_pace_);
 }
 void CharacterImpl::ResetMove(void){ // Error
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
