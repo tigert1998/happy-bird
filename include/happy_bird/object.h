@@ -20,7 +20,7 @@ class Object{
 	World* world_;
 	// OpenGL util
 	Shader* shader_;
-	uint32_t vao_, vbos_[2], ebo_;
+	uint32_t vao_, normal_vbo_, position_vbo_, ebo_;
 	// Bullet shape
 	bool is_soft_;
 	btCollisionObject* bt_object_;
@@ -43,7 +43,6 @@ class Object{
 	virtual void InitSoftMesh(btSoftBody* shape);
 	virtual btVector3 GetOrigin(void); 
 	virtual btTransform GetTransform(void);
-	// virtual void InitSoftMesh(btCollisionShape* shape);
 	inline bool is_soft(void);
 	inline void addTriangle(const btVector3& a, const btVector3& b, const btVector3& c);
 };

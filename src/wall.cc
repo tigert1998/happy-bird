@@ -222,11 +222,5 @@ void Wall::InitBricks(const btTransform& parent_transform){
 		flipBarrier[(level+1)%2].push_back(half_extents_[0] * 2);
 		level ++;
 	}
-	// for(int i = 0; i + 2 < vertices_.size(); i+= 3){
-	// 	cout << (i/3) << ": " << "(" << vertices_[i] << ", " << vertices_[i+1] << ", " << vertices_[i+2] << ")" << endl;
-	// }
-	// for(int i = 0; i + 2 < indices_.size(); i+= 3){
-	// 	cout << "[" << indices_[i] << ", " << indices_[i+1] << ", " << indices_[i+2] << "]" << endl;
-	// }
 	return ;
 }

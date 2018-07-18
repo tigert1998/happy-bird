@@ -31,7 +31,6 @@ Cloth::Cloth(World* world, Shader* shader, Material* material, float attachWid, 
 	// attached_ = head->bt_object_;
 	attached_ = head->character_->GetDelegate();
 	auto trans = attached_->getWorldTransform();
-	std::cout << "[Cloth::Cloth(World*, Material*, Shader*, float, float, uint32_t, Head*)] " << trans.getOrigin().getX() << ", " << trans.getOrigin().getY() << ", " << trans.getOrigin().getZ() << endl;
 	// btCollisionObject* object = head->character_->ghost_object_;
 	btVector3 left(-radius, 0.2, 0);
 	btVector3 fleft(-0.5 * radius, 0.2, 0.866 * radius);
@@ -79,7 +78,7 @@ void Cloth::ImportToGraphics() {
 
 	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, position_vbo_);
 	glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(btScalar), vertices_.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
 

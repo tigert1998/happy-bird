@@ -6,6 +6,7 @@ using std::endl;
 #include "random.h"
 #include "math_utility.h"
 #include "opengl_common.h"
+#include "shader_utility/pure_color_material.h"
 
 ParticleConfig::ParticleConfig(glm::vec3 v, Color color, float interval, int intFlag): 
 	major_velocity_(v),
@@ -121,7 +122,7 @@ Particle::Particle(
 	offset_(offset),
 	amount_(amount), 
 	particles_(amount), 
-	emitter_(ParticleConfig(velocity, material->diffuse(), interval, flags)){
+	emitter_(ParticleConfig(velocity, dynamic_cast<PureColorMaterial*>(material)->diffuse(), interval, flags)){
 	assert(world_);
 	vertices_.resize(amount_ * 4);
 	if(!shader_)shader_ = new Shader("shader/particle.vert", "shader/particle.frag");
@@ -137,10 +138,9 @@ void Particle::InitParticles(void){
 }
 void Particle::ImportToGraphics(){
 	glBindVertexArray(vao_); 
-	// point coord
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, position_vbo_);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(btScalar) * vertices_.size(), vertices_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0,4,GL_FLOAT, GL_FALSE, 4*sizeof(btScalar), (void*)0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(btScalar), (void*) 0);
 	glEnableVertexAttribArray(0);
 	// point radius
 	// glBindBuffer(GL_ARRAY_BUFFER, vbos_[1]);
@@ -150,7 +150,7 @@ void Particle::ImportToGraphics(){
 
 	glBindVertexArray(0);
 }
-void Particle::Draw(Camera* camera, const LightCollection* lights){
+void Particle::Draw(Camera* camera, const LightCollection* lights) {
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update();
 		vertices_[4*i + 0] = particles_[i].position[0];
@@ -160,7 +160,7 @@ void Particle::Draw(Camera* camera, const LightCollection* lights){
 	}
 	ImportToGraphics();
 	shader_->Use();
-	shader_->SetUniform<glm::vec3>("uColor", material_->diffuse());
+	shader_->SetUniform<glm::vec3>("uColor", dynamic_cast<PureColorMaterial*>(material_)->diffuse());
 	
 	btTransform transform;
 	transform.setIdentity();

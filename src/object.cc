@@ -8,6 +8,7 @@ using std::endl;
 #include "object.h"
 #include "world.h"
 #include "camera.h"
+#include "debug_utility/log.h"
 
 // Base class //
 bool Object::is_soft(void) {
@@ -35,7 +36,8 @@ Object::Object(World* w, Shader* shader, Material* material):
 	material_(material),
 	bt_object_(nullptr) {
 	glGenVertexArrays(1, &vao_);
-	glGenBuffers(2, vbos_);
+	glGenBuffers(1, &normal_vbo_);
+	glGenBuffers(1, &position_vbo_);
 	glGenBuffers(1, &ebo_);
 }
 
@@ -44,30 +46,30 @@ Object::~Object(){
 	delete shader_;
 	delete bt_object_;
 	glDeleteVertexArrays(1, &vao_);
-	glDeleteBuffers(2, vbos_);
+	glDeleteBuffers(1, &normal_vbo_);
+	glDeleteBuffers(1, &position_vbo_);
 	glDeleteBuffers(1, &ebo_);
 }
 
-void Object::ImportToPhysics(){
+void Object::ImportToPhysics() {
 	world_->bt_world_->addRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
 
-void Object::DeleteFromPhysics(){
+void Object::DeleteFromPhysics() {
 	world_->bt_world_->removeRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
 }
 
 void Object::ImportToGraphics() {
-	// cout << "[Object::ImportToGraphics()]" << endl;
 	glBindVertexArray(vao_);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, position_vbo_);
 	glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(btScalar), vertices_.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, normal_vbo_);
 	glBufferData(GL_ARRAY_BUFFER, normals_.size() * sizeof(btScalar), normals_.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
 
@@ -80,7 +82,6 @@ void Object::ImportToGraphics() {
 }
 
 void Object::Draw(Camera* camera, const btTransform& transform, const LightCollection* light_collection) {
-	// cout << "[Object::Draw(Camera*, const btTransform&, const LightCollection*)]" << endl;
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uEye.position", camera->position());
 	shader_->SetUniform<LightCollection>("uLightCollection", *light_collection);
@@ -94,7 +95,6 @@ void Object::Draw(Camera* camera, const btTransform& transform, const LightColle
 }
 
 void Object::Draw(Camera* camera, const LightCollection* light_collection) {
-	// cout << "[Object::Draw(Camera*, const LightCollection*)]" << endl;
 	shader_->Use();
 	shader_->SetUniform<Material>("uMaterial", *material_);
 	
@@ -116,19 +116,16 @@ void Object::Draw(Camera* camera, const LightCollection* light_collection) {
 	glBindVertexArray(0);
 }
 
-void Object::InitMesh(void){
-	// cout << "[Object::InitMesh()]" << endl;
+void Object::InitMesh(void) {
 	vertices_.clear();
 	indices_.clear();
 	if (!is_soft_) {
 		btTransform parent_transform;
 		parent_transform.setIdentity();
-		// btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(parent_transform);
 		btCollisionShape* bt_shape = bt_object_->getCollisionShape();
 		InitRigidMesh(bt_shape, parent_transform);
-	}
-	else{
-		InitSoftMesh( dynamic_cast<btSoftBody*>(bt_object_) );
+	} else {
+		InitSoftMesh(dynamic_cast<btSoftBody*>(bt_object_));
 	}
 }
 
@@ -150,25 +147,24 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 			btScalar vecLen = 100.f;
 			btVector3 verts[4];
 
-			verts[0] = plane_origin + vec0*vecLen + vec1*vecLen;
-			verts[1] = plane_origin - vec0*vecLen + vec1*vecLen;
-			verts[2] = plane_origin - vec0*vecLen - vec1*vecLen;
-			verts[3] = plane_origin + vec0*vecLen - vec1*vecLen;
+			verts[0] = plane_origin + vec0 * vecLen + vec1 * vecLen;
+			verts[1] = plane_origin - vec0 * vecLen + vec1 * vecLen;
+			verts[2] = plane_origin - vec0 * vecLen - vec1 * vecLen;
+			verts[3] = plane_origin + vec0 * vecLen - vec1 * vecLen;
 			int startIndex = vertices_.size() / 3;
-			indices_.push_back(startIndex+0);
-			indices_.push_back(startIndex+1);
-			indices_.push_back(startIndex+2);
-			indices_.push_back(startIndex+0);
-			indices_.push_back(startIndex+2);
-			indices_.push_back(startIndex+3);
+			indices_.push_back(startIndex + 0);
+			indices_.push_back(startIndex + 1);
+			indices_.push_back(startIndex + 2);
+			indices_.push_back(startIndex + 0);
+			indices_.push_back(startIndex + 2);
+			indices_.push_back(startIndex + 3);
 
 			btVector3 triNormal = parent_transform.getBasis()*planeNormal;
 				
 
-			for (int i=0;i<4;i++)
-			{
+			for (int i = 0; i < 4; i++) {
 				btVector3 vtxPos;
-				btVector3 pos =parent_transform*verts[i];
+				btVector3 pos =parent_transform * verts[i];
 				vertices_.push_back(pos[0]);
 				vertices_.push_back(pos[1]);
 				vertices_.push_back(pos[2]);
@@ -178,54 +174,57 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 			}
 			break;
 		}
-		case TRIANGLE_MESH_SHAPE_PROXYTYPE:
-		{
-
+		case TRIANGLE_MESH_SHAPE_PROXYTYPE: {
 			btBvhTriangleMeshShape* trimesh = (btBvhTriangleMeshShape*) bt_shape;
 			btVector3 trimeshScaling = trimesh->getLocalScaling();
 			btStridingMeshInterface* meshInterface = trimesh->getMeshInterface();
 			btAlignedObjectArray<btVector3> vertices;
 			btAlignedObjectArray<int> indices;
 				
-			for (int partId=0;partId<meshInterface->getNumSubParts();partId++)
-			{
-					
+			for (int partId = 0; partId<meshInterface->getNumSubParts(); partId++) {
 				const unsigned char *vertexbase = 0;
 				int numverts = 0;
 				PHY_ScalarType type = PHY_INTEGER;
 				int stride = 0;
-				const unsigned char *indexbase = 0;
+				const unsigned char* indexbase = 0;
 				int indexstride = 0;
 				int numfaces = 0;
 				PHY_ScalarType indicestype = PHY_INTEGER;
-				//PHY_ScalarType indexType=0;
 					
 				btVector3 triangleVerts[3];
-				meshInterface->getLockedReadOnlyVertexIndexBase(&vertexbase,numverts,	type,stride,&indexbase,indexstride,numfaces,indicestype,partId);
+				meshInterface->getLockedReadOnlyVertexIndexBase(
+					&vertexbase,
+					numverts,
+					type,
+					stride,
+					&indexbase,
+					indexstride,
+					numfaces,
+					indicestype,
+					partId
+				);
 				btVector3 aabbMin,aabbMax;
 					
-				for (int triangleIndex = 0 ; triangleIndex < numfaces;triangleIndex++)
-				{
-					unsigned int* gfxbase = (unsigned int*)(indexbase+triangleIndex*indexstride);
+				for (int triangleIndex = 0; triangleIndex < numfaces; triangleIndex++) {
+					unsigned int* gfxbase = (unsigned int*) (indexbase + triangleIndex * indexstride);
 						
-					for (int j=2;j>=0;j--)
-					{
+					for (int j = 2; j >= 0; j--) {
 							
-						int graphicsindex = indicestype==PHY_SHORT?((unsigned short*)gfxbase)[j]:gfxbase[j];
-						if (type == PHY_FLOAT)
-						{
-							float* graphicsbase = (float*)(vertexbase+graphicsindex*stride);
+						int graphicsindex = indicestype == PHY_SHORT ? ((unsigned short*) gfxbase)[j] : gfxbase[j];
+						if (type == PHY_FLOAT) {
+							float* graphicsbase = (float*) (vertexbase+graphicsindex * stride);
 							triangleVerts[j] = btVector3(
-															graphicsbase[0]*trimeshScaling.getX(),
-															graphicsbase[1]*trimeshScaling.getY(),
-															graphicsbase[2]*trimeshScaling.getZ());
-						}
-						else
-						{
-							double* graphicsbase = (double*)(vertexbase+graphicsindex*stride);
-							triangleVerts[j] = btVector3( btScalar(graphicsbase[0]*trimeshScaling.getX()),
-															btScalar(graphicsbase[1]*trimeshScaling.getY()),
-															btScalar(graphicsbase[2]*trimeshScaling.getZ()));
+								graphicsbase[0] * trimeshScaling.getX(),
+								graphicsbase[1] * trimeshScaling.getY(),
+								graphicsbase[2] * trimeshScaling.getZ()
+							);
+						} else {
+							double* graphicsbase = (double*) (vertexbase+graphicsindex * stride);
+							triangleVerts[j] = btVector3( 
+								btScalar(graphicsbase[0] * trimeshScaling.getX()),
+								btScalar(graphicsbase[1] * trimeshScaling.getY()),
+								btScalar(graphicsbase[2] * trimeshScaling.getZ())
+							);
 						}
 					}
 					indices.push_back(vertices.size());
@@ -235,16 +234,13 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 					indices.push_back(vertices.size());
 					vertices.push_back(triangleVerts[2]);
 
-					btVector3 triNormal = (triangleVerts[1]-triangleVerts[0]).cross(triangleVerts[2]-triangleVerts[0]);
+					btVector3 triNormal = (triangleVerts[1] - triangleVerts[0]).cross(triangleVerts[2] - triangleVerts[0]);
 					btScalar dot = triNormal.dot(triNormal);
 
 					//cull degenerate triangles
-					if (dot >= SIMD_EPSILON*SIMD_EPSILON)
-					{
+					if (dot >= SIMD_EPSILON*SIMD_EPSILON) {
 						triNormal /= btSqrt(dot);
-						for (int v = 0; v < 3; v++)
-						{
-
+						for (int v = 0; v < 3; v++) {
 							btVector3 pos = parent_transform*triangleVerts[v];
 							indices_.push_back(vertices_.size() / 3);
 							vertices_.push_back(pos[0]);
@@ -258,13 +254,10 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 					
 				}
 			}
-			
 			break;
 		}
-		default:
-		{
-			if (bt_shape->isConvex())
-			{
+		default: {
+			if (bt_shape->isConvex()) {
 				btConvexShape* convex = (btConvexShape*)bt_shape;
 				{
 					btShapeHull* hull = new btShapeHull(convex);
@@ -275,24 +268,21 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 						//int numVertices = hull->numVertices();
 						//int numIndices =hull->numIndices();
 
-						for (int t=0;t<hull->numTriangles();t++)
-						{
-
+						for (int t = 0; t < hull->numTriangles(); t++) {
 							btVector3 triNormal;
 
-							int index0 = hull->getIndexPointer()[t*3+0];
-							int index1 = hull->getIndexPointer()[t*3+1];
-							int index2 = hull->getIndexPointer()[t*3+2];
-							btVector3 pos0 =parent_transform*hull->getVertexPointer()[index0];
-							btVector3 pos1 =parent_transform*hull->getVertexPointer()[index1];
-							btVector3 pos2 =parent_transform*hull->getVertexPointer()[index2];
-							triNormal = (pos1-pos0).cross(pos2-pos0);
+							int index0 = hull->getIndexPointer()[t * 3 + 0];
+							int index1 = hull->getIndexPointer()[t * 3 + 1];
+							int index2 = hull->getIndexPointer()[t * 3 + 2];
+							btVector3 pos0 = parent_transform * hull->getVertexPointer()[index0];
+							btVector3 pos1 = parent_transform * hull->getVertexPointer()[index1];
+							btVector3 pos2 = parent_transform * hull->getVertexPointer()[index2];
+							triNormal = (pos1 - pos0).cross(pos2 - pos0);
 							triNormal.normalize();
 
-							for (int v=0;v<3;v++)
-							{
-								int index = hull->getIndexPointer()[t*3+v];
-								btVector3 pos =parent_transform*hull->getVertexPointer()[index];
+							for (int v = 0; v < 3; v++) {
+								int index = hull->getIndexPointer()[t * 3 + v];
+								btVector3 pos = parent_transform * hull->getVertexPointer()[index];
 								indices_.push_back(vertices_.size() / 3);
 								vertices_.push_back(pos[0]);
 								vertices_.push_back(pos[1]);
@@ -305,142 +295,134 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 					}
 					delete hull;
 				}
-			} else
-			{
-				if (bt_shape->isCompound())
-				{
+			} else {
+				if (bt_shape->isCompound()) {
 					btCompoundShape* compound = (btCompoundShape*) bt_shape;
-					for (int i=0;i<compound->getNumChildShapes();i++)
-					{
-
+					for (int i = 0; i < compound->getNumChildShapes(); i++) {
 						btTransform childWorldTrans = parent_transform * compound->getChildTransform(i);
 						InitRigidMesh(compound->getChildShape(i),childWorldTrans);
 					}
-				} else
-				{
-					if (bt_shape->getShapeType()==SDF_SHAPE_PROXYTYPE)
-					{
+				} else {
+					if (bt_shape->getShapeType() == SDF_SHAPE_PROXYTYPE) {
 						//not yet
-					} else
-					{
+					} else {
 						btAssert(0);
 					}
 				}
-					
 			}
 		}
 	};
 }
-void Object::InitSoftMesh(btSoftBody* psb){
+
+void Object::InitSoftMesh(btSoftBody* psb) {
 	int drawflags = 0x0004;
-	const btScalar		scl=(btScalar)0.1;
-	const btScalar		nscl=scl*5;
-	const btVector3		lcolor=btVector3(0,0,0);
-	const btVector3		ncolor=btVector3(1,1,1);
-	const btVector3		ccolor=btVector3(1,0,0);
-	int i,j,nj;
-	if(0!=(drawflags&fDrawFlags::Clusters))
-	{
+	const btScalar scl = (btScalar) 0.1;
+	const btScalar nscl = scl * 5;
+	const btVector3 lcolor = btVector3(0, 0, 0);
+	const btVector3	ncolor = btVector3(1, 1, 1);
+	const btVector3	ccolor = btVector3(1, 0, 0);
+	int i, j, nj;
+	if (0 != (drawflags & fDrawFlags::Clusters)) {
 		srand(1806);
-		for(i=0;i<psb->m_clusters.size();++i)
-		{
-			if(psb->m_clusters[i]->m_collide)
-			{
-				btVector3						color(	rand()/(btScalar)RAND_MAX,
-					rand()/(btScalar)RAND_MAX,
-					rand()/(btScalar)RAND_MAX);
-				color=color.normalized()*0.75;
+		for (i = 0; i < psb->m_clusters.size(); ++i) {
+			if (psb->m_clusters[i]->m_collide) {
+				btVector3 color(
+					rand() / (btScalar) RAND_MAX,
+					rand() / (btScalar) RAND_MAX,
+					rand() / (btScalar) RAND_MAX
+				);
+				color = color.normalized() * 0.75;
 				btAlignedObjectArray<btVector3>	vertices;
 				vertices.resize(psb->m_clusters[i]->m_nodes.size());
-				for(j=0,nj=vertices.size();j<nj;++j)
-				{				
-					vertices[j]=psb->m_clusters[i]->m_nodes[j]->m_x;
+				for(j = 0, nj = vertices.size(); j < nj; ++j) {
+					vertices[j] = psb->m_clusters[i]->m_nodes[j]->m_x;
 				}
-				btConvexHullComputer	computer;
+				btConvexHullComputer computer;
 				int stride = sizeof(btVector3);
 				int count = vertices.size();
-				btScalar shrink=0.f;
-				btScalar shrinkClamp=0.f;
-				computer.compute(&vertices[0].getX(),stride,count,shrink,shrinkClamp);
-				for (int i=0;i<computer.faces.size();i++)
-				{
-
+				btScalar shrink = 0.0f;
+				btScalar shrinkClamp = 0.0f;
+				computer.compute(&vertices[0].getX(), stride,count, shrink, shrinkClamp);
+				for (int i = 0; i < computer.faces.size(); i++) {
 					int face = computer.faces[i];
 					//printf("face=%d\n",face);
-					const btConvexHullComputer::Edge*  firstEdge = &computer.edges[face];
-					const btConvexHullComputer::Edge*  edge = firstEdge->getNextEdgeOfFace();
+					const btConvexHullComputer::Edge* firstEdge = &computer.edges[face];
+					const btConvexHullComputer::Edge* edge = firstEdge->getNextEdgeOfFace();
 
 					int v0 = firstEdge->getSourceVertex();
 					int v1 = firstEdge->getTargetVertex();
-					while (edge!=firstEdge)
-					{
+					while (edge != firstEdge) {
 						int v2 = edge->getTargetVertex();
-						addTriangle(computer.vertices[v0],computer.vertices[v1],computer.vertices[v2]);
+						addTriangle(computer.vertices[v0], computer.vertices[v1], computer.vertices[v2]);
 						edge = edge->getNextEdgeOfFace();
-						v0=v1;
-						v1=v2;
-					};
+						v0 = v1;
+						v1 = v2;
+					}
 				}
 			}
 		}
-	}
-	else
-	{
-		/* Faces	*/ 
-		if(0!=(drawflags&fDrawFlags::Faces))
-		{
-			const btScalar	scl=(btScalar)0.8;
-			const btScalar	alp=(btScalar)1;
-			const btVector3	col(0,(btScalar)0.7,0);
-			for(i=0;i<psb->m_faces.size();++i)
-			{
+	} else {
+		/* Faces */ 
+		if (0 != (drawflags & fDrawFlags::Faces)) {
+			const btScalar scl = (btScalar) 0.8;
+			const btScalar alp = (btScalar) 1;
+			const btVector3	col(0, (btScalar) 0.7, 0);
+			for (i = 0; i < psb->m_faces.size(); ++i) {
 				const btSoftBody::Face&	f=psb->m_faces[i];
-				if(0==(f.m_material->m_flags&btSoftBody::fMaterial::DebugDraw)) continue;
-				const btVector3			x[]={f.m_n[0]->m_x,f.m_n[1]->m_x,f.m_n[2]->m_x};
-				const btVector3			c=(x[0]+x[1]+x[2])/3;
-				addTriangle((x[0]-c)*scl+c,
-					(x[1]-c)*scl+c,
-					(x[2]-c)*scl+c);
-			}	
+				if (0 == (f.m_material->m_flags&btSoftBody::fMaterial::DebugDraw)) continue;
+				const btVector3 x[] = {
+					f.m_n[0]->m_x,
+					f.m_n[1]->m_x,
+					f.m_n[2]->m_x
+				};
+				const btVector3 c = (x[0] + x[1] + x[2]) / 3;
+				addTriangle(
+					(x[0] - c) * scl + c,
+					(x[1] - c) * scl + c,
+					(x[2] - c) * scl + c
+				);
+			}
 		}
-		/* Tetras	*/ 
-		if(0!=(drawflags&fDrawFlags::Tetras))
-		{
-			const btScalar	scl=(btScalar)0.8;
-			const btScalar	alp=(btScalar)1;
-			const btVector3	col((btScalar)0.3,(btScalar)0.3,(btScalar)0.7);
-			for(int i=0;i<psb->m_tetras.size();++i)
-			{
-				const btSoftBody::Tetra&	t=psb->m_tetras[i];
-				if(0==(t.m_material->m_flags&btSoftBody::fMaterial::DebugDraw)) continue;
-				const btVector3				x[]={t.m_n[0]->m_x,t.m_n[1]->m_x,t.m_n[2]->m_x,t.m_n[3]->m_x};
-				const btVector3				c=(x[0]+x[1]+x[2]+x[3])/4;
-				addTriangle((x[0]-c)*scl+c,(x[1]-c)*scl+c,(x[2]-c)*scl+c);
-				addTriangle((x[0]-c)*scl+c,(x[1]-c)*scl+c,(x[3]-c)*scl+c);
-				addTriangle((x[1]-c)*scl+c,(x[2]-c)*scl+c,(x[3]-c)*scl+c);
-				addTriangle((x[2]-c)*scl+c,(x[0]-c)*scl+c,(x[3]-c)*scl+c);
+		/* Tetras */ 
+		if (0 != (drawflags & fDrawFlags::Tetras)) {
+			const btScalar scl = (btScalar) 0.8;
+			const btScalar alp = (btScalar) 1;
+			const btVector3	col((btScalar) 0.3, (btScalar) 0.3, (btScalar) 0.7);
+			for (int i = 0; i < psb->m_tetras.size(); ++i) {
+				const btSoftBody::Tetra& t = psb->m_tetras[i];
+				if (0 == (t.m_material->m_flags&btSoftBody::fMaterial::DebugDraw)) continue;
+				const btVector3	x[] = {
+					t.m_n[0]->m_x,
+					t.m_n[1]->m_x,
+					t.m_n[2]->m_x,
+					t.m_n[3]->m_x
+				};
+				const btVector3 c = (x[0] + x[1] + x[2] + x[3]) / 4;
+				addTriangle((x[0] - c) * scl + c, (x[1] - c) * scl + c, (x[2] - c) * scl + c);
+				addTriangle((x[0] - c) * scl + c, (x[1] - c) * scl + c, (x[3] - c) * scl + c);
+				addTriangle((x[1] - c) * scl + c, (x[2] - c) * scl + c, (x[3] - c) * scl + c);
+				addTriangle((x[2] - c) * scl + c, (x[0] - c) * scl + c, (x[3] - c) * scl + c);
 			}	
 		}
 	} // end of else if clause
 }
 
-btVector3 Object::GetOrigin(void){
-	if(!is_soft_){
+btVector3 Object::GetOrigin(void) {
+	if (!is_soft_) {
 		btTransform transform;
 		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
 		return transform.getOrigin();
-	}
-	else{
+	} else {
 		return btVector3(0,0,0);
 	}
 }
-btTransform Object::GetTransform(void){
+
+btTransform Object::GetTransform(void) {
 	btTransform transform;
-	if(!is_soft_){
+	if (!is_soft_) {
 		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
 		return transform;
-	}
-	else{
+	} else {
 		transform.setIdentity();
 		return transform;
 	}

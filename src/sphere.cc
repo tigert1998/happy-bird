@@ -1,5 +1,6 @@
 #include "sphere.h"
 #include "world.h"
+#include "debug_utility/log.h"
 
 inline float Sphere::radius(void) const {
 	return radius_;
@@ -19,7 +20,6 @@ Sphere::Sphere(World* world, Shader* shader, Material* material, const btTransfo
 	// create mesh //
 	InitMesh();
 	ImportToGraphics();
-	// bt_object_->setWorldTransform(transform);
 	if(!shader){
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	}

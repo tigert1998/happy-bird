@@ -3,7 +3,8 @@ using std::cout;
 using std::endl;
 
 #include "shader_utility/shader.h"
-#include "shader_utility/material.h"
+#include "shader_utility/pure_color_material.h"
+#include "shader_utility/texture_material.h"
 #include "shader_utility/spot_light.h"
 #include "shader_utility/light_collection.h"
 
@@ -112,8 +113,20 @@ void Shader::SetUniform(const std::string &identifier, const Attenuation& value)
 
 template <>
 void Shader::SetUniform<Material>(const std::string &identifier, const Material& value) const {
-	SetUniform<glm::vec3>(identifier + ".diffuse", value.diffuse());
-	SetUniform<glm::vec3>(identifier + ".specular", value.specular());
+	switch (value.type()) {
+		case MaterialType::kPureColor:
+			SetUniform<glm::vec3>(identifier + ".specular", dynamic_cast<const PureColorMaterial&>(value).specular());
+			SetUniform<glm::vec3>(identifier + ".diffuse", dynamic_cast<const PureColorMaterial&>(value).diffuse());
+			break;
+		case MaterialType::kTexture:
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, dynamic_cast<const TextureMaterial&>(value).diffuse_texture());
+			SetUniform<int32_t>(identifier + ".diffuseTexture", 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, dynamic_cast<const TextureMaterial&>(value).specular_texture());
+			SetUniform<int32_t>(identifier + ".specularTexture", 1);
+			break;
+	}
 	SetUniform<float>(identifier + ".shininess", value.shininess());
 }
 

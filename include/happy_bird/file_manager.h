@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cg_exception.h"
+#include "debug_utility/cg_exception.h"
 
 #include <fstream>
 #include <string>

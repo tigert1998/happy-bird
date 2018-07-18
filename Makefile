@@ -7,7 +7,8 @@ LIB_FLAGS = -framework OpenGL -lglfw $(subst lib/lib, -l, $(basename $(LIB_SRCS)
 CC = clang++
 STD_FLAG = -std=c++11
 
-SRCS = $(filter-out src/test.cc src/glad_win.c, $(wildcard src/*.c src/*.cc src/shader_utility/*.cc))
+SRC_DIRS = $(shell find src -type d)
+SRCS = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c $(dir)/*.cc))
 
 all:
 	$(CC) $(LIB_DIR_FLAG) $(INCLUDE_DIR_FLAG) $(STD_FLAG) $(SRCS) -o main $(LIB_FLAGS)

@@ -43,10 +43,10 @@ struct LightCollection {
 	SpotLight spot[1];
 };
 
-struct PureColorMaterial {
+struct TextureMaterial {
 	float shininess;
-	vec3 diffuse;
-	vec3 specular;
+	sampler2D diffuseTexture;
+	sampler2D specularTexture;
 };
 
 struct Eye {
@@ -55,14 +55,15 @@ struct Eye {
 
 uniform Eye uEye;
 uniform LightCollection uLightCollection;
-uniform PureColorMaterial uMaterial;
+uniform TextureMaterial uMaterial;
 
 in vec3 vPosition;
 in vec3 vNormal;
+in vec2 vTexCoord;
 
 out vec4 fragColor;
 
-vec3 CalculatePointlLight(Eye eye, PointLight light, PureColorMaterial material) {
+vec3 CalculatePointlLight(Eye eye, PointLight light, TextureMaterial material) {
 	vec3 lightDirection = normalize(light.position - vPosition);
 	float diffuseFactor = max(dot(vNormal, lightDirection), 0.0) * light.intensity;
 
@@ -76,12 +77,12 @@ vec3 CalculatePointlLight(Eye eye, PointLight light, PureColorMaterial material)
 		attenuation = 1.0f / (light.attenuation.constant + light.attenuation.linear * distance + light.attenuation.quadratic * pow(distance, 2));  
 	}
 	
-	vec3 diffuseColor = diffuseFactor * material.diffuse * light.color;
-	vec3 specularColor = specularFactor * material.specular * light.color ;
+	vec3 diffuseColor = diffuseFactor * texture(material.diffuseTexture, vTexCoord).rgb * light.color;
+	vec3 specularColor = specularFactor * texture(material.specularTexture, vTexCoord).rgb * light.color ;
 	return attenuation * (diffuseColor + specularColor);
 }
 
-vec3 CalculateParallelLight(Eye eye, ParallelLight light, PureColorMaterial material) {
+vec3 CalculateParallelLight(Eye eye, ParallelLight light, TextureMaterial material) {
 	vec3 lightDirection = normalize(-light.direction);
 	float diffuseFactor = max(dot(vNormal, lightDirection), 0.0) * light.intensity;
 
@@ -89,12 +90,12 @@ vec3 CalculateParallelLight(Eye eye, ParallelLight light, PureColorMaterial mate
 	vec3 viewDirection = normalize(eye.position - vPosition);
 	float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) * light.intensity;
 	
-	vec3 diffuseColor = diffuseFactor * material.diffuse * light.color;
-	vec3 specularColor = specularFactor * material.specular * light.color;
+	vec3 diffuseColor = diffuseFactor * texture(material.diffuseTexture, vTexCoord).rgb * light.color;
+	vec3 specularColor = specularFactor * texture(material.specularTexture, vTexCoord).rgb * light.color;
 	return diffuseColor + specularColor;
 }
 
-vec3 CalculateSpotLight(Eye eye, SpotLight light, PureColorMaterial material) {
+vec3 CalculateSpotLight(Eye eye, SpotLight light, TextureMaterial material) {
 	vec3 lightDirection = normalize(light.position - vPosition);
 	float diffuseFactor = max(dot(vNormal, lightDirection), 0.0) * light.intensity;
 
@@ -110,12 +111,12 @@ vec3 CalculateSpotLight(Eye eye, SpotLight light, PureColorMaterial material) {
 		attenuation = 1.0f / (light.attenuation.constant + light.attenuation.linear * distance + light.attenuation.quadratic * pow(distance, 2));  
 	}
 	
-	vec3 diffuseColor = diffuseFactor * material.diffuse * light.color;
-	vec3 specularColor = specularFactor * material.specular * light.color ;
+	vec3 diffuseColor = diffuseFactor * texture(material.diffuseTexture, vTexCoord).rgb * light.color;
+	vec3 specularColor = specularFactor * texture(material.specularTexture, vTexCoord).rgb * light.color ;
 	return attenuation * spotFactor * (diffuseColor + specularColor);
 }
 
-vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, PureColorMaterial material) {
+vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, TextureMaterial material) {
 	vec3 color = lightCollection.ambient;
 	for (int i = 0; i < lightCollection.total.parallel; i++) {
 		color += CalculateParallelLight(eye, lightCollection.parallel[i], material);
@@ -129,17 +130,6 @@ vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, PureColorM
 	return color;
 }
 
-vec3 Cartoonize(vec3 color, int level) {
-	int r = int(color.r * 255) / level;
-	int g = int(color.g * 255) / level;
-	int b = int(color.b * 255) / level;
-	vec3 result;
-	result.r = float(r * level) / 255.0;
-	result.g = float(g * level) / 255.0;
-	result.b = float(b * level) / 255.0;
-	return result;
-}
-
 void main() {
-	fragColor = vec4(Cartoonize(CalculateFragmentColor(uEye, uLightCollection, uMaterial), 35), 1);
+	fragColor = vec4(CalculateFragmentColor(uEye, uLightCollection, uMaterial), texture(uMaterial.diffuseTexture, vTexCoord).a);
 }
