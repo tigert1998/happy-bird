@@ -1,6 +1,6 @@
 #include "light.h"
 
-class ParallelLight: public Light {
+class ParallelLight: virtual public Light {
 private:
 	glm::vec3 direction_;
 	

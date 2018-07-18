@@ -4,8 +4,7 @@ using std::endl;
 
 #include "shader_utility/shader.h"
 #include "shader_utility/material.h"
-#include "shader_utility/parallel_light.h"
-#include "shader_utility/point_light.h"
+#include "shader_utility/spot_light.h"
 #include "shader_utility/light_collection.h"
 
 Shader::Shader(const std::string &vs_path, const std::string &fs_path) {
@@ -130,13 +129,19 @@ void Shader::SetUniform(const std::string &identifier, const Light& value) const
 		case LightType::kParallel:
 			SetUniform<glm::vec3>(identifier + ".direction", dynamic_cast<const ParallelLight&>(value).direction());
 			break;
+		case LightType::kSpot:
+			SetUniform<glm::vec3>(identifier + ".position", dynamic_cast<const SpotLight&>(value).position());
+			SetUniform<Attenuation>(identifier + ".attenuation", dynamic_cast<const SpotLight&>(value).attenuation());
+			SetUniform<glm::vec3>(identifier + ".direction", dynamic_cast<const SpotLight&>(value).direction());
+			SetUniform<float>(identifier + ".angle", dynamic_cast<const SpotLight&>(value).angle());
+			break;
 	}
 }
 
 template <>
 void Shader::SetUniform<LightCollection>(const std::string &identifier, const LightCollection& value) const {
 	SetUniform<glm::vec3>(identifier + ".ambient", value.ambient());
-	int point_light_total = 0, parallel_light_total = 0;
+	int point_light_total = 0, parallel_light_total = 0, spot_light_total = 0;
 	for (int i = 0; i < value.Size(); i++) {
 		std::string sub_identifier;
 		switch (value[i]->type()) {
@@ -146,7 +151,13 @@ void Shader::SetUniform<LightCollection>(const std::string &identifier, const Li
 			case LightType::kParallel:
 				sub_identifier = identifier + ".parallel[" + std::to_string(parallel_light_total++) + "]";
 				break;
+			case LightType::kSpot:
+				sub_identifier = identifier + ".spot[" + std::to_string(spot_light_total++) + "]";
+				break;
 		}
 		SetUniform<Light>(sub_identifier, *value[i]);
 	}
+	SetUniform<int32_t>(identifier + ".total.point", point_light_total);
+	SetUniform<int32_t>(identifier + ".total.parallel", parallel_light_total);
+	SetUniform<int32_t>(identifier + ".total.spot", spot_light_total);
 }

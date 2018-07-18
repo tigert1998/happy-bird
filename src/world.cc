@@ -3,8 +3,7 @@ using namespace std;
 
 #include "world.h"
 #include "object_common.h"
-#include "shader_utility/point_light.h"
-#include "shader_utility/parallel_light.h"
+#include "shader_utility/spot_light.h"
 
 int World::height = 600;
 int World::width = 800;
@@ -145,14 +144,23 @@ void World::InitScene(void) {
   light_collection->PushBack(
     new PointLight(
       glm::vec3(0, 15, 0), 
-      glm::vec3(0, 1, 0), 0.6, 
+      glm::vec3(0, 1, 0), 0.1, 
       Attenuation(325, 1, 0.014, 0.0007)
     )
   );
   light_collection->PushBack(
     new ParallelLight(
       glm::vec3(-1, -1, -1), 
-      glm::vec3(1, 0, 0), 0.7
+      glm::vec3(1, 0, 0), 0.1
+    )
+  );
+  light_collection->PushBack(
+    new SpotLight(
+      glm::vec3(25, 25, 25), 
+      glm::vec3(-1, -1, -1),
+      color::White(), 0.8,
+      Attenuation(325, 1, 0.014, 0.0007),
+      glm::pi<float>() / 4
     )
   );
   // objects_.push_back( new Particle(this, nullptr, new Material(color::White(), color::White(), 8), man));

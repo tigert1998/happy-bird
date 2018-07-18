@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 
 enum class LightType {
-	kPoint, kParallel
+	kPoint, kParallel, kSpot
 };
 
 class Light {
