@@ -9,13 +9,12 @@
 .tags*
 paxos
 main
-lib/*
+lib/* 
 .DS_Store
 *.pdb
 *.ilk
 log
-
 YPB_build/*
-src/glad.c
-src/glad_win.c
+glad.c
+glad_win.c
 include/stb
