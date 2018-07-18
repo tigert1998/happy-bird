@@ -198,7 +198,7 @@ void World::InitScene(void) {
       glm::pi<float>() / 4
     )
   );
-  objects_.push_back( new Particle(this, nullptr, new Material(color::Red(), color::Red(), 40), man));
+  objects_.push_back( new Particle(this, nullptr, new Material(color::Red(), color::Red(), 40), man, glm::vec3(0,0,-1), glm::vec3(0,0,-0.02), kLargeParticle | kFlameParticle | kAmbientParticle));
   float wallHeight = 20;
   float wallWidth = 50;
   btTransform wall_transform;
