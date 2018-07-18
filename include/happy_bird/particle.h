@@ -81,7 +81,7 @@ struct ParticleConfig{
 
 	float interval_; // one particle per interval
 
-	ParticleConfig::ParticleConfig(glm::vec3 v, Color color, float interval, int flags = 0); 
+	ParticleConfig(glm::vec3 v, Color color, float interval, int flags = 0); 
 };
 
 
