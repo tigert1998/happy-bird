@@ -11,8 +11,11 @@ int World::width = 800;
 bool World::keys_pressed[1024];
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
-LightCollection* World::light_collection = new LightCollection(glm::vec3(0.2, 0.2, 0.2));
+LightCollection* World::light_collection = new LightCollection(glm::vec3(0, 0, 0));
 btVector3 World::origin(0, 0, 0);
+btVector3 World::forward(0,0,1);
+btVector3 World::left(1,0,0);
+btVector3 World::up(0,1,0);
 btScalar World::character_height(8);
 
 World::World() {
@@ -97,7 +100,7 @@ void World::InitPhysics(void) {
     bt_soft_solver_
   );
 
-  bt_world_->setGravity(btVector3(0, -10, 0));
+  bt_world_->setGravity(btVector3(0, -50, 0));
   bt_soft_info_.m_dispatcher = bt_dispatcher_;
   bt_soft_info_.m_broadphase = bt_overlapping_paircache_;
   bt_soft_info_.m_sparsesdf.Initialize();
@@ -107,23 +110,46 @@ void World::InitPhysics(void) {
 void World::InitScene(void) {
   // Ground aka Box
   cout << "[World::InitScene()]" << endl;
+  // btTransform ground_transform;
+  // btScalar half_bound = 50;
+  // ground_transform.setIdentity();
+  // ground_transform.setOrigin(btVector3(0, -half_bound , 0));
+  // objects_.push_back(new Box(
+  //   this, nullptr, new Material(color::White(), color::White(), 8),
+  //   0, ground_transform, 
+  //   glm::vec3(half_bound, half_bound, half_bound)
+  // ));
+  // btTransform box_transform;
+  // btScalar box_half = World::character_height;
+  // box_transform.setIdentity();
+  // box_transform.setOrigin(btVector3(box_half * 2, box_half, 0));
+  // objects_.push_back(new Box(
+  //   this, nullptr, new Material(color::White(), color::White(), 8),
+  //   35, box_transform, glm::vec3(box_half, box_half, box_half)
+  // ));
+  // Groud aka Wall
   btTransform ground_transform;
   btScalar half_bound = 50;
+  float thickness = 5;
   ground_transform.setIdentity();
-  ground_transform.setOrigin(btVector3(0, -half_bound , 0));
-  objects_.push_back(new Box(
-    this, nullptr, new Material(color::White(), color::White(), 8),
-    0, ground_transform, 
-    glm::vec3(half_bound, half_bound, half_bound)
+  ground_transform.setOrigin(btVector3(0, -thickness / 2.0 , 0));
+  btMatrix3x3 orn = ground_transform.getBasis();
+  orn *= btMatrix3x3(btQuaternion(btVector3(1,0,0), glm::pi<float>()/2.0));
+  ground_transform.setBasis(orn);
+  objects_.push_back(new Wall(
+    this, nullptr, new Material(color::White(), color::White(), 3),
+    ground_transform, 
+    thickness,
+    glm::vec3(half_bound, half_bound, 0)
   ));
-  btTransform box_transform;
+  // btTransform box_transform;
   btScalar box_half = World::character_height;
-  box_transform.setIdentity();
-  box_transform.setOrigin(btVector3(box_half * 2, box_half, 0));
-  objects_.push_back(new Box(
-    this, nullptr, new Material(color::White(), color::White(), 8),
-    35, box_transform, glm::vec3(box_half, box_half, box_half)
-  ));
+  // box_transform.setIdentity();
+  // box_transform.setOrigin(btVector3(box_half * 2, box_half, 0));
+  // objects_.push_back(new Box(
+  //   this, nullptr, new Material(color::White(), color::White(), 8),
+  //   35, box_transform, glm::vec3(box_half, box_half, box_half)
+  // )); 
   // Sphere
   btTransform start_transform;
   start_transform.setIdentity();
@@ -135,37 +161,40 @@ void World::InitScene(void) {
   objects_.push_back(man);
   character_ = man->character_;
 
-  camera->set_accompany_object(man, 50);
-  // objects_.push_back( new Sphere(this, nullptr, start_transform, 2) );
+  start_transform.setOrigin( World::origin + btVector3(0, World::character_height * 2, 0));
+  objects_.push_back(new Sphere(this, nullptr, new Material(color::White(), color::White(), 8),
+    start_transform, World::character_height / 4));
+
+  camera->set_accompany_object(man, 120);
   // Cloth
-  objects_.push_back(new Cloth(
-    this, nullptr, new Material(color::White(), color::White(), 8), 
-    5, 6, 8, dynamic_cast<Head*>(objects_.back())
-  ));
-  light_collection->PushBack(
-    new PointLight(
-      glm::vec3(0, 15, 0), 
-      glm::vec3(0, 1, 0), 0.6, 
-      Attenuation(325, 1, 0.014, 0.0007)
-    )
-  );
+  // objects_.push_back(new Cloth(
+  //   this, nullptr, new Material(color::White(), color::White(), 8), 
+  //   5, 6, 8, dynamic_cast<Head*>(objects_.back())
+  // ));
+    light_collection->PushBack(
+      new PointLight(
+        glm::vec3(0, 15, 0), 
+        glm::vec3(0, 1, 0), 0.6, 
+        Attenuation(1200)
+      )
+    );
   light_collection->PushBack(
     new ParallelLight(
-      glm::vec3(-1, -1, -1), 
-      glm::vec3(1, 0, 0), 0.7
+      glm::vec3(0, -1, 1), 
+      color::Blue(), 0.1
     )
   );
-  // objects_.push_back( new Particle(this, nullptr, new Material(color::White(), color::White(), 8), man));
-  float wallHeight = 10;
-  float wallWidth = 10;
+  objects_.push_back( new Particle(this, nullptr, new Material(color::Red(), color::Red(), 20), man));
+  float wallHeight = 20;
+  float wallWidth = 50;
   btTransform wall_transform;
   wall_transform.setIdentity();
-  wall_transform.setOrigin(btVector3(-box_half * 2, wallHeight / 2 , -box_half * 2));
+  wall_transform.setOrigin(btVector3( box_half * 2, wallHeight / 2 , box_half));
   objects_.push_back( new Wall(
     this, nullptr, 
-    new Material(color::White(), color::White(), 8), 
+    new Material(color::White(), color::White(), 2), 
     wall_transform, 
-    1, 
+    thickness, 
     glm::vec3(wallWidth/2, wallHeight/2, 0))
   );
 }

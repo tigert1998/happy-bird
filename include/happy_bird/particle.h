@@ -1,6 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
+using std::ostream;
+using std::endl;
+using std::cout;
 
 #include "bullet_common.h" // btCollisionObject
 #include "object.h" // DeadObject
@@ -13,35 +17,37 @@
 struct ParticleInfo{
 	glm::vec3 velocity;
 	glm::vec3 position;
-	glm::vec3 acceleration;
 	float radius;
 	Color color;
 	ParticleInfo():
 		velocity(0, 0, 0),
 		position(0, 0, 0),
-		acceleration(0, 0, 0),
 		radius(1),
 		color(1, 1, 1){ }
 	ParticleInfo(
+		glm::vec3 p,
 		glm::vec3 v, 
-		glm::vec3 a, 
 		float radius = 0, 
 		Color color = color::White()):
+		position(p),
 		velocity(v),
-		position(0, 0, 0),
-		acceleration(a),
 		radius(radius),
 		color(color){ }
 	ParticleInfo(const ParticleInfo& rhs):
 		velocity(rhs.velocity),
 		position(rhs.position),
-		acceleration(rhs.acceleration),
 		radius(rhs.radius),
 		color(rhs.color) { }
 	~ParticleInfo(){ }
 	void Update(void){
 		position += velocity;
-		velocity += acceleration;
+	}
+	friend ostream& operator<<(ostream& os, const ParticleInfo& rhs){
+		os << "Particle: [v]" << rhs.velocity[0] << ", " << rhs.velocity[1] << ", " << rhs.velocity[2] <<  endl
+			<<  "          [p]" << rhs.position[0] << ", " << rhs.position[1] << ", " << rhs.position[2] << endl
+			<<  "          [r]" << rhs.radius << endl;
+		// system("pause");
+		return os;
 	}
 };
 
@@ -56,11 +62,11 @@ class ParticleEmitter{
 		glm::vec3 direction, 
 		float minVelocity = 1, 
 		float maxVelocity = 2, 
-		float minRadius = 1, 
-		float maxRadius = 2
+		float minRadius = 7, 
+		float maxRadius = 10
 	);
 	~ParticleEmitter(){ }
-	void Emit(std::vector<ParticleInfo>& container, int head);
+	void Emit(std::vector<ParticleInfo>& container, glm::vec3 p, int head);
 };
 
 class Particle: public DeadObject{

@@ -7,6 +7,8 @@ class LivingObject;
 
 class Character{
 	friend LivingObject;
+ protected:
+ 	static float static_pace_;
  public:
  	Character() = default;
  	virtual ~Character(){ }

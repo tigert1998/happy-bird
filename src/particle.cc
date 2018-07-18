@@ -3,6 +3,7 @@ using std::cout;
 using std::endl;
 
 #include "particle.h"
+#include "vector_utility.h"
 
 ParticleEmitter::ParticleEmitter(
 	glm::vec3 direction, 
@@ -17,12 +18,15 @@ ParticleEmitter::ParticleEmitter(
 	min_r_(minRadius),
 	max_r_(maxRadius) {
 }
-void ParticleEmitter::Emit(std::vector<ParticleInfo>& container, int head){
+void ParticleEmitter::Emit(std::vector<ParticleInfo>& container, glm::vec3 p, int head){
+	static float factor = 0.1;
+	static int count = 0;
 	container[head] = ParticleInfo(
-		direction_ * ((min_v_ + max_v_) / 2.0f), 
-		glm::vec3(0, 0, 0),
+		p,
+		0.3f * direction_ + glm::vec3(count % 7 * factor, count % 3 * factor, count % 13 * factor), 
 		(min_r_ + max_r_ ) / 2.0
 	);
+	count ++;
 }
 
 Particle::Particle(World* world, Shader* shader, Material* material, Object* object, int amount):
@@ -37,8 +41,9 @@ Particle::Particle(World* world, Shader* shader, Material* material, Object* obj
 	InitParticles();
 }
 void Particle::InitParticles(void){
+	btVector3 p = anchor_->GetOrigin();
 	for(int i = 0; i < amount_; i++){
-		emitter_.Emit(particles_, i);
+		emitter_.Emit(particles_,BTVector3ToGLMVec3(p), i);
 	}
 	head_ = 0;
 }
@@ -60,16 +65,19 @@ void Particle::ImportToGraphics(){
 void Particle::Draw(Camera* camera, const LightCollection* lights){
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update();
-		vertices_[3*i + 0] = particles_[i].position[0];
-		vertices_[3*i + 1] = particles_[i].position[1];
-		vertices_[3*i + 2] = particles_[i].position[2];
-		vertices_[3*i + 3] = particles_[i].radius;
+		cout << particles_[i];
+		vertices_[4*i + 0] = particles_[i].position[0];
+		vertices_[4*i + 1] = particles_[i].position[1];
+		vertices_[4*i + 2] = particles_[i].position[2];
+		vertices_[4*i + 3] = particles_[i].radius;
 	}
 	ImportToGraphics();
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uColor", material_->diffuse());
 	
-	btTransform transform = anchor_->GetTransform();
+	// btTransform transform = anchor_->GetTransform();
+	btTransform transform;
+	transform.setIdentity();
 
 	shader_->SetUniform<btTransform>("uModelMatrix", transform);
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
@@ -79,7 +87,8 @@ void Particle::Draw(Camera* camera, const LightCollection* lights){
 	glDrawArrays(GL_POINTS, 0, amount_);
 	glBindVertexArray(0);
 
-	emitter_.Emit(particles_, head_ ++);
+	btVector3 p = anchor_->GetOrigin();
+	emitter_.Emit(particles_, BTVector3ToGLMVec3(p), head_ ++);
 	if(head_ >= amount_)head_ = 0;
 }
 

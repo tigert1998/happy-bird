@@ -5,7 +5,7 @@ using std::ostream;
 
 #include "wall.h"
 
-float Wall::margin_ratio_ = 0.15;
+float Wall::margin_ratio_ = 0.1;
 float Wall::brick_ratio_ = 2;
 std::vector<float> Wall::brick_vertices_ = {
 	brick_ratio_ / 2.0f, 0.5f - margin_ratio_, 0.5f - margin_ratio_, // group 1
@@ -116,7 +116,7 @@ Wall::Wall(
 	Shader* shader,
 	Material* material,
 	const btTransform& trans, 
-	float scaling, 
+	float scaling,
 	glm::vec3 half_extents
 	):
 	DeadObject(world, shader, material), 
@@ -138,13 +138,13 @@ Wall::Wall(
 	ImportToGraphics();
 
 }
-
+#define kErr (0.1)
 void Wall::InitBricks(const btTransform& parent_transform){
 	btTransform baseTransform; // point to left-down corner
 	baseTransform.setIdentity();
 	baseTransform.setOrigin(btVector3(
-		scaling_ * brick_ratio_ / 2.0 - half_extents_[0],
-		scaling_ / 2.0 - half_extents_[1],
+		- half_extents_[0],
+		- half_extents_[1],
 		0
 	) );
 	int totalLevel = half_extents_[1] * 2 / scaling_;
@@ -162,10 +162,11 @@ void Wall::InitBricks(const btTransform& parent_transform){
 		for(int i = 0; i < flipBarrier[level%2].size(); i++){ // init this level
 			current = end + scaling_;
 			end = flipBarrier[level%2][i];
-			while(current < end){ // init this partition
+			while(current + scaling_ < end + kErr){ // init this partition
 				btTransform currentTransform;
 				currentTransform.setIdentity();
-				if(bricks % 7 == 0 ){
+				bool rotated = false;
+				if( level + 1 < totalLevel && ((bricks % 3 == 0 && bricks % (level+1) != 0) || (current + scaling_ * brick_ratio_ > half_extents_[0] * 2 + kErr)) ){
 					currentTransform.setOrigin(btVector3(
 						current + scaling_ / 2.0,
 						level * scaling_ + scaling_ * brick_ratio_ / 2.0, 
@@ -175,10 +176,11 @@ void Wall::InitBricks(const btTransform& parent_transform){
 					btMatrix3x3 orn = currentTransform.getBasis();
 					orn *= btMatrix3x3(btQuaternion(btVector3(0,0,1), glm::pi<float>()/2.0));
 					currentTransform.setBasis(orn);
+					rotated = true;
 					flipBarrier[(level+1)%2].push_back(current);
 					current += scaling_;
 				}
-				else{
+				else if ((current + scaling_ * brick_ratio_ <= end + kErr)){
 					currentTransform.setOrigin(btVector3(
 						current + scaling_ * brick_ratio_ / 2.0,
 						level * scaling_ + scaling_ / 2.0, 
@@ -186,6 +188,10 @@ void Wall::InitBricks(const btTransform& parent_transform){
 					));
 					currentTransform = currentTransform * baseTransform;
 					current += scaling_ * brick_ratio_;
+				}
+				else{
+					current += scaling_ * brick_ratio_;
+					continue;
 				}
 				int base = vertices_.size() / 3;
 				for(int v = 0; v + 2 < brick_vertices_.size(); v += 3){
@@ -195,12 +201,17 @@ void Wall::InitBricks(const btTransform& parent_transform){
 					vertices_.push_back(vertice[0]);
 					vertices_.push_back(vertice[1]);
 					vertices_.push_back(vertice[2]);
-					btVector3 normal = 
-						currentTransform * 
-						btVector3(brick_normals_[v], brick_normals_[v+1], brick_normals_[v+2]);
-					normals_.push_back(normal[0]);
-					normals_.push_back(normal[1]);
-					normals_.push_back(normal[2]);
+					// only rotate normal
+					if(rotated){
+						normals_.push_back(-brick_normals_[v+1]);
+						normals_.push_back(brick_normals_[v+0]);
+						normals_.push_back(brick_normals_[v+2]);						
+					}
+					else{
+						normals_.push_back(brick_normals_[v+0]);
+						normals_.push_back(brick_normals_[v+1]);
+						normals_.push_back(brick_normals_[v+2]);						
+					}
 				}
 				for(auto& indice: brick_indices_){
 					indices_.push_back(indice + base);

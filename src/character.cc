@@ -5,6 +5,8 @@ using std::endl;
 #include "character.h"
 #include "world.h"
 
+float Character::static_pace_(300);
+
 // MUST input a ConvexShape pointer
 CharacterBullet::CharacterBullet(World* world, const btTransform& startTransform, btCollisionObject* obj){
 	world_ = world;
@@ -81,34 +83,33 @@ btCollisionObject* CharacterImpl::GetDelegate(void){
 	return object_;
 }
 void CharacterImpl::Move(bool forward, float step){
-	btTransform trans = object_->getWorldTransform();
-	btVector3 forwardDir = trans.getBasis()[2].normalize();
-	cout << "Forward dir: " << forwardDir[0] << ", " << forwardDir[1] << ", " << forwardDir[2] << endl;
-	step = 10;
+	// btTransform trans = object_->getWorldTransform();
+	// btVector3 forwardDir = trans.getBasis()[2].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
-	body->setLinearVelocity(body->getLinearVelocity() + forwardDir * step * (forward?1:-1));
+	body->setLinearVelocity(body->getLinearVelocity() + World::forward * step * Character::static_pace_ * (forward?1:-1));
 }
 void CharacterImpl::Rotate(bool left, float step){
+	// Try rotating
 	// btMatrix3x3 orn = object_->getWorldTransform().getBasis();
 	// orn *= btMatrix3x3(btQuaternion(btVector3(0,1,0),0.01 * (left?-1:1) ));
 	// step = 10;
+	// Try move left-right
 	// object_->getWorldTransform().setBasis(orn);
-	btTransform trans = object_->getWorldTransform();
-	btVector3 leftDir = trans.getBasis()[0].normalize();
-	cout << "Left dir: " << leftDir[0] << ", " << leftDir[1] << ", " << leftDir[2] << endl;
-	step = 10;
+	// btTransform trans = object_->getWorldTransform();
+	// btVector3 leftDir = trans.getBasis()[0].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
-	body->setLinearVelocity(body->getLinearVelocity() + leftDir * step * (left?1:-1));
+	// Move by world standard
+	body->setLinearVelocity(body->getLinearVelocity() + World::left * step * Character::static_pace_ * (left?1:-1));
 }
 void CharacterImpl::Jump(float step){
-	btTransform trans = object_->getWorldTransform();
-	btVector3 upDir = trans.getBasis()[1].normalize();
-	// upDir = btVector3(0, 1, 0);
-	step = 10;
+	// btTransform trans = object_->getWorldTransform();
+	// btVector3 upDir = trans.getBasis()[1].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
-	body->setLinearVelocity(body->getLinearVelocity() + upDir * step);
+	body->setLinearVelocity(body->getLinearVelocity() + World::up * step / 2 * Character::static_pace_);
 }
-void CharacterImpl::ResetMove(void){
-	dynamic_cast<btRigidBody*>(object_)->setLinearVelocity(btVector3(0,0,0));
+void CharacterImpl::ResetMove(void){ // Error
+	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
+	btVector3 v = body->getLinearVelocity();
+	body->setLinearVelocity(btVector3(0,v[1],0));
 	return ;
 }

@@ -8,7 +8,7 @@ private:
 	float quadratic_;
 	
 public:
-	Attenuation(float range, float constant, float linear, float quadratic);
+	Attenuation(float range);
 	float range() const;
 	float constant() const;
 	float linear() const;

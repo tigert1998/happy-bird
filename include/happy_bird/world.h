@@ -42,6 +42,9 @@ class World{
 	static glm::vec3 global_ambient;
 	static LightCollection* light_collection;
 	static btVector3 origin;
+	static btVector3 forward;
+	static btVector3 left;
+	static btVector3 up;
 	static btScalar character_height; 
 
 	World();
