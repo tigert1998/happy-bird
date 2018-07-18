@@ -14,4 +14,7 @@ lib/*
 *.pdb
 *.ilk
 log
+
 YPB_build/*
+src/glad.c
+src/glad_win.c
