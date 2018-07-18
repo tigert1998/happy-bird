@@ -18,4 +18,4 @@ void main()
     // FragColor = mix(vec4(uColor,1), color2, smoothstep(0.1, 0.25, f));  
 
    	FragColor = vec4(uColor, 1.0);
-};
+}
