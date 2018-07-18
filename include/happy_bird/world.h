@@ -10,13 +10,11 @@
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
 
+enum class MoveDirectionType {
+	kLeft, kRight, kFront, kBack
+};
+
 class World{
-	enum {
-		kLeft = 0,
-		kRight = 1,
-		kFront = 2,
-		kBack = 3
-	} MoveDirectionType;
 	friend class Object;
  protected:
  	// OpenGL util
@@ -36,7 +34,7 @@ class World{
 	Character* character_;
  public:
  	// shared
- 	static bool keys_pressed [1024];
+ 	static bool keys_pressed[1024];
 	static int height, width;
 	static Camera* camera;
 	static glm::vec3 global_ambient;
@@ -60,6 +58,6 @@ class World{
 	void ProcessInput(void);
 	btSoftRigidDynamicsWorld* bt_world(void) const ;
 	btBroadphaseInterface* bt_broadphase(void) const;
-	btSoftBodyWorldInfo& bt_info() ;
+	btSoftBodyWorldInfo& bt_info();
 
 };

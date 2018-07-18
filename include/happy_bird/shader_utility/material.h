@@ -2,15 +2,16 @@
 
 #include <glm/glm.hpp>
 
+enum class MaterialType {
+	kPureColor, kTexture
+};
+
 class Material {
 private:
-	glm::vec3 diffuse_, specular_;
 	float shininess_;
-
 public:
 	Material() = delete;
-	Material(glm::vec3 diffuse, glm::vec3 specular, float shininess);
-	glm::vec3 diffuse() const;
-	glm::vec3 specular() const;
+	Material(float shininess);
 	float shininess() const;
+	virtual MaterialType type() const = 0;
 };

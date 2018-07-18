@@ -4,20 +4,22 @@ using std::endl;
 
 #include "particle.h"
 #include "math_utility.h"
+#include "shader_utility/pure_color_material.h"
+#include "debug_utility/log.h"
 
 ParticleEmitter::ParticleEmitter(
 	glm::vec3 direction, 
 	float minVelocity, 
 	float maxVelocity, 
 	float minRadius, 
-	float maxRadius
-):
+	float maxRadius):
 	direction_(direction),
 	min_v_(minVelocity),
 	max_v_(maxVelocity),
 	min_r_(minRadius),
 	max_r_(maxRadius) {
 }
+
 void ParticleEmitter::Emit(std::vector<ParticleInfo>& container, glm::vec3 p, int head){
 	static float factor = 0.1;
 	static int count = 0;
@@ -49,10 +51,9 @@ void Particle::InitParticles(void){
 }
 void Particle::ImportToGraphics(){
 	glBindVertexArray(vao_); 
-	// point coord
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, position_vbo_);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(btScalar) * vertices_.size(), vertices_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0,4,GL_FLOAT, GL_FALSE, 4*sizeof(btScalar), (void*)0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(btScalar), (void*) 0);
 	glEnableVertexAttribArray(0);
 	// point radius
 	// glBindBuffer(GL_ARRAY_BUFFER, vbos_[1]);
@@ -62,7 +63,7 @@ void Particle::ImportToGraphics(){
 
 	glBindVertexArray(0);
 }
-void Particle::Draw(Camera* camera, const LightCollection* lights){
+void Particle::Draw(Camera* camera, const LightCollection* lights) {
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update();
 		vertices_[4*i + 0] = particles_[i].position[0];
@@ -72,7 +73,7 @@ void Particle::Draw(Camera* camera, const LightCollection* lights){
 	}
 	ImportToGraphics();
 	shader_->Use();
-	shader_->SetUniform<glm::vec3>("uColor", material_->diffuse());
+	shader_->SetUniform<glm::vec3>("uColor", dynamic_cast<PureColorMaterial*>(material_)->diffuse());
 	
 	btTransform transform;
 	transform.setIdentity();
