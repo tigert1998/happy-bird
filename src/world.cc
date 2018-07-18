@@ -17,7 +17,6 @@ btVector3 World::left(1,0,0);
 btVector3 World::up(0,1,0);
 btScalar World::character_height(8);
 btScalar World::bounding_height(100);
-btScalar World::max_speed(15.0);
 
 World::World() {
   InitPhysics();
@@ -199,7 +198,7 @@ void World::InitScene(void) {
       glm::pi<float>() / 4
     )
   );
-  objects_.push_back( new Particle(this, nullptr, new Material(color::Red(), color::Red(), 20), man));
+  objects_.push_back( new Particle(this, nullptr, new Material(color::Red(), color::Red(), 40), man));
   float wallHeight = 20;
   float wallWidth = 50;
   btTransform wall_transform;

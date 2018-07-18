@@ -9,8 +9,9 @@ class Character{
 	friend LivingObject;
  protected:
  	static float static_pace_;
+ 	float max_speed_;
  public:
- 	Character() = default;
+ 	Character(float speed = 15):max_speed_(speed){ };
  	virtual ~Character(){ }
  	virtual btCollisionObject* GetDelegate(void) = 0;
  	virtual void Move(bool, float) = 0;

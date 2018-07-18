@@ -3,30 +3,54 @@ using std::cout;
 using std::endl;
 
 #include "particle.h"
+#include "random.h"
 #include "math_utility.h"
+#include "opengl_common.h"
 
-ParticleEmitter::ParticleEmitter(
-	glm::vec3 direction, 
-	float minVelocity, 
-	float maxVelocity, 
-	float minRadius, 
-	float maxRadius
-):
-	direction_(direction),
-	min_v_(minVelocity),
-	max_v_(maxVelocity),
-	min_r_(minRadius),
-	max_r_(maxRadius) {
+ParticleEmitter::ParticleEmitter():
+	major_velocity_(0,0,0.02),
+	acceleration_(0,0,0),
+	variance_velocity_(0.02),
+	major_radius_(5),
+	variance_radius_(3),
+	major_color_(color::White()),
+	delta_color_(-color::White()),
+	gradual_(false),
+	interval_(0.07){
+	timer_ = kSharedTimer.New();
 }
-void ParticleEmitter::Emit(std::vector<ParticleInfo>& container, glm::vec3 p, int head){
-	static float factor = 0.1;
-	static int count = 0;
-	container[head] = ParticleInfo(
+void ParticleEmitter::Emit(std::vector<ParticleInfo>::iterator curslot, glm::vec3 p){
+	cout << "Emit one at (" << p[0] << ", " << p[1] << ", " << p[2] << ")" << endl;
+	// system("pause"); 
+	glm::vec3 v = major_velocity_;
+	float min_component = 0.5 + std::min(std::min(v[0],v[1]),v[2]); // min has largest var, others small var
+	float factor = Random::QueryFloatRandom(-variance_velocity_, variance_velocity_);
+	v[0] += factor * min_component / (v[0]+0.5);
+	factor = Random::QueryFloatRandom(-variance_velocity_, variance_velocity_);
+	v[1] += factor * min_component / (v[1]+0.5);
+	factor = Random::QueryFloatRandom(-variance_velocity_, variance_velocity_);
+	v[2] += factor * min_component / (v[2]+0.5);
+	Color color = major_color_;
+	factor = Random::QueryFloatRandom(0, 1);
+	color[0] += delta_color_[0] * factor;
+	if(!gradual_)factor = Random::QueryFloatRandom(0, 1);
+	color[1] += delta_color_[1] * factor;
+	if(!gradual_)factor = Random::QueryFloatRandom(0, 1);
+	color[2] += delta_color_[2] * factor;
+	*curslot = ParticleInfo(
 		p,
-		0.3f * direction_ + glm::vec3(count % 7 * factor, count % 3 * factor, count % 13 * factor), 
-		(min_r_ + max_r_ ) / 2.0
+		v,
+		acceleration_,
+		major_radius_ + Random::QueryFloatRandom(0, variance_radius_),
+		color
 	);
-	count ++;
+}
+void ParticleEmitter::Update(std::vector<ParticleInfo>::iterator& curslot, glm::vec3 p){
+	if(kSharedTimer.Query(timer_) >= interval_){
+		Emit(curslot, p);
+		kSharedTimer.Pin(timer_);
+	}
+	curslot ++;
 }
 
 Particle::Particle(World* world, Shader* shader, Material* material, Object* object, int amount):
@@ -34,7 +58,7 @@ Particle::Particle(World* world, Shader* shader, Material* material, Object* obj
 	anchor_(object),
 	amount_(amount), 
 	particles_(amount), 
-	emitter_(glm::vec3(1,0,0)){
+	emitter_(){
 	assert(world_);
 	vertices_.resize(amount_ * 4);
 	if(!shader_)shader_ = new Shader("shader/particle.vert", "shader/particle.frag");
@@ -42,10 +66,10 @@ Particle::Particle(World* world, Shader* shader, Material* material, Object* obj
 }
 void Particle::InitParticles(void){
 	btVector3 p = anchor_->GetOrigin();
-	for(int i = 0; i < amount_; i++){
-		emitter_.Emit(particles_,BTVector3ToGLMVec3(p), i);
+	for(auto slot = particles_.begin(); slot != particles_.end(); slot ++){
+		emitter_.Emit(slot,BTVector3ToGLMVec3(p));
 	}
-	head_ = 0;
+	slot_ = particles_.begin();
 }
 void Particle::ImportToGraphics(){
 	glBindVertexArray(vao_); 
@@ -86,8 +110,8 @@ void Particle::Draw(Camera* camera, const LightCollection* lights){
 	glBindVertexArray(0);
 
 	btVector3 p = anchor_->GetOrigin();
-	emitter_.Emit(particles_, BTVector3ToGLMVec3(p), head_ ++);
-	if(head_ >= amount_)head_ = 0;
+	emitter_.Update(slot_, BTVector3ToGLMVec3(p));
+	if(slot_ >= particles_.end())slot_ = particles_.begin();
 }
 
 

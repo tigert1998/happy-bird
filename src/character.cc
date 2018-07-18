@@ -92,8 +92,8 @@ void CharacterImpl::Move(bool forward, float step){ // position 2
 	body->setActivationState(ACTIVE_TAG);
 	// ResetMove();
 	btVector3 v = body->getLinearVelocity() + World::forward * step * Character::static_pace_ * (forward?1:-1);
-	if(v[2] > World::max_speed)v[2] = World::max_speed;
-	if(v[2] < -World::max_speed)v[2] = -World::max_speed;
+	if(v[2] > max_speed_)v[2] = max_speed_;
+	if(v[2] < -max_speed_)v[2] = -max_speed_;
 	body->setLinearVelocity(v);
 }
 void CharacterImpl::Rotate(bool left, float step){
@@ -110,8 +110,8 @@ void CharacterImpl::Rotate(bool left, float step){
 	body->setActivationState(ACTIVE_TAG);
 	// ResetRotate();
 	btVector3 v = body->getLinearVelocity() + World::left * step * Character::static_pace_ * (left?1:-1);
-	if(v[0] > World::max_speed)v[0] = World::max_speed;
-	if(v[0] < -World::max_speed)v[0] = -World::max_speed;
+	if(v[0] > max_speed_)v[0] = max_speed_;
+	if(v[0] < -max_speed_)v[0] = -max_speed_;
 	body->setLinearVelocity(v);
 	// body->setLinearVelocity(body->getLinearVelocity() + World::left * step * Character::static_pace_ * (left?1:-1));
 }

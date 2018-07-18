@@ -11,12 +11,13 @@ using std::cout;
 #include "color.h" // Color
 #include "shader_utility/shader.h"
 #include "camera.h"
-#include "head.h"
 #include "shader_utility/light_collection.h"
+#include "timer.h"
 
 struct ParticleInfo{
 	glm::vec3 velocity;
 	glm::vec3 position;
+	glm::vec3 acceleration;
 	float radius;
 	Color color;
 	ParticleInfo():
@@ -27,10 +28,12 @@ struct ParticleInfo{
 	ParticleInfo(
 		glm::vec3 p,
 		glm::vec3 v, 
+		glm::vec3 a = glm::vec3(0,0,0),
 		float radius = 0, 
 		Color color = color::White()):
 		position(p),
 		velocity(v),
+		acceleration(a),
 		radius(radius),
 		color(color){ }
 	ParticleInfo(const ParticleInfo& rhs):
@@ -41,38 +44,35 @@ struct ParticleInfo{
 	~ParticleInfo(){ }
 	void Update(void){
 		position += velocity;
-	}
-	friend ostream& operator<<(ostream& os, const ParticleInfo& rhs){
-		os << "Particle: [v]" << rhs.velocity[0] << ", " << rhs.velocity[1] << ", " << rhs.velocity[2] <<  endl
-			<<  "          [p]" << rhs.position[0] << ", " << rhs.position[1] << ", " << rhs.position[2] << endl
-			<<  "          [r]" << rhs.radius << endl;
-		// system("pause");
-		return os;
+		// velocity += acceleration;
 	}
 };
 
 class ParticleEmitter{
-	glm::vec3 direction_;
-	float min_v_;
-	float max_v_;
-	float min_r_;
-	float max_r_;
+	glm::vec3 major_velocity_; // var by acceleration / random
+	glm::vec3 acceleration_; // set
+	float variance_velocity_;
+
+	float major_radius_; // var by random
+	float variance_radius_;
+
+	Color major_color_; // var in range
+	Color delta_color_; // range delta
+	bool gradual_; // true for gradual change
+
+	float interval_; // one particle per interval
+	Timer::TimingId timer_;
  public:
-	ParticleEmitter(
-		glm::vec3 direction, 
-		float minVelocity = 1, 
-		float maxVelocity = 2, 
-		float minRadius = 7, 
-		float maxRadius = 10
-	);
+	ParticleEmitter();
 	~ParticleEmitter(){ }
-	void Emit(std::vector<ParticleInfo>& container, glm::vec3 p, int head);
+	void Emit(std::vector<ParticleInfo>::iterator slot, glm::vec3 p);
+	void Update(std::vector<ParticleInfo>::iterator& slot, glm::vec3 p);
 };
 
 class Particle: public DeadObject{
 	Object* anchor_; // for updating position
 	int amount_;
-	int head_;
+	std::vector<ParticleInfo>::iterator slot_;
 	std::vector<ParticleInfo> particles_;
 	ParticleEmitter emitter_;
  public:
