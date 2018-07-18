@@ -59,7 +59,7 @@ btRigidBody* World::CreateRigidBody(btScalar mass, const btTransform& transform,
 }
 
 void World::InitGraphics(void) {
-  cout << "[World::InitGraphics()]" << endl;
+  // cout << "[World::InitGraphics()]" << endl;
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -85,7 +85,7 @@ void World::InitGraphics(void) {
 }
 
 void World::InitPhysics(void) {
-  cout << "[World::InitPhysics()]" << endl;
+  // cout << "[World::InitPhysics()]" << endl;
   bt_configure_ = new btSoftBodyRigidBodyCollisionConfiguration();
   bt_dispatcher_ = new btCollisionDispatcher(bt_configure_);
   bt_overlapping_paircache_ = new btDbvtBroadphase();
@@ -99,7 +99,7 @@ void World::InitPhysics(void) {
     bt_soft_solver_
   );
 
-  bt_world_->setGravity(btVector3(0, -200, 0));
+  bt_world_->setGravity(btVector3(0, -50, 0));
   bt_soft_info_.m_dispatcher = bt_dispatcher_;
   bt_soft_info_.m_broadphase = bt_overlapping_paircache_;
   bt_soft_info_.m_sparsesdf.Initialize();
@@ -108,7 +108,7 @@ void World::InitPhysics(void) {
 }
 void World::InitScene(void) {
   // Ground aka Box
-  cout << "[World::InitScene()]" << endl;
+  // cout << "[World::InitScene()]" << endl;
   // btTransform ground_transform;
   // btScalar half_bound = 50;
   // ground_transform.setIdentity();
@@ -212,7 +212,7 @@ void World::InitScene(void) {
   );
 }
 void World::Update(void) { // sync mesh and render
-  cout << "[World::Update()]" << endl;
+  // cout << "[World::Update()]" << endl;
   ProcessInput();
   static float last_time = glfwGetTime(), current_time = 0;
   glClearColor(0, 0, 0, 1);
@@ -231,7 +231,7 @@ void World::Update(void) { // sync mesh and render
   glfwPollEvents();
 }
 void World::Run(void) {
-  cout << "[World::Run()]" << endl;
+  // cout << "[World::Run()]" << endl;
   while (!glfwWindowShouldClose(window_)) {
     Update();
   }
@@ -251,24 +251,29 @@ void World::CursorPosCallback(GLFWwindow *window, double x, double y) {
 void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
-  else
+  else{
     keys_pressed[key] = (action != GLFW_RELEASE);
+  }
 }
 void World::ProcessInput(void) {
   if(!character_)return ;
-  static float current_time, last_time;
+  static float current_time, last_time = glfwGetTime();
   current_time = glfwGetTime();
   float delta_time = current_time - last_time;
   last_time = current_time;
-  character_->ResetMove();
+  // character_->ResetMove();
   if (keys_pressed[GLFW_KEY_W]) // Forward
     character_->Move(true, delta_time);
   else if (keys_pressed[GLFW_KEY_S])
     character_->Move(false, delta_time);
+  else
+    character_->ResetMove();
   if (keys_pressed[GLFW_KEY_A]) // Left
     character_->Rotate(true, delta_time);
   else if (keys_pressed[GLFW_KEY_D])
     character_->Rotate(false, delta_time);
+  else
+    character_->ResetRotate();
   if (keys_pressed[GLFW_KEY_SPACE])
     character_->Jump(delta_time);
 }

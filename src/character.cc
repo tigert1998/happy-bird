@@ -53,6 +53,9 @@ void CharacterBullet::ResetMove(void){
 	controller_->setWalkDirection(btVector3(0,0,0));
 	UpdateDelegate();
 }
+void CharacterBullet::ResetRotate(void){
+	ResetMove();
+}
 void CharacterBullet::Move(bool forward, float step){
 	// std::cout << "Move" << std::endl;
 	btTransform trans = ghost_object_->getWorldTransform();
@@ -86,6 +89,7 @@ void CharacterImpl::Move(bool forward, float step){
 	// btTransform trans = object_->getWorldTransform();
 	// btVector3 forwardDir = trans.getBasis()[2].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
+	body->setActivationState(ACTIVE_TAG);
 	body->setLinearVelocity(body->getLinearVelocity() + World::forward * step * Character::static_pace_ * (forward?1:-1));
 }
 void CharacterImpl::Rotate(bool left, float step){
@@ -99,17 +103,27 @@ void CharacterImpl::Rotate(bool left, float step){
 	// btVector3 leftDir = trans.getBasis()[0].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
 	// Move by world standard
+	body->setActivationState(ACTIVE_TAG);
 	body->setLinearVelocity(body->getLinearVelocity() + World::left * step * Character::static_pace_ * (left?1:-1));
 }
 void CharacterImpl::Jump(float step){
 	// btTransform trans = object_->getWorldTransform();
 	// btVector3 upDir = trans.getBasis()[1].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
+	body->setActivationState(ACTIVE_TAG);
 	body->setLinearVelocity(body->getLinearVelocity() + World::up * step / 3 * Character::static_pace_);
 }
 void CharacterImpl::ResetMove(void){ // Error
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
 	btVector3 v = body->getLinearVelocity();
-	body->setLinearVelocity(btVector3(0,v[1],0));
+	body->setActivationState(ACTIVE_TAG);
+	body->setLinearVelocity(btVector3(v[0],v[1],0));
+	return ;
+}
+void CharacterImpl::ResetRotate(void){
+	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
+	btVector3 v = body->getLinearVelocity();
+	body->setActivationState(ACTIVE_TAG);
+	body->setLinearVelocity(btVector3(0,v[1],v[2]));
 	return ;
 }

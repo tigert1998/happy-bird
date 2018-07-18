@@ -65,7 +65,6 @@ void Particle::ImportToGraphics(){
 void Particle::Draw(Camera* camera, const LightCollection* lights){
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update();
-		cout << particles_[i];
 		vertices_[4*i + 0] = particles_[i].position[0];
 		vertices_[4*i + 1] = particles_[i].position[1];
 		vertices_[4*i + 2] = particles_[i].position[2];
@@ -75,7 +74,6 @@ void Particle::Draw(Camera* camera, const LightCollection* lights){
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uColor", material_->diffuse());
 	
-	// btTransform transform = anchor_->GetTransform();
 	btTransform transform;
 	transform.setIdentity();
 

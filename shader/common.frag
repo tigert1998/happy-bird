@@ -130,5 +130,13 @@ vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, Material m
 }
 
 void main() {
-	fragColor = vec4(CalculateFragmentColor(uEye, uLightCollection, uMaterial), 1);
+	// fragColor = vec4(CalculateFragmentColor(uEye, uLightCollection, uMaterial), 1);
+	vec3 realColor = CalculateFragmentColor(uEye, uLightCollection, uMaterial);
+	int x = int(realColor.x * 255 / 35);
+	int y = int(realColor.y * 255 / 35);
+	int z = int(realColor.z * 255 / 35);
+	realColor.x = float(x) * 35 / 255.0;
+	realColor.y = float(y) * 35 / 255.0;
+	realColor.z = float(z) * 35 / 255.0;
+	fragColor = vec4(realColor, 1);
 }

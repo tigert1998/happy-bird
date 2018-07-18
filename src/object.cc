@@ -57,7 +57,7 @@ void Object::DeleteFromPhysics(){
 }
 
 void Object::ImportToGraphics() {
-	cout << "[Object::ImportToGraphics()]" << endl;
+	// cout << "[Object::ImportToGraphics()]" << endl;
 	glBindVertexArray(vao_);
 
 	glEnableVertexAttribArray(0);
@@ -80,7 +80,7 @@ void Object::ImportToGraphics() {
 }
 
 void Object::Draw(Camera* camera, const btTransform& transform, const LightCollection* light_collection) {
-	cout << "[Object::Draw(Camera*, const btTransform&, const LightCollection*)]" << endl;
+	// cout << "[Object::Draw(Camera*, const btTransform&, const LightCollection*)]" << endl;
 	shader_->Use();
 	shader_->SetUniform<glm::vec3>("uEye.position", camera->position());
 	shader_->SetUniform<LightCollection>("uLightCollection", *light_collection);
@@ -94,7 +94,7 @@ void Object::Draw(Camera* camera, const btTransform& transform, const LightColle
 }
 
 void Object::Draw(Camera* camera, const LightCollection* light_collection) {
-	cout << "[Object::Draw(Camera*, const LightCollection*)]" << endl;
+	// cout << "[Object::Draw(Camera*, const LightCollection*)]" << endl;
 	shader_->Use();
 	shader_->SetUniform<Material>("uMaterial", *material_);
 	
@@ -117,7 +117,7 @@ void Object::Draw(Camera* camera, const LightCollection* light_collection) {
 }
 
 void Object::InitMesh(void){
-	cout << "[Object::InitMesh()]" << endl;
+	// cout << "[Object::InitMesh()]" << endl;
 	vertices_.clear();
 	indices_.clear();
 	if (!is_soft_) {
