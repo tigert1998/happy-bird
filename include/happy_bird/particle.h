@@ -42,9 +42,9 @@ struct ParticleInfo{
 		radius(rhs.radius),
 		color(rhs.color) { }
 	~ParticleInfo(){ }
-	void Update(void){
-		position += velocity;
-		velocity += acceleration;
+	void Update(float delta){
+		position += velocity * delta;
+		velocity += acceleration * delta;
 	}
 };
 enum ParticleFlag{

@@ -103,8 +103,8 @@ void ParticleEmitter::Update(std::vector<ParticleInfo>::iterator& curslot, glm::
 	if(Timer::Query(timer_) >= config_.interval_){
 		Emit(curslot, p);
 		Timer::Pin(timer_);
+		curslot ++;
 	}
-	curslot ++;
 }
 
 Particle::Particle(
@@ -151,8 +151,12 @@ void Particle::ImportToGraphics(){
 	glBindVertexArray(0);
 }
 void Particle::Draw(Camera* camera, const LightCollection* lights) {
+	static float last_time = glfwGetTime(), current_time;
+	current_time = glfwGetTime();
+	float delta_time = (current_time - last_time) * 500;
+	last_time = current_time;
 	for(int i = 0; i < amount_; i++){
-		particles_[i].Update();
+		particles_[i].Update(delta_time);
 		vertices_[4*i + 0] = particles_[i].position[0];
 		vertices_[4*i + 1] = particles_[i].position[1];
 		vertices_[4*i + 2] = particles_[i].position[2];
