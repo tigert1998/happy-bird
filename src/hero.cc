@@ -3,11 +3,11 @@
 #include "camera.h"
 #include "debug_utility/log.h"
 
-float Hero::width(void) const {
+float Hero::width() const {
 	return width_;
 }
 
-float Hero::height(void) const {
+float Hero::height() const {
 	return height_;
 }
 
@@ -15,35 +15,25 @@ float Hero::thickness_ = 0.5;
 
 Hero::~Hero() { }
 
-void Hero::ImportToGraphics() {
-	glBindVertexArray(vao_);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, position_vbo_);
-	glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(btScalar), vertices_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, normal_vbo_);
-	glBufferData(GL_ARRAY_BUFFER, normals_.size() * sizeof(btScalar), normals_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
-
+void Hero::InitMesh() {
+	Object::InitMesh();
+	tex_coords_.clear();
 	for (int i = 0; i < vertices_.size(); i += 3) {
 		tex_coords_.push_back(vertices_[i + 0] < 0 ? 0 : 1);
 		tex_coords_.push_back(vertices_[i + 1] < 0 ? 0 : 1);
 	}
+}
 
+void Hero::ImportToGraphics() {
+	Object::ImportToGraphics();
+
+	glBindVertexArray(vao_);
+	glGenBuffers(1, &tex_coord_vbo_);
 	glBindBuffer(GL_ARRAY_BUFFER, tex_coord_vbo_);
 	glBufferData(GL_ARRAY_BUFFER, tex_coords_.size() * sizeof(btScalar), tex_coords_.data(), GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, false, 2 * sizeof(btScalar), (void *) 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uint32_t), indices_.data(), GL_STATIC_DRAW);
-
-	assert(vertices_.size() == normals_.size());
-
 	glBindVertexArray(0);
 }
 
@@ -57,12 +47,12 @@ Hero::Hero(World* world, Shader* shader, Material* material, const btTransform& 
 		transform,
 		new btBoxShape(btVector3(width_ / 2, height_ / 2, thickness_ / 2))
 	);
-	// create mesh
-	InitMesh();
-	ImportToGraphics();
 	if (!shader) {
 		shader_ = new Shader("shader/hero.vert", "shader/hero.frag");
 	}
+	// create mesh
+	InitMesh();
+	ImportToGraphics();
 	// Bind to new character
 	character_ = new CharacterImpl(world_, transform, bt_object_);
 	// Add constraint
@@ -78,11 +68,9 @@ Hero::Hero(World* world, Shader* shader, Material* material, const btTransform& 
 	level_constraint->setAngularLowerLimit(rotation_lower);
 	level_constraint->setAngularUpperLimit(rotation_upper);
 	world_->bt_world()->addConstraint((btTypedConstraint*) level_constraint);
-
-	glGenBuffers(1, &tex_coord_vbo_);
 }
 
-btVector3 Hero::GetOrigin(void) {
+btVector3 Hero::GetOrigin() {
 	return character_->GetDelegate()->getWorldTransform().getOrigin();
 }
 

@@ -12,7 +12,7 @@
 
 class World;
 
-class Hero: public LivingObject{
+class Hero: public LivingObject {
 private:
 	float width_;
 	float height_;
@@ -24,9 +24,10 @@ public:
  	Hero() = delete;
 	Hero(World* world, Shader* shader, Material* material, const btTransform& transform, float w, float h);
 	~Hero();
-	btVector3 GetOrigin(void);
-	float height(void) const;
-	float width(void) const;
+	btVector3 GetOrigin();
+	float height() const;
+	float width() const;
 	void Draw(Camera* camera, const LightCollection* light_collection);
 	void ImportToGraphics();
+	void InitMesh();
 };
