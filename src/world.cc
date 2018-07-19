@@ -138,14 +138,14 @@ void World::InitScene(void) {
 	ground_transform.setIdentity();
 	ground_transform.setOrigin(btVector3(0, -thickness / 2.0 , 0));
 	btMatrix3x3 orn = ground_transform.getBasis();
-	orn *= btMatrix3x3(btQuaternion(btVector3(1,0,0), glm::pi<float>()/2.0));
+	orn *= btMatrix3x3(btQuaternion(btVector3(1, 0, 0), glm::pi<float>() / 2.0));
 	ground_transform.setBasis(orn);
 	objects_.push_back(
 		new Wall(
-			this, 
-			nullptr, 
+			this,
+			nullptr,
 			new PureColorMaterial(color::White(), color::White(), 3),
-			ground_transform, 
+			ground_transform,
 			thickness,
 			glm::vec3(half_bound, half_bound, 0)
 		)
@@ -159,9 +159,9 @@ void World::InitScene(void) {
 	wall_transform.setOrigin(btVector3(box_half * 2, wallHeight / 2 , box_half));
 	objects_.push_back(
 		new Wall(
-			this, nullptr, 
-			new PureColorMaterial(color::White(), color::White(), 2), 
-			wall_transform, 
+			this, nullptr,
+			new PureColorMaterial(color::White(), color::White(), 2),
+			wall_transform,
 			thickness,
 			glm::vec3(wallWidth / 2, wallHeight / 2, 0)
 		)
@@ -183,8 +183,12 @@ void World::InitScene(void) {
 	//	 start_transform, World::character_height / 4
 	// );
 	LivingObject* man = new Hero(
-		this, nullptr, new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
-		start_transform, World::character_height, World::character_height
+		this,
+		nullptr,
+		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
+		start_transform,
+		World::character_height,
+		World::character_height
 	);
 	objects_.push_back(man);
 	character_ = man->character_;
@@ -206,14 +210,14 @@ void World::InitScene(void) {
 	//	 this, nullptr, new Material(color::White(), color::White(), 8), 
 	//	 5, 6, 8, dynamic_cast<Head*>(objects_.back())
 	// ));
-	objects_.push_back( 
+	objects_.push_back(
 		new Particle(
-			this, 
-			nullptr, 
-			new PureColorMaterial(color::Red(), color::Red(), 40), 
-			man, 
-			glm::vec3(0, 0, -1), 
-			glm::vec3(0, 0, -0.02), 
+			this,
+			nullptr,
+			new PureColorMaterial(color::Red(), color::Red(), 40),
+			man,
+			glm::vec3(0, 0, -1),
+			glm::vec3(0, 0, -0.02),
 			kLargeParticle | kFlameParticle | kAmbientParticle
 		)
 	);

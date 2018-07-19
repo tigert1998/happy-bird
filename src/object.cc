@@ -76,8 +76,6 @@ void Object::ImportToGraphics() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uint32_t), indices_.data(), GL_STATIC_DRAW);
 
-	assert(vertices_.size() == normals_.size());
-
 	glBindVertexArray(0);
 }
 

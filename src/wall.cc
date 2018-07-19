@@ -5,6 +5,7 @@ using std::ostream;
 
 #include "wall.h"
 #include "random.h"
+#include "debug_utility/log.h"
 
 float Wall::margin_ratio_ = 0.1;
 float Wall::brick_ratio_ = 2;
@@ -137,8 +138,8 @@ Wall::Wall(
 	// create mesh //
 	InitBricks(trans);
 	ImportToGraphics();
-
 }
+
 #define kErr (0.1)
 void Wall::InitBricks(const btTransform& parent_transform){
 	btTransform baseTransform; // point to left-down corner

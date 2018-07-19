@@ -1,5 +1,7 @@
 #version 330 core
 
+const float zero = 0.00000001;
+
 struct Attenuation {
 	float range;
 	float constant;
@@ -111,7 +113,7 @@ vec3 CalculateSpotLight(Eye eye, SpotLight light, PureColorMaterial material) {
 	}
 	
 	vec3 diffuseColor = diffuseFactor * material.diffuse * light.color;
-	vec3 specularColor = specularFactor * material.specular * light.color ;
+	vec3 specularColor = specularFactor * material.specular * light.color;
 	return attenuation * spotFactor * (diffuseColor + specularColor);
 }
 
