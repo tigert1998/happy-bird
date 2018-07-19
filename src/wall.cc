@@ -4,6 +4,7 @@ using std::endl;
 using std::ostream;
 
 #include "wall.h"
+#include "random.h"
 
 float Wall::margin_ratio_ = 0.1;
 float Wall::brick_ratio_ = 2;
@@ -156,6 +157,7 @@ void Wall::InitBricks(const btTransform& parent_transform){
 	int level = 0;
 	float current;
 	float end;
+	int seed = Random::QueryIntRandom(3,7);
 	while(level < totalLevel){
 		end = -scaling_; // initial value
 		flipBarrier[(level+1)%2].clear();
@@ -166,7 +168,7 @@ void Wall::InitBricks(const btTransform& parent_transform){
 				btTransform currentTransform;
 				currentTransform.setIdentity();
 				bool rotated = false;
-				if( level + 1 < totalLevel && ((bricks % 3 == 0 && bricks % (level+1) != 0) || (current + scaling_ * brick_ratio_ > half_extents_[0] * 2 + kErr)) ){
+				if( level + 1 < totalLevel && (bricks % seed == 1 || (current + scaling_ * brick_ratio_ > half_extents_[0] * 2 + kErr)) ){
 					currentTransform.setOrigin(btVector3(
 						current + scaling_ / 2.0,
 						level * scaling_ + scaling_ * brick_ratio_ / 2.0, 

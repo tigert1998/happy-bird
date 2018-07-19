@@ -83,6 +83,7 @@ void World::InitGraphics(void) {
 	glEnable(GL_POINT_SPRITE_ARB);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_BLEND);
+	// for alpha texture
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	memset(keys_pressed, 0, sizeof(keys_pressed));
@@ -233,10 +234,11 @@ void World::InitScene(void) {
 	);
 	light_collection->PushBack(
 		new SpotLight(
-			glm::vec3(25, 25, 25), 
-			glm::vec3(-1, -1, -1),
-			color::White(), 0.8,
-			Attenuation(1000),
+			glm::vec3(-25, 25, -25), 
+			glm::vec3(10, 0, 0),
+			color::White(), 
+			10,
+			Attenuation(1800),
 			glm::pi<float>() / 4
 		)
 	);

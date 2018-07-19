@@ -8,8 +8,7 @@ using std::endl;
 float Character::static_pace_(100);
 
 // MUST input a ConvexShape pointer
-CharacterBullet::CharacterBullet(World* world, const btTransform& startTransform, btCollisionObject* obj){
-	world_ = world;
+CharacterBullet::CharacterBullet(World* world, const btTransform& startTransform, btCollisionObject* obj):Character(15),world_(world){
 	btCollisionShape* shape = obj->getCollisionShape();
 	// Create ghost object
 	ghost_object_ = new btPairCachingGhostObject();
@@ -77,10 +76,7 @@ void CharacterBullet::Jump(float step){
 	UpdateDelegate();
 }
 
-CharacterImpl::CharacterImpl(World* world, const btTransform& transform, btCollisionObject* obj){
-	world_ = world;
-	object_ = obj;
-}
+CharacterImpl::CharacterImpl(World* world, const btTransform& transform, btCollisionObject* obj, float speed):Character(speed),world_(world), object_(obj){ }
 CharacterImpl::~CharacterImpl(){ }
 btCollisionObject* CharacterImpl::GetDelegate(void){
 	return object_;

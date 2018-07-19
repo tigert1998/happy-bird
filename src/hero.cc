@@ -64,7 +64,7 @@ Hero::Hero(World* world, Shader* shader, Material* material, const btTransform& 
 		shader_ = new Shader("shader/hero.vert", "shader/hero.frag");
 	}
 	// Bind to new character
-	character_ = new CharacterImpl(world_, transform, bt_object_);
+	character_ = new CharacterImpl(world_, transform, bt_object_, 15);
 	// Add constraint
 	btVector3 pivotInA(0, World::character_height, 0);
 	btTransform tmpTrans(btTransform::getIdentity());

@@ -11,7 +11,7 @@ class Character{
  	static float static_pace_;
  	float max_speed_;
  public:
- 	Character(float speed = 15):max_speed_(speed){ };
+ 	Character(float speed):max_speed_(speed){ };
  	virtual ~Character(){ }
  	virtual btCollisionObject* GetDelegate(void) = 0;
  	virtual void Move(bool, float) = 0;
@@ -43,7 +43,7 @@ class CharacterImpl: public Character{
  	World* world_;
  	btCollisionObject* object_;
  public:
- 	CharacterImpl(World*, const btTransform&, btCollisionObject*);
+ 	CharacterImpl(World*, const btTransform&, btCollisionObject*, float speed = 15);
  	~CharacterImpl();
  	btCollisionObject* GetDelegate(void);
  	void Move(bool, float);
