@@ -2,14 +2,14 @@
 
 
 
-void playUtil(const char *fileName)
+/*void playUtil(const char *fileName)
 {
 	ALuint buffer;
 	ALuint source;
 	ALenum error;
 	ALint status;
 	Sleep(2);
-	/* Create an AL buffer from the given sound file. */
+	//Create an AL buffer from the given sound file. 
 	buffer = alutCreateBufferFromFile(fileName);
 	if (buffer == AL_NONE)
 	{
@@ -19,12 +19,12 @@ void playUtil(const char *fileName)
 		exit(EXIT_FAILURE);
 	}
 
-	/* Generate a single source, attach the buffer to it and start playing. */
+	//Generate a single source, attach the buffer to it and start playing. 
 	alGenSources(1, &source);
 	alSourcei(source, AL_BUFFER, buffer);
 	alSourcePlay(source);
 
-	/* Normally nothing should go wrong above, but one never knows... */
+	// Normally nothing should go wrong above, but one never knows... 
 	error = alGetError();
 	if (error != ALUT_ERROR_NO_ERROR)
 	{
@@ -63,4 +63,6 @@ void play_audio(std::string s)
 	delete[] plt;
 }
 
+
+*/
 
