@@ -20,24 +20,7 @@ class Character{
  	virtual void ResetMove(void) = 0;
  	virtual void ResetRotate(void) = 0;
 };
-class CharacterBullet: public Character{
- protected:
-	World* world_;
-	btKinematicCharacterController* controller_;
-	btPairCachingGhostObject* ghost_object_;
-	btCollisionObject* delegate_;
-	void UpdateDelegate(void);
- public:
-	CharacterBullet(World*, const btTransform&, btCollisionObject*);
-	~CharacterBullet();
-	// void Move(const btVector3&, float delta);
-	btCollisionObject* GetDelegate(void);
-	void Move(bool forward, float step);
-	void Rotate(bool left, float step);
-	void Jump(float step);
-	void ResetMove(void);
-	void ResetRotate(void);
-};
+
 class CharacterImpl: public Character{
  protected:
  	World* world_;

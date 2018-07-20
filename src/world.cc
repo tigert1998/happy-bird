@@ -3,6 +3,7 @@ using namespace std;
 
 #include "world.h"
 #include "object_common.h"
+#include "controller_utility/keyboard.h"
 #include "shader_utility/spot_light.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
@@ -13,6 +14,7 @@ bool World::keys_pressed[1024];
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
 LightCollection* World::light_collection = new LightCollection(glm::vec3(0, 0, 0));
+Keyboard &World::keyboard = Keyboard::shared;
 btVector3 World::origin(0, 0, 0);
 btVector3 World::forward(0, 0, 1);
 btVector3 World::left(1, 0, 0);
@@ -249,7 +251,6 @@ void World::InitScene(void) {
 }
 
 void World::Update(void) { // sync mesh and render
-	ProcessInput();
 	static float last_time = glfwGetTime(), current_time = 0;
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -259,6 +260,7 @@ void World::Update(void) { // sync mesh and render
 	last_time = current_time;
 
 	bt_world_->stepSimulation(delta_time);
+	keyboard.Elapse(delta_time);
 
 	for(auto& obj : objects_) {
 		obj->Draw(camera, light_collection);
@@ -287,31 +289,8 @@ void World::CursorPosCallback(GLFWwindow *window, double x, double y) {
 }
 
 void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode) {
+	keyboard.Trigger(key, action);
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	} else {
-		keys_pressed[key] = (action != GLFW_RELEASE);
 	}
-}
-
-void World::ProcessInput(void) {
-	if (!character_) return;
-	static float current_time, last_time = glfwGetTime();
-	current_time = glfwGetTime();
-	float delta_time = current_time - last_time;
-	last_time = current_time;
-	if (keys_pressed[GLFW_KEY_W]) // Forward
-		character_->Move(true, delta_time);
-	else if (keys_pressed[GLFW_KEY_S])
-		character_->Move(false, delta_time);
-	else
-		character_->ResetMove();
-	if (keys_pressed[GLFW_KEY_A]) // Left
-		character_->Rotate(true, delta_time);
-	else if (keys_pressed[GLFW_KEY_D])
-		character_->Rotate(false, delta_time);
-	else
-		character_->ResetRotate();
-	if (keys_pressed[GLFW_KEY_SPACE])
-		character_->Jump(delta_time);
 }

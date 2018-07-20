@@ -57,7 +57,7 @@ class World{
 	void Run(void);
 	static void CursorPosCallback(GLFWwindow *window, double x, double y);
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
-	void ProcessInput(void);
+	static Keyboard &keyboard;
 	btSoftRigidDynamicsWorld* bt_world(void) const ;
 	btBroadphaseInterface* bt_broadphase(void) const;
 	btSoftBodyWorldInfo& bt_info();
