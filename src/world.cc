@@ -20,7 +20,7 @@ btVector3 World::up(0, 1, 0);
 btScalar World::character_height(8);
 btScalar World::bounding_height(100);
 
-World::World() {
+World::World(): stage_(this) {
 	InitPhysics();
 	InitGraphics();
 	InitScene();
@@ -112,77 +112,12 @@ void World::InitPhysics(void) {
 }
 
 void World::InitScene(void) {
-	// Ground aka Box
-	// cout << "[World::InitScene()]" << endl;
-	// btTransform ground_transform;
-	// btScalar half_bound = 50;
-	// ground_transform.setIdentity();
-	// ground_transform.setOrigin(btVector3(0, -half_bound , 0));
-	// objects_.push_back(new Box(
-	//	 this, nullptr, new Material(color::White(), color::White(), 8),
-	//	 0, ground_transform, 
-	//	 glm::vec3(half_bound, half_bound, half_bound)
-	// ));
-	// btTransform box_transform;
-	// btScalar box_half = World::character_height;
-	// box_transform.setIdentity();
-	// box_transform.setOrigin(btVector3(box_half * 2, box_half, 0));
-	// objects_.push_back(new Box(
-	//	 this, nullptr, new Material(color::White(), color::White(), 8),
-	//	 35, box_transform, glm::vec3(box_half, box_half, box_half)
-	// ));
-	// Groud aka Wall
-	btTransform ground_transform;
-	btScalar half_bound = 50;
-	float thickness = 5;
-	ground_transform.setIdentity();
-	ground_transform.setOrigin(btVector3(0, -thickness / 2.0 , 0));
-	btMatrix3x3 orn = ground_transform.getBasis();
-	orn *= btMatrix3x3(btQuaternion(btVector3(1, 0, 0), glm::pi<float>() / 2.0));
-	ground_transform.setBasis(orn);
-	objects_.push_back(
-		new Wall(
-			this,
-			nullptr,
-			new PureColorMaterial(color::White(), color::White(), 3),
-			ground_transform,
-			thickness,
-			glm::vec3(half_bound, half_bound, 0)
-		)
-	);
+	stage_.InitStage(kDefaultStage);
 
-	btScalar box_half = World::character_height;
-	float wallHeight = 20;
-	float wallWidth = 50;
-	btTransform wall_transform;
-	wall_transform.setIdentity();
-	wall_transform.setOrigin(btVector3(box_half * 2, wallHeight / 2 , box_half));
-	objects_.push_back(
-		new Wall(
-			this, nullptr,
-			new PureColorMaterial(color::White(), color::White(), 2),
-			wall_transform,
-			thickness,
-			glm::vec3(wallWidth / 2, wallHeight / 2, 0)
-		)
-	);
-
-	// btTransform box_transform;
-	// box_transform.setIdentity();
-	// box_transform.setOrigin(btVector3(box_half * 2, box_half, 0));
-	// objects_.push_back(new Box(
-	//	 this, nullptr, new Material(color::White(), color::White(), 8),
-	//	 35, box_transform, glm::vec3(box_half, box_half, box_half)
-	// )); 
-	// Sphere
 	btTransform start_transform;
 	start_transform.setIdentity();
 	start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0));
-	// LivingObject* man = new Head(
-	//	 this, nullptr, new Material(color::White(), color::White(), 8),
-	//	 start_transform, World::character_height / 4
-	// );
-	LivingObject* man = new Hero(
+	Object* man = new Hero(
 		this,
 		nullptr,
 		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
@@ -191,37 +126,29 @@ void World::InitScene(void) {
 		World::character_height
 	);
 	objects_.push_back(man);
-	character_ = man->character_;
-
-	start_transform.setOrigin(World::origin + btVector3(0, World::character_height * 2, 0));
-	objects_.push_back(
+	character_ = new CharacterImpl(this, man);
+	objects_.push_back( 
 		new Sphere(
 			this, 
 			nullptr, 
-			new PureColorMaterial(color::White(), color::White(), 8),
-			start_transform, 
-			World::character_height / 4
+			new PureColorMaterial(color::White(), color::White(), 3),
+			start_transform,
+			3
 		)
 	);
-
+	objects_.back()->Attach(man, btVector3(0,3,0));
 	camera->set_accompany_object(man, 120);
-	// Cloth
-	// objects_.push_back(new Cloth(
-	//	 this, nullptr, new Material(color::White(), color::White(), 8), 
-	//	 5, 6, 8, dynamic_cast<Head*>(objects_.back())
-	// ));
 	objects_.push_back(
 		new Particle(
 			this,
 			nullptr,
 			new PureColorMaterial(color::Red(), color::Red(), 40),
-			man,
-			glm::vec3(0, 0, -1),
+			btVector3(0, 0, 0), // position
 			glm::vec3(0, 0, -0.02),
 			kLargeParticle | kFlameParticle | kAmbientParticle
 		)
 	);
-  
+	objects_.back()->Attach(objects_[objects_.size()-2], btVector3(0,3,0));
 
 	light_collection->PushBack(
 		new PointLight(
@@ -259,6 +186,11 @@ void World::Update(void) { // sync mesh and render
 	last_time = current_time;
 
 	bt_world_->stepSimulation(delta_time);
+	
+	int i = 0;
+	for(auto p = stage_.begin(); p != stage_.end(); p++){
+		(*p)->Draw(camera, light_collection);
+	}
 
 	for(auto& obj : objects_) {
 		obj->Draw(camera, light_collection);

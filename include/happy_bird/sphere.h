@@ -7,13 +7,13 @@
 
 class World;
 
-class Sphere: public DeadObject{
+class Sphere: public Object{
 	float radius_;
  public:
 	Sphere() = delete;
 	Sphere(World* world, Shader* shader, Material* material, const btTransform& trans, float radius);
-	void Draw(Camera* camera, const LightCollection* light_collection);
 	~Sphere();
 	// accessor
 	inline float radius(void) const;
+	void ImportToGraphics(void);
 };

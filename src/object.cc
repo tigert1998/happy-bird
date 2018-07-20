@@ -11,122 +11,53 @@ using std::endl;
 #include "debug_utility/log.h"
 
 // Base class //
-bool Object::is_soft(void) {
-	return is_soft_;
-}
-
-void Object::addTriangle(const btVector3& a, const btVector3& b, const btVector3& c) {
-	indices_.push_back(vertices_.size() / 3);
-	indices_.push_back(vertices_.size() / 3 + 1);
-	indices_.push_back(vertices_.size() / 3 + 2);
-	vertices_.push_back(a[0]);
-	vertices_.push_back(a[1]);
-	vertices_.push_back(a[2]);
-	vertices_.push_back(b[0]);
-	vertices_.push_back(b[1]);
-	vertices_.push_back(b[2]);
-	vertices_.push_back(c[0]);
-	vertices_.push_back(c[1]);
-	vertices_.push_back(c[2]);
-}
-
-Object::Object(World* w, Shader* shader, Material* material):
-	world_(w),
-	shader_(shader),
-	material_(material),
-	bt_object_(nullptr) {
+Object::Object(World* w, Shader* shader, Material* material, uint32_t stride, bool soft):
+		world_(w),
+		shader_(shader),
+		material_(material),
+		bt_object_(nullptr),
+		anchor_(nullptr),
+		stride_(stride),
+		is_soft_(soft) {
+	// Init in Graphics
 	glGenVertexArrays(1, &vao_);
-	glGenBuffers(1, &normal_vbo_);
-	glGenBuffers(1, &position_vbo_);
+	glGenBuffers(1, &vbo_);
 	glGenBuffers(1, &ebo_);
 }
 
 Object::~Object(){
-	// delete world_;
+	// delete from Graphics
+	glDeleteVertexArrays(1, &vao_);
+	glDeleteBuffers(1, &vbo_);
+	glDeleteBuffers(1, &ebo_);
+	// delete from bullet
+	// DeleteFromPhysics();
 	delete shader_;
 	delete bt_object_;
-	glDeleteVertexArrays(1, &vao_);
-	glDeleteBuffers(1, &normal_vbo_);
-	glDeleteBuffers(1, &position_vbo_);
-	glDeleteBuffers(1, &ebo_);
 }
-
-void Object::ImportToPhysics() {
-	world_->bt_world_->addRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
-}
-
-void Object::DeleteFromPhysics() {
-	world_->bt_world_->removeRigidBody(dynamic_cast<btRigidBody*>(bt_object_));
-}
-
-void Object::ImportToGraphics() {
-	glBindVertexArray(vao_);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ARRAY_BUFFER, position_vbo_);
-	glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(btScalar), vertices_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, normal_vbo_);
-	glBufferData(GL_ARRAY_BUFFER, normals_.size() * sizeof(btScalar), normals_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, 3 * sizeof(btScalar), (void *) 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uint32_t), indices_.data(), GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-}
-
-void Object::Draw(Camera* camera, const btTransform& transform, const LightCollection* light_collection) {
-	shader_->Use();
-	shader_->SetUniform<glm::vec3>("uEye.position", camera->position());
-	shader_->SetUniform<LightCollection>("uLightCollection", *light_collection);
-	shader_->SetUniform<Material>("uMaterial", *material_);
-	shader_->SetUniform<btTransform>("uModelMatrix", transform);
-	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
-	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
-	glBindVertexArray(vao_);
-	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
-
-void Object::Draw(Camera* camera, const LightCollection* light_collection) {
-	shader_->Use();
-	shader_->SetUniform<Material>("uMaterial", *material_);
-	
+void Object::InitRigidMesh(void){
+	assert(stride_ >= 6);
 	btTransform transform;
-	if (!is_soft_) {
-		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-	} else {
-		transform.setIdentity();
-	}
-
-	shader_->SetUniform<glm::vec3>("uEye.position", camera->position());
-	shader_->SetUniform<LightCollection>("uLightCollection", *light_collection);
-	shader_->SetUniform<btTransform>("uModelMatrix", transform);
-	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
-	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
-
-	glBindVertexArray(vao_);
-	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	transform.setIdentity();
+	InitRigidMesh(bt_object_->getCollisionShape(), transform);
 }
-
-void Object::InitMesh(void) {
-	vertices_.clear();
-	indices_.clear();
-	if (!is_soft_) {
-		btTransform parent_transform;
-		parent_transform.setIdentity();
-		btCollisionShape* bt_shape = bt_object_->getCollisionShape();
-		InitRigidMesh(bt_shape, parent_transform);
-	} else {
-		InitSoftMesh(dynamic_cast<btSoftBody*>(bt_object_));
-	}
+void Object::AddTriangle(const btVector3& a, const btVector3& b, const btVector3& c) {
+	indices_.push_back(data_.size() / stride_);
+	indices_.push_back(data_.size() / stride_ + 1);
+	indices_.push_back(data_.size() / stride_ + 2);
+	data_.push_back(a[0]);
+	data_.push_back(a[1]);
+	data_.push_back(a[2]);
+	for(int i = 3; i <= stride_; i++)data_.push_back(0);
+	data_.push_back(b[0]);
+	data_.push_back(b[1]);
+	data_.push_back(b[2]);
+	for(int i = 3; i <= stride_; i++)data_.push_back(0);
+	data_.push_back(c[0]);
+	data_.push_back(c[1]);
+	data_.push_back(c[2]);
+	for(int i = 3; i <= stride_; i++)data_.push_back(0);
 }
-
 void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent_transform){
 	// todo: support all collision shape types
 	switch (bt_shape->getShapeType()) {
@@ -149,7 +80,7 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 			verts[1] = plane_origin - vec0 * vecLen + vec1 * vecLen;
 			verts[2] = plane_origin - vec0 * vecLen - vec1 * vecLen;
 			verts[3] = plane_origin + vec0 * vecLen - vec1 * vecLen;
-			int startIndex = vertices_.size() / 3;
+			int startIndex = data_.size() / stride_;
 			indices_.push_back(startIndex + 0);
 			indices_.push_back(startIndex + 1);
 			indices_.push_back(startIndex + 2);
@@ -163,12 +94,13 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 			for (int i = 0; i < 4; i++) {
 				btVector3 vtxPos;
 				btVector3 pos =parent_transform * verts[i];
-				vertices_.push_back(pos[0]);
-				vertices_.push_back(pos[1]);
-				vertices_.push_back(pos[2]);
-				normals_.push_back(triNormal[0]);
-				normals_.push_back(triNormal[1]);
-				normals_.push_back(triNormal[2]);
+				data_.push_back(pos[0]);
+				data_.push_back(pos[1]);
+				data_.push_back(pos[2]);
+				data_.push_back(triNormal[0]);
+				data_.push_back(triNormal[1]);
+				data_.push_back(triNormal[2]);
+				for(int j = 6; j < stride_; j++)data_.push_back(0);
 			}
 			break;
 		}
@@ -240,13 +172,14 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 						triNormal /= btSqrt(dot);
 						for (int v = 0; v < 3; v++) {
 							btVector3 pos = parent_transform*triangleVerts[v];
-							indices_.push_back(vertices_.size() / 3);
-							vertices_.push_back(pos[0]);
-							vertices_.push_back(pos[1]);
-							vertices_.push_back(pos[2]);
-							normals_.push_back(triNormal[0]);
-							normals_.push_back(triNormal[1]);
-							normals_.push_back(triNormal[2]);
+							indices_.push_back(data_.size() / stride_);
+							data_.push_back(pos[0]);
+							data_.push_back(pos[1]);
+							data_.push_back(pos[2]);
+							data_.push_back(triNormal[0]);
+							data_.push_back(triNormal[1]);
+							data_.push_back(triNormal[2]);
+							for(int j = 6; j < stride_; j++)data_.push_back(0);
 						}
 					}
 					
@@ -281,13 +214,14 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 							for (int v = 0; v < 3; v++) {
 								int index = hull->getIndexPointer()[t * 3 + v];
 								btVector3 pos = parent_transform * hull->getVertexPointer()[index];
-								indices_.push_back(vertices_.size() / 3);
-								vertices_.push_back(pos[0]);
-								vertices_.push_back(pos[1]);
-								vertices_.push_back(pos[2]);
-								normals_.push_back(triNormal[0]);
-								normals_.push_back(triNormal[1]);
-								normals_.push_back(triNormal[2]);
+								indices_.push_back(data_.size() / stride_);
+								data_.push_back(pos[0]);
+								data_.push_back(pos[1]);
+								data_.push_back(pos[2]);
+								data_.push_back(triNormal[0]);
+								data_.push_back(triNormal[1]);
+								data_.push_back(triNormal[2]);
+								for(int j = 6; j < stride_; j++)data_.push_back(0);
 							}
 						}
 					}
@@ -312,7 +246,9 @@ void Object::InitRigidMesh(btCollisionShape* bt_shape, const btTransform& parent
 	};
 }
 
-void Object::InitSoftMesh(btSoftBody* psb) {
+void Object::InitSoftMesh(void) {
+	assert(stride_ >= 3);
+	btSoftBody* psb = dynamic_cast<btSoftBody*>(bt_object_);
 	int drawflags = 0x0004;
 	const btScalar scl = (btScalar) 0.1;
 	const btScalar nscl = scl * 5;
@@ -351,7 +287,7 @@ void Object::InitSoftMesh(btSoftBody* psb) {
 					int v1 = firstEdge->getTargetVertex();
 					while (edge != firstEdge) {
 						int v2 = edge->getTargetVertex();
-						addTriangle(computer.vertices[v0], computer.vertices[v1], computer.vertices[v2]);
+						AddTriangle(computer.vertices[v0], computer.vertices[v1], computer.vertices[v2]);
 						edge = edge->getNextEdgeOfFace();
 						v0 = v1;
 						v1 = v2;
@@ -374,7 +310,7 @@ void Object::InitSoftMesh(btSoftBody* psb) {
 					f.m_n[2]->m_x
 				};
 				const btVector3 c = (x[0] + x[1] + x[2]) / 3;
-				addTriangle(
+				AddTriangle(
 					(x[0] - c) * scl + c,
 					(x[1] - c) * scl + c,
 					(x[2] - c) * scl + c
@@ -396,35 +332,76 @@ void Object::InitSoftMesh(btSoftBody* psb) {
 					t.m_n[3]->m_x
 				};
 				const btVector3 c = (x[0] + x[1] + x[2] + x[3]) / 4;
-				addTriangle((x[0] - c) * scl + c, (x[1] - c) * scl + c, (x[2] - c) * scl + c);
-				addTriangle((x[0] - c) * scl + c, (x[1] - c) * scl + c, (x[3] - c) * scl + c);
-				addTriangle((x[1] - c) * scl + c, (x[2] - c) * scl + c, (x[3] - c) * scl + c);
-				addTriangle((x[2] - c) * scl + c, (x[0] - c) * scl + c, (x[3] - c) * scl + c);
+				AddTriangle((x[0] - c) * scl + c, (x[1] - c) * scl + c, (x[2] - c) * scl + c);
+				AddTriangle((x[0] - c) * scl + c, (x[1] - c) * scl + c, (x[3] - c) * scl + c);
+				AddTriangle((x[1] - c) * scl + c, (x[2] - c) * scl + c, (x[3] - c) * scl + c);
+				AddTriangle((x[2] - c) * scl + c, (x[0] - c) * scl + c, (x[3] - c) * scl + c);
 			}	
 		}
-	} // end of else if clause
+	}
 }
 
 btVector3 Object::GetOrigin(void) {
-	if (!is_soft_) {
-		btTransform transform;
-		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
-		return transform.getOrigin();
-	} else {
-		return btVector3(0,0,0);
-	}
+	return GetTransform().getOrigin();
 }
 
 btTransform Object::GetTransform(void) {
 	btTransform transform;
-	if (!is_soft_) {
+	if (!is_soft_ && bt_object_) {
 		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
 		return transform;
-	} else {
+	}
+	else if (anchor_) {
+		transform.setIdentity();
+		transform.setOrigin(offset_);
+		return transform * anchor_->GetTransform();
+	}
+	else {
 		transform.setIdentity();
 		return transform;
 	}
 }
 
-LivingObject::LivingObject(World* world, Shader* shader, Material* material):
-	Object(world, shader, material), character_(nullptr) { }
+void Object::Draw(Camera* camera, const LightCollection* light_collection){
+	shader_->Use();
+	shader_->SetUniform<glm::vec3>("uEye.position", camera->position());
+	shader_->SetUniform<LightCollection>("uLightCollection", *light_collection);
+	shader_->SetUniform<Material>("uMaterial", *material_);
+	shader_->SetUniform<btTransform>("uModelMatrix", GetTransform());
+	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
+	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
+	glBindVertexArray(vao_);
+	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+btCollisionObject* Object::GetBulletObject(void){
+	return bt_object_;
+}
+void Object::Attach(Object* target, const btVector3& offset){
+	assert(!is_soft_); // soft body live by Bullet
+	anchor_ = target;
+	offset_ = offset;
+	if(bt_object_){
+		world_->bt_world_->removeCollisionObject(bt_object_);
+		bt_object_ = nullptr;
+	}
+}
+void Object::ActivateControl(void){
+	bt_object_->setActivationState(ACTIVE_TAG);
+}
+
+btVector3 Object::GetVelocity(void){
+	if(!bt_object_ || is_soft_)return btVector3(0, 0, 0);
+	else{
+		return dynamic_cast<btRigidBody*>(bt_object_)->getLinearVelocity();
+	}
+}
+void Object::SetVelocity(const btVector3& v){
+	if(!bt_object_)return ;
+	if(is_soft_){
+		dynamic_cast<btSoftBody*>(bt_object_)->setVelocity(v);
+	}
+	else{
+		dynamic_cast<btRigidBody*>(bt_object_)->setLinearVelocity(v);
+	}
+}
