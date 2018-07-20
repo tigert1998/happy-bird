@@ -8,6 +8,7 @@
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
 #include "controller_utility/keyboard_controller.h"
+#include "controller_utility/automation_controller.h"
 #include "stage.h"
 
 #if defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER)
@@ -36,11 +37,12 @@ class World{
 	std::vector<Object*> objects_;
 	Stage stage_;
 	// controller
-	Character* character_;
+	Character* man_character_;
+	Character* enemy_character_;
 	KeyboardController *keyboard_controller_;
+	AutomationController *automation_controller_;
  public:
  	// shared
- 	static bool keys_pressed[1024];
 	static int height, width;
 	static Camera* camera;
 	static glm::vec3 global_ambient;
@@ -63,7 +65,6 @@ class World{
 	void Run(void);
 	static void CursorPosCallback(GLFWwindow *window, double x, double y);
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
-	static Keyboard &keyboard;
 	btSoftRigidDynamicsWorld* bt_world(void) const ;
 	btBroadphaseInterface* bt_broadphase(void) const;
 	btSoftBodyWorldInfo& bt_info();

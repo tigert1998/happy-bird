@@ -9,4 +9,5 @@ protected:
 public:
 	Controller() = delete;
 	Controller(Character &controlee);
+	virtual void Elapse(double time) const = 0;
 };

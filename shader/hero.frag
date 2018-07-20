@@ -129,7 +129,7 @@ vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, TextureMat
 	for (int i = 0; i < lightCollection.total.spot; i++) {
 		color += CalculateSpotLight(eye, lightCollection.spot[i], material);
 	}
-	return color;
+	return color * 5;
 }
 
 void main() {

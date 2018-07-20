@@ -3,18 +3,15 @@ using namespace std;
 
 #include "world.h"
 #include "object_common.h"
-#include "controller_utility/keyboard.h"
 #include "shader_utility/spot_light.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
 
 int World::height = 600;
 int World::width = 800;
-bool World::keys_pressed[1024];
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
 LightCollection* World::light_collection = new LightCollection(glm::vec3(0, 0, 0));
-Keyboard &World::keyboard = Keyboard::shared;
 btVector3 World::origin(0, 0, 0);
 btVector3 World::forward(0, 0, 1);
 btVector3 World::left(1, 0, 0);
@@ -87,8 +84,6 @@ void World::InitGraphics(void) {
 	glEnable(GL_BLEND);
 	// for alpha texture
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	memset(keys_pressed, 0, sizeof(keys_pressed));
 }
 
 void World::InitPhysics(void) {
@@ -110,7 +105,7 @@ void World::InitPhysics(void) {
 	bt_soft_info_.m_broadphase = bt_overlapping_paircache_;
 	bt_soft_info_.m_sparsesdf.Initialize();
 
-	character_ = nullptr;
+	man_character_ = nullptr;
 }
 
 void World::InitScene(void) {
@@ -118,7 +113,7 @@ void World::InitScene(void) {
 
 	btTransform start_transform;
 	start_transform.setIdentity();
-	start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0));
+	start_transform.setOrigin(World::origin + btVector3(0, World::character_height, -World::character_height));
 	Object* man = new Hero(
 		this,
 		nullptr,
@@ -128,8 +123,8 @@ void World::InitScene(void) {
 		World::character_height
 	);
 	objects_.push_back(man);
-	character_ = new CharacterImpl(this, man);
-	keyboard_controller_ = new KeyboardController(*character_);
+	man_character_ = new CharacterImpl(this, man);
+	keyboard_controller_ = new KeyboardController(*man_character_);
 	objects_.push_back( 
 		new Sphere(
 			this, 
@@ -141,6 +136,7 @@ void World::InitScene(void) {
 	);
 	objects_.back()->Attach(man, btVector3(0,3,0));
 	camera->set_accompany_object(man, 120);
+
 	objects_.push_back(
 		new Particle(
 			this,
@@ -152,6 +148,33 @@ void World::InitScene(void) {
 		)
 	);
 	objects_.back()->Attach(objects_[objects_.size()-2], btVector3(0,3,0));
+
+
+	start_transform.setIdentity();
+	start_transform.setOrigin(World::origin + btVector3(0, World::character_height, -3 * World::character_height));
+	Object* enemy = new Hero(
+		this,
+		nullptr,
+		new TextureMaterial("resources/enemy.png", "resources/enemy.png", 8),
+		start_transform,
+		World::character_height,
+		World::character_height
+	);
+	objects_.push_back(enemy);
+	enemy_character_ = new CharacterImpl(this, enemy);
+	automation_controller_ = new AutomationController(*enemy_character_, *man_character_);
+
+	objects_.push_back(
+		new Particle(
+			this,
+			nullptr,
+			new PureColorMaterial(color::Green(), color::Green(), 40),
+			btVector3(0, 0, 0), // position
+			glm::vec3(0, 0, -0.02),
+			kLargeParticle | kFlameParticle | kAmbientParticle
+		)
+	);
+	objects_.back()->Attach(objects_[objects_.size() - 2], btVector3(0, 3, 0));
 
 	light_collection->PushBack(
 		new PointLight(
@@ -188,7 +211,8 @@ void World::Update(void) { // sync mesh and render
 	last_time = current_time;
 
 	bt_world_->stepSimulation(delta_time);
-	keyboard.Elapse(delta_time);
+	keyboard_controller_->Elapse(delta_time);
+	automation_controller_->Elapse(delta_time);
 
 	int i = 0;
 	for(auto p = stage_.begin(); p != stage_.end(); p++){
@@ -222,7 +246,7 @@ void World::CursorPosCallback(GLFWwindow *window, double x, double y) {
 }
 
 void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode) {
-	keyboard.Trigger(key, action);
+	Keyboard::shared.Trigger(key, action);
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
