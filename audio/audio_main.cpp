@@ -1,5 +1,9 @@
-#include<audio.h>
-
+//#include<audio.h>
+//#include<amp.h>
+#include<thread>
+#include<windows.h>
+#include "mmsystem.h"//导入声音头文件
+#pragma comment(lib,"winmm.lib")//导入声音头文件库 
 
 
 /*void playUtil(const char *fileName)
