@@ -8,8 +8,7 @@
 #include "opengl_common.h"
 #include "bullet_common.h"
 
-#define absolute_path_vs2017
-#ifndef absolute_path_vs2017
+#ifndef _MSC_VER
 #define cloth_vert "shader/cloth.vert"
 #define cloth_frag "shader/cloth.frag"
 #define common_vert "shader/common.vert"
@@ -27,7 +26,7 @@
 #define hero_frag "D:\\code\\happy-bird\\shader\\hero.frag"
 #define particle_vert "D:\\code\\happy-bird\\shader\\particle.vert"
 #define particle_frag "D:\\code\\happy-bird\\shader\\particle.frag"
-#endif // !absolute_path
+#endif
 
 class Shader {
 public:

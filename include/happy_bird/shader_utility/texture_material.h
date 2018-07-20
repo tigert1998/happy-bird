@@ -2,17 +2,13 @@
 
 #include "shader_utility/material.h"
 #include <string>
-#ifndef absolute_path_vs2017
-#define absolute_path_vs2017
-#endif
 
-#ifndef absolute_path_vs2017
-#define png "resources/hero.png"
-
+#ifndef _MSC_VER
+#define PNG_PATH "resources/hero.png"
 #else 
-#define png "D:\\code\\happy-bird\\resources\\hero.png"
-
+#define PNG_PATH "D:\\code\\happy-bird\\resources\\hero.png"
 #endif
+
 class TextureMaterial: public Material {
 private:
 	uint32_t diffuse_texture_;

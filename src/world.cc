@@ -119,7 +119,7 @@ void World::InitScene(void) {
 	Object* man = new Hero(
 		this,
 		nullptr,
-		new TextureMaterial(png, png, 8),
+		new TextureMaterial(PNG_PATH, PNG_PATH, 8),
 		start_transform,
 		World::character_height,
 		World::character_height
@@ -243,12 +243,13 @@ void World::ProcessInput(void) {
 		character_->Rotate(false, delta_time);
 	else
 		character_->ResetRotate();
-	if (keys_pressed[GLFW_KEY_SPACE])
-	{
-		//play_audio("D:\\code\\happy-bird\\audio\\sounds\\bubble.wav");
+
+	if (keys_pressed[GLFW_KEY_SPACE]) {
+		#if defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER)
 		PlaySound(TEXT("D:\\code\\happy-bird\\audio\\sounds\\ding.wav"), NULL, SND_ASYNC | SND_FILENAME);
-		character_->Jump(delta_time);
+		#endif
 		
+		character_->Jump(delta_time);
 	}
 		
 }
