@@ -4,8 +4,8 @@ SRC_PATH = ./src
 SRC = $(SRC_PATH)/main.cc $(SRC_PATH)/stage.cc $(SRC_PATH)/camera.cc \
 $(SRC_PATH)/file_manager.cc $(SRC_PATH)/glad.c $(SRC_PATH)/object.cc \
 $(SRC_PATH)/world.cc $(SRC_PATH)/character.cc \
-$(SRC_PATH)/box.cc $(SRC_PATH)/sphere.cc $(SRC_PATH)/head.cc \
-$(SRC_PATH)/cloth.cc $(SRC_PATH)/math_utility.cc\
+$(SRC_PATH)/box.cc $(SRC_PATH)/sphere.cc \
+$(SRC_PATH)/math_utility.cc\
 $(SRC_PATH)/particle.cc  $(SRC_PATH)/wall.cc\
 $(SRC_PATH)/shader_utility/shader.cc $(SRC_PATH)/shader_utility/light.cc \
 $(SRC_PATH)/shader_utility/light_collection.cc $(SRC_PATH)/shader_utility/material.cc \

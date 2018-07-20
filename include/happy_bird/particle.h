@@ -97,10 +97,9 @@ class ParticleEmitter{
 	void Update(std::vector<ParticleInfo>::iterator& slot, glm::vec3 p);
 };
 
-class Particle: public DeadObject{
-	Object* anchor_; // for updating position
+class Particle: public Object{
+	btVector3 position_;
 	int amount_;
-	glm::vec3 offset_;
 	std::vector<ParticleInfo>::iterator slot_;
 	std::vector<ParticleInfo> particles_;
 	ParticleEmitter emitter_;
@@ -109,16 +108,16 @@ class Particle: public DeadObject{
  		World* world, 
  		Shader* shader, 
  		Material* material, 
- 		Object* object, 
- 		glm::vec3 offset,
+ 		const btVector3& position,
  		glm::vec3 velocity, 
  		int flags,
  		int amount = 20,
  		float interval = 0.07
  	);
 	~Particle(){ }
+	btVector3 GetOrigin(void);
 	void ImportToGraphics();
-	void InitParticles(void);
+	void InitMesh(void);
 	void Draw(Camera*, const LightCollection*);
 };
 

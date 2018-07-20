@@ -114,17 +114,19 @@ ostream& operator<<(ostream& os, const btTransform& transform){
 }
 
 Wall::Wall(
-	World* world, 
-	Shader* shader,
-	Material* material,
-	const btTransform& trans, 
-	float scaling,
-	glm::vec3 half_extents
+		World* world, 
+		Shader* shader,
+		Material* material,
+		const btTransform& trans, 
+		float scaling,
+		glm::vec3 half_extents
 	):
-	DeadObject(world, shader, material), 
-	half_extents_(half_extents), 
-	scaling_(scaling) {
+		Object(world, shader, material, 6, false), 
+		half_extents_(half_extents), 
+		scaling_(scaling) {
 	assert(world_);
+	stride_ = 6;
+	std::cout << "InitWall" << std::endl;
 	is_soft_ = false;
 	if (!shader)
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
@@ -136,12 +138,12 @@ Wall::Wall(
 		new btBoxShape(GLMVec3ToBTVector3(half_extents_))
 	);
 	// create mesh //
-	InitBricks(trans);
+	InitMesh();
 	ImportToGraphics();
 }
 
 #define kErr (0.1)
-void Wall::InitBricks(const btTransform& parent_transform){
+void Wall::InitMesh(){
 	btTransform baseTransform; // point to left-down corner
 	baseTransform.setIdentity();
 	baseTransform.setOrigin(btVector3(
@@ -196,24 +198,24 @@ void Wall::InitBricks(const btTransform& parent_transform){
 					current += scaling_ * brick_ratio_;
 					continue;
 				}
-				int base = vertices_.size() / 3;
+				int base = data_.size() / 6;
 				for(int v = 0; v + 2 < brick_vertices_.size(); v += 3){
 					btVector3 vertice = 
 						currentTransform * 
 						btVector3(brick_vertices_[v] * scaling_, brick_vertices_[v+1] * scaling_, brick_vertices_[v+2] * scaling_);
-					vertices_.push_back(vertice[0]);
-					vertices_.push_back(vertice[1]);
-					vertices_.push_back(vertice[2]);
+					data_.push_back(vertice[0]);
+					data_.push_back(vertice[1]);
+					data_.push_back(vertice[2]);
 					// only rotate normal
 					if(rotated){
-						normals_.push_back(-brick_normals_[v+1]);
-						normals_.push_back(brick_normals_[v+0]);
-						normals_.push_back(brick_normals_[v+2]);						
+						data_.push_back(-brick_normals_[v+1]);
+						data_.push_back(brick_normals_[v+0]);
+						data_.push_back(brick_normals_[v+2]);						
 					}
 					else{
-						normals_.push_back(brick_normals_[v+0]);
-						normals_.push_back(brick_normals_[v+1]);
-						normals_.push_back(brick_normals_[v+2]);						
+						data_.push_back(brick_normals_[v+0]);
+						data_.push_back(brick_normals_[v+1]);
+						data_.push_back(brick_normals_[v+2]);						
 					}
 				}
 				for(auto& indice: brick_indices_){
@@ -226,4 +228,21 @@ void Wall::InitBricks(const btTransform& parent_transform){
 		level ++;
 	}
 	return ;
+}
+void Wall::ImportToGraphics(void){
+	glBindVertexArray(vao_);
+	// Bind indice
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uint32_t), indices_.data(), GL_STATIC_DRAW);
+	// Bind data
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+	glBufferData(GL_ARRAY_BUFFER, data_.size() * sizeof(float), data_.data(), GL_STATIC_DRAW);	
+	// Basic Attrib: vertex coords
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, stride_ * sizeof(float), (void *) 0);
+	glEnableVertexAttribArray(0);
+	// Normal attrib
+	glVertexAttribPointer(1, 3, GL_FLOAT, false, stride_ * sizeof(float), (void *) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	// Unbind vao
+	glBindVertexArray(0);
 }

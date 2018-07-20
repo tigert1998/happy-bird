@@ -12,22 +12,19 @@
 
 class World;
 
-class Hero: public LivingObject {
+class Hero: public Object {
 private:
 	float width_;
 	float height_;
 	static float thickness_;
-	uint32_t tex_coord_vbo_;
-	std::vector<float> tex_coords_;
-
 public:
  	Hero() = delete;
 	Hero(World* world, Shader* shader, Material* material, const btTransform& transform, float w, float h);
 	~Hero();
 	btVector3 GetOrigin();
+	btTransform GetTransform();
 	float height() const;
 	float width() const;
-	void Draw(Camera* camera, const LightCollection* light_collection);
 	void ImportToGraphics();
 	void InitMesh();
 };

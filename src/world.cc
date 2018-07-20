@@ -117,7 +117,7 @@ void World::InitScene(void) {
 	btTransform start_transform;
 	start_transform.setIdentity();
 	start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0));
-	LivingObject* man = new Hero(
+	Object* man = new Hero(
 		this,
 		nullptr,
 		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
@@ -126,19 +126,30 @@ void World::InitScene(void) {
 		World::character_height
 	);
 	objects_.push_back(man);
-	character_ = man->character_;
+	character_ = new CharacterImpl(this, man);
+	objects_.push_back( 
+		new Sphere(
+			this, 
+			nullptr, 
+			new PureColorMaterial(color::White(), color::White(), 3),
+			start_transform,
+			3
+		)
+	);
+	objects_.back()->Attach(man, btVector3(0,3,0));
 	camera->set_accompany_object(man, 120);
 	objects_.push_back(
 		new Particle(
 			this,
 			nullptr,
 			new PureColorMaterial(color::Red(), color::Red(), 40),
-			man,
-			glm::vec3(0, 0, -1),
+			btVector3(0, 0, 0), // position
 			glm::vec3(0, 0, -0.02),
 			kLargeParticle | kFlameParticle | kAmbientParticle
 		)
 	);
+	objects_.back()->Attach(objects_[objects_.size()-2], btVector3(0,3,0));
+
 	light_collection->PushBack(
 		new PointLight(
 			glm::vec3(0, 15, 0),
@@ -178,7 +189,6 @@ void World::Update(void) { // sync mesh and render
 	
 	int i = 0;
 	for(auto p = stage_.begin(); p != stage_.end(); p++){
-		cout << "Draw no." << (i++) << endl;
 		(*p)->Draw(camera, light_collection);
 	}
 

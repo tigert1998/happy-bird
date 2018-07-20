@@ -75,9 +75,9 @@ void Stage::InitDefaultStage(void){
 		 	world_, 
 		 	nullptr, 
 		 	new PureColorMaterial(color::White(), color::White(), 8),
-		 	35, // mass
 		 	box_transform, 
-		 	glm::vec3(box_half, box_half, box_half)
+		 	glm::vec3(box_half, box_half, box_half),
+		 	35.0f // mass
 		)
 	); 
 	

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "light.h"
 
 class ParallelLight: virtual public Light {
