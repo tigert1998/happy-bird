@@ -69,12 +69,4 @@ void play_audio(std::string s)
 	delete[] plt;
 }
 
-/*
-int main()
-{
-	test("D:\\code\\happy-bird\\audio\\sounds\\bubble.wav");
-	return 0;
-}
-*/
-
 
