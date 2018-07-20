@@ -9,11 +9,13 @@
 
 class World;
 
-class Box: public DeadObject{
+class Box: public Object{
 	glm::vec3 half_extents_;
+	float mass_;
  public:
 	Box() = delete;
-	Box(World*, Shader*, Material*, float, const btTransform&, glm::vec3);
-	void Draw(Camera* camera, const LightCollection* light_collection);
+	Box(World*, Shader*, Material*, const btTransform&, glm::vec3 half, float mass);
+	void InitMesh(void);
+	void ImportToGraphics(void);
 	~Box(){ }
 };

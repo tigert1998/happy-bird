@@ -1,4 +1,5 @@
 *_test
+_*
 *_temp.*
 *.o
 *.obj
@@ -18,3 +19,4 @@ YPB_build/*
 glad.c
 glad_win.c
 include/stb
+happy_bird_win32.exp

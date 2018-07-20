@@ -10,6 +10,7 @@ int main(int argc, char** argv)
 {
 
 	World demo;
+	//PlaySound(TEXT("D:\\code\\happy-bird\\audio\\sounds\\bubble.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	demo.Run();
 
 }
