@@ -1,11 +1,5 @@
 #include<audio.h>
-#include<AL/alut.h>
-#include<al.h>
-//#include<alc.h>
-//#include<efx.h>
-//#include<efx-creative.h>
-//#include<EFX-Util.h>
-//#include<xram.h>
+
 
 
 void playUtil(const char *fileName)
