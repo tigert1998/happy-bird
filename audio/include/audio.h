@@ -16,4 +16,5 @@ void playUtil(const char *fileName);
 void pre_play_audio(int argc, char **argv);
 void play_audio(std::string s);
 void test_audio_2();
+int test_audio_3();
 
