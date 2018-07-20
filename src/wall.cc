@@ -126,8 +126,11 @@ Wall::Wall(
 	scaling_(scaling) {
 	assert(world_);
 	is_soft_ = false;
+
+
+	
 	if (!shader)
-		shader_ = new Shader("shader/common.vert", "shader/common.frag");
+		shader_ = new Shader(common_vert, common_frag);
 	// initialize physics shape //
 	half_extents_[2] = scaling_ / 2;
 	bt_object_ = world_->CreateRigidBody(
