@@ -9,6 +9,7 @@
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
 #include "shader_utility/material.h"
+#include "debug_utility/log.h"
 
 class World;
 class Camera;

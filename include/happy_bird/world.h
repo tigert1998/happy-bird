@@ -9,6 +9,7 @@
 #include "shader_utility/light_collection.h"
 #include "controller_utility/keyboard_controller.h"
 #include "controller_utility/automation_controller.h"
+#include "player_utility/player_collection.h"
 #include "stage.h"
 
 #if defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER)
@@ -36,11 +37,7 @@ class World{
 	// Object collections
 	std::vector<Object*> objects_;
 	Stage stage_;
-	// controller
-	Character* man_character_;
-	Character* enemy_character_;
-	KeyboardController *keyboard_controller_;
-	AutomationController *automation_controller_;
+	PlayerCollection *player_collection_ptr_;
  public:
  	// shared
 	static int height, width;

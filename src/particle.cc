@@ -124,7 +124,7 @@ Particle::Particle(
 		emitter_(ParticleConfig(velocity, dynamic_cast<PureColorMaterial*>(material)->diffuse(), interval, flags)){
 	assert(world_);
 
-	std::cout << "InitParticle" << std::endl;
+	LOG();
 	data_.resize(amount_ * 4);
 	if(!shader_)shader_ = new Shader(particle_vert, particle_frag);
 	InitMesh();

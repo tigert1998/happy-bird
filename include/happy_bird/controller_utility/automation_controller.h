@@ -1,3 +1,5 @@
+#pragma once
+
 #include "controller_utility/controller.h"
 
 class AutomationController: public Controller {

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 using namespace std;
 
 #include "world.h"
@@ -6,6 +7,8 @@ using namespace std;
 #include "shader_utility/spot_light.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
+
+using std::shared_ptr;
 
 int World::height = 600;
 int World::width = 800;
@@ -104,77 +107,12 @@ void World::InitPhysics(void) {
 	bt_soft_info_.m_dispatcher = bt_dispatcher_;
 	bt_soft_info_.m_broadphase = bt_overlapping_paircache_;
 	bt_soft_info_.m_sparsesdf.Initialize();
-
-	man_character_ = nullptr;
 }
 
 void World::InitScene(void) {
 	stage_.InitStage(kDefaultStage);
-
-	btTransform start_transform;
-	start_transform.setIdentity();
-	start_transform.setOrigin(World::origin + btVector3(0, World::character_height, -World::character_height));
-	Object* man = new Hero(
-		this,
-		nullptr,
-		new TextureMaterial(PNG_PATH, PNG_PATH, 8),
-		start_transform,
-		World::character_height,
-		World::character_height
-	);
-	objects_.push_back(man);
-	man_character_ = new CharacterImpl(this, man);
-	keyboard_controller_ = new KeyboardController(*man_character_);
-	objects_.push_back( 
-		new Sphere(
-			this, 
-			nullptr, 
-			new PureColorMaterial(color::White(), color::White(), 3),
-			start_transform,
-			3
-		)
-	);
-	objects_.back()->Attach(man, btVector3(0,3,0));
-	camera->set_accompany_object(man, 120);
-
-	objects_.push_back(
-		new Particle(
-			this,
-			nullptr,
-			new PureColorMaterial(color::Red(), color::Red(), 40),
-			btVector3(0, 0, 0), // position
-			glm::vec3(0, 0, -0.02),
-			kLargeParticle | kFlameParticle | kAmbientParticle
-		)
-	);
-	objects_.back()->Attach(objects_[objects_.size()-2], btVector3(0,3,0));
-
-
-	start_transform.setIdentity();
-	start_transform.setOrigin(World::origin + btVector3(0, World::character_height, -3 * World::character_height));
-	Object* enemy = new Hero(
-		this,
-		nullptr,
-		new TextureMaterial("resources/enemy.png", "resources/enemy.png", 8),
-		start_transform,
-		World::character_height,
-		World::character_height
-	);
-	objects_.push_back(enemy);
-	enemy_character_ = new CharacterImpl(this, enemy);
-	automation_controller_ = new AutomationController(*enemy_character_, *man_character_);
-
-	objects_.push_back(
-		new Particle(
-			this,
-			nullptr,
-			new PureColorMaterial(color::Green(), color::Green(), 40),
-			btVector3(0, 0, 0), // position
-			glm::vec3(0, 0, -0.02),
-			kLargeParticle | kFlameParticle | kAmbientParticle
-		)
-	);
-	objects_.back()->Attach(objects_[objects_.size() - 2], btVector3(0, 3, 0));
+	player_collection_ptr_ = new PlayerCollection();
+	player_collection_ptr_->InitPlayerCollection(this);
 
 	light_collection->PushBack(
 		new PointLight(
@@ -211,8 +149,6 @@ void World::Update(void) { // sync mesh and render
 	last_time = current_time;
 
 	bt_world_->stepSimulation(delta_time);
-	keyboard_controller_->Elapse(delta_time);
-	automation_controller_->Elapse(delta_time);
 
 	int i = 0;
 	for(auto p = stage_.begin(); p != stage_.end(); p++){
@@ -222,6 +158,12 @@ void World::Update(void) { // sync mesh and render
 	for(auto& obj : objects_) {
 		obj->Draw(camera, light_collection);
 	}
+
+	player_collection_ptr_->Traverse([delta_time] (weak_ptr<Player> player_ptr) {
+		player_ptr.lock()->controller_ptr().lock()->Elapse(delta_time);
+		player_ptr.lock()->object_ptr().lock()->Draw(camera, light_collection);
+	});
+
 	glfwSwapBuffers(window_);
 	glfwPollEvents();
 }

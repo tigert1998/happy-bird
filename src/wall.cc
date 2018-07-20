@@ -125,8 +125,8 @@ Wall::Wall(
 		half_extents_(half_extents), 
 		scaling_(scaling) {
 	assert(world_);
+	LOG();
 	stride_ = 6;
-	std::cout << "InitWall" << std::endl;
 	is_soft_ = false;
 
 
