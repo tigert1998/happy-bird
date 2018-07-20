@@ -204,6 +204,9 @@ void World::Update(void) { // sync mesh and render
 		);
 	temp_.Update();	
 	Timer::UpdateFrame();
+	// Playing
+	static Audiofile background_audio("bubble.wav");
+	background_audio.play();
 	// Drawing
 	for(auto p = stage_.begin(); p != stage_.end(); p++){
 		auto ptr = p->get().lock();
