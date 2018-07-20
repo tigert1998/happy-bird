@@ -5,6 +5,8 @@
 #include<cstdint>
 #include<thread>
 #include<future>
+#include<iostream>
+//#include<boost/filesystem/convenience.hpp>
 #include<chrono>
 #include<random>
 #include<windows.h>
@@ -20,12 +22,24 @@
 class Audiofile
 {
 	std::string filename_;
-	std::string abspath_;	// only VS2017 may use this member
+	std::string abspath_;
 	const uint32_t index;
 public:
 
-	Audiofile(std::string filename) :filename_(filename), abspath_("D:\\code\\happy-bird\\audio\\sounds\\" + filename),
-		index(Timer::New()){}
+	Audiofile(std::string filename) :filename_(filename), index(Timer::New())
+	{
+		//std::ifstream is("D:\\code\\happy-bird\\audio\\sounds\\" + filename_, std::ios::in);
+		std::ifstream is("D:/code/happy-bird/audio/sounds/" + filename_,std::ios::in);
+		if (is.is_open())
+		{
+			//abspath_ = "D:\\code\\happy-bird\\audio\\sounds\\" + filename_;
+			abspath_ = "D:/code/happy-bird/audio/sounds/" + filename_;
+		}
+		else
+		{
+			//;
+		}
+	}
 
 
 	void play()
@@ -38,6 +52,12 @@ public:
 		auto how_long= Timer::Query(index);
 		if(how_long<=duration)
 		mciSendString((LPCSTR)(("play " + abspath_).c_str()), 0, 0, 0);
+	}
+	void play(uint32_t time)
+	{
+		uint32_t times = 0;
+		if (times++ <= time)
+			mciSendString((LPCSTR)(("play " + abspath_).c_str()), 0, 0, 0);
 	}
 };
 
