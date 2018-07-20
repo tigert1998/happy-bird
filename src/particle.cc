@@ -55,7 +55,18 @@ ParticleConfig::ParticleConfig(glm::vec3 v, Color color, int intFlag):
 			gradual = true;
 			delta_color = glm::vec3(0, 0, 0);
 	}
-
+	if(flags & kJitterParticle){
+		jitter = true;
+	}
+	else{
+		jitter = false;
+	}
+	if(flags & kInnerParticle){
+		inner_force = true;
+	}
+	else{
+		inner_force = false;
+	}
 }
 
 // ParticleEmitter::ParticleEmitter():
@@ -88,6 +99,9 @@ void ParticleEmitter::Emit(std::vector<ParticleInfo>::iterator curslot, glm::vec
 	color[1] += config_.delta_color[1] * factor;
 	if(!config_.gradual)factor = Random::QueryFloatRandom(0, 1);
 	color[2] += config_.delta_color[2] * factor;
+	if(config_.jitter){
+		p += glm::vec3(Random::QueryFloatRandom(-1,1), 0, Random::QueryFloatRandom(-1,1));
+	}
 	*curslot = ParticleInfo(
 		p,
 		v,
@@ -144,16 +158,19 @@ void Particle::ImportToGraphics(){
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * data_.size(), data_.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) (1 * sizeof(float)));
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 }
 void Particle::Draw(Camera* camera, const LightCollection* lights) {
-	static float last_time = glfwGetTime(), current_time;
-	current_time = glfwGetTime();
-	float delta_time = (current_time - last_time) * 500;
-	last_time = current_time;
+	static Timer::TimingId timerId = Timer::New();
+	float delta_time = Timer::QueryAndPin(timerId) * 2000;
+	// static float last_time = glfwGetTime(), current_time;
+	// current_time = glfwGetTime();
+	// float delta_time = (current_time - last_time) * 500;
+	// cout << amount_ <<  " -> Delta: " << delta_time << endl; 
+	// last_time = current_time;
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update(delta_time);
 		data_[4*i + 0] = particles_[i].position[0];

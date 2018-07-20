@@ -1,12 +1,11 @@
 #version 330 core
-
-struct Material {
+struct PureColorMaterial {
 	float shininess;
 	vec3 diffuse;
 	vec3 specular;
 };
 
-uniform Material uMaterial;
+uniform PureColorMaterial uMaterial;
 
 out vec4 fragColor;
 

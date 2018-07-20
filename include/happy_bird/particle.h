@@ -43,23 +43,31 @@ struct ParticleInfo{
 		color(rhs.color) { }
 	~ParticleInfo(){ }
 	void Update(float delta){
-		position += velocity * delta;
-		velocity += acceleration * delta;
+		position += velocity * float(Timer::kFrameElapsed * 500);
+		velocity += acceleration * float(Timer::kFrameElapsed * 500);
 	}
 };
 enum ParticleFlag{
+	// acceleration
 	kDefaultParticle = 0x00,
 	kGravityParticle = 0x01,
 	kFlameParticle = 0x02,
 	kFloatParticle = 0x03, // 00 for float
+	// radius
 	kSmallParticle = 0x04,
 	kLargeParticle = 0x08,
 	kMediumParticle = 0x0c, // 00 for small
+	// velocity var
 	kAmbientParticle = 0x00,
 	kLaserParticle = 0x10, // 00 for ambient
+	// color var
 	kGradualColorParticle = 0x20,
 	kMonoColorParticle = 0x40,
-	kRandomColorParticle = 0x60 // 00 for mono
+	kRandomColorParticle = 0x60, // 00 for mono
+	// origin var
+	kJitterParticle = 0x80,
+	// inner force
+	kInnerParticle = 0x100
 } ;
 struct ParticleConfig{
 	// explicit assigned
@@ -78,6 +86,9 @@ struct ParticleConfig{
 	// kGradualColorParticle, kMonoColorParticle, kRandomColorParticle
 	Color delta_color; // range delta
 	bool gradual; // true for gradual change
+	// external option
+	bool jitter;
+	bool inner_force;
 
 	ParticleConfig(glm::vec3 v, Color color, int flags = 0); 
 };

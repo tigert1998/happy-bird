@@ -21,7 +21,8 @@ enum class MoveDirectionType {
 };
 
 class World{
-	friend class Object;
+	friend Object;
+	friend Character;
  protected:
  	// OpenGL util
 	GLFWwindow* window_;

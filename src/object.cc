@@ -31,6 +31,7 @@ Object::~Object(){
 	glDeleteBuffers(1, &vbo_);
 	glDeleteBuffers(1, &ebo_);
 	// delete from bullet
+	if(bt_object_)world_->bt_world_->removeCollisionObject(bt_object_);
 	// DeleteFromPhysics();
 	delete shader_;
 	delete bt_object_;

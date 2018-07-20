@@ -126,7 +126,7 @@ void World::InitScene(void) {
 		World::character_height
 	);
 	objects_.push_back(man);
-	character_ = new CharacterImpl(this, man);
+	character_ = new Character(this, man);
 	objects_.push_back( 
 		new Sphere(
 			this, 
@@ -141,11 +141,11 @@ void World::InitScene(void) {
 	objects_.push_back(
 		new Particle(
 			this,
-			nullptr,
-			new PureColorMaterial(color::Red(), color::Red(), 40),
+			new Shader("shader/particle.vert", "shader/blood_incr.frag"),
+			new PureColorMaterial(color::Green(), color::Green(), 40),
 			btVector3(0, 0, 0), // position
 			glm::vec3(0, 0, -0.02),
-			kLargeParticle | kFlameParticle | kAmbientParticle
+			kMediumParticle | kFlameParticle | kAmbientParticle | kJitterParticle
 		)
 	);
 	objects_.back()->Attach(objects_[objects_.size()-2], btVector3(0,3,0));
@@ -187,22 +187,24 @@ void World::Update(void) { // sync mesh and render
 
 	bt_world_->stepSimulation(delta_time);
 
-	if(Random::QueryIntRandom(0, 2000) == 0)	
-	temp_.PushBack(
-		new Particle(
-			this,
-			nullptr,
-			new PureColorMaterial(color::Red(), color::Red(), 40),
-			btVector3(Random::QueryFloatRandom(-50, 50), Random::QueryFloatRandom(-50, 50), Random::QueryFloatRandom(-50, 50)),
-			glm::vec3(0, 0, -0.02),
-			kLargeParticle | kFlameParticle | kAmbientParticle,
-			8,
-			0.07,
-			4
-		),
-		6
-	);
-	int i = 0;
+	if(Random::QueryIntRandom(0, 2000) < 2)	
+		temp_.PushBack(
+			new Particle(
+				this,
+				nullptr,
+				new PureColorMaterial(color::Red(), color::Red(), 40),
+				btVector3(Random::QueryFloatRandom(-50, 50), Random::QueryFloatRandom(-50, 50), Random::QueryFloatRandom(-50, 50)),
+				glm::vec3(0, 0, -0.02),
+				kLargeParticle | kFlameParticle | kAmbientParticle,
+				8,
+				0.07,
+				4
+			),
+			6
+		);
+	temp_.Update();	
+	Timer::UpdateFrame();
+	// Drawing
 	for(auto p = stage_.begin(); p != stage_.end(); p++){
 		auto ptr = p->get().lock();
 		if(ptr){
@@ -267,6 +269,13 @@ void World::ProcessInput(void) {
 		character_->Rotate(false, delta_time);
 	else
 		character_->ResetRotate();
+
+	if(keys_pressed[GLFW_KEY_F]){
+		character_->LaserAttack();
+	}
+	if(keys_pressed[GLFW_KEY_G]){
+		character_->BoxAttack();
+	}
 
 	if (keys_pressed[GLFW_KEY_SPACE]) {
 		character_->Jump(delta_time);

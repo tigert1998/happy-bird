@@ -8,6 +8,11 @@ class Timer{
 	static std::vector<std::chrono::time_point<std::chrono::high_resolution_clock> > pined_;
  public:
  	using TimingId = uint32_t;
+	static TimingId kFrameTimer;
+	static float kFrameElapsed;
+	static void UpdateFrame(void){
+		kFrameElapsed = Timer::QueryAndPin(kFrameTimer);
+	}
  	static uint32_t New(void){ // auto pin
  		pined_.push_back(std::chrono::high_resolution_clock::now());
  		return pined_.size() - 1;
