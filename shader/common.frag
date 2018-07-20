@@ -2,6 +2,32 @@
 
 const float zero = 0.00000001;
 
+#define UnfoldParallelSingle(n) if(i == n){ \
+	color += CalculateParallelLight(eye, lightCollection.parallel[n], material);\
+}
+#define UnfoldParallel	UnfoldParallelSingle(0)\
+	UnfoldParallelSingle(1)\
+	UnfoldParallelSingle(2)\
+	UnfoldParallelSingle(3)\
+	UnfoldParallelSingle(4)
+#define UnfoldPointSingle(n) if(i == n){ \
+	color += CalculatePointLight(eye, lightCollection.point[n], material);\
+}
+#define UnfoldPoint	UnfoldPointSingle(0)\
+	UnfoldPointSingle(1)\
+	UnfoldPointSingle(2)\
+	UnfoldPointSingle(3)\
+	UnfoldPointSingle(4)
+#define UnfoldSpotSingle(n) if(i == n){ \
+	color += CalculateSpotLight(eye, lightCollection.spot[n], material);\
+}
+#define UnfoldSpot	UnfoldSpotSingle(0)\
+	UnfoldSpotSingle(1)\
+	UnfoldSpotSingle(2)\
+	UnfoldSpotSingle(3)\
+	UnfoldSpotSingle(4)
+
+
 struct Attenuation {
 	float range;
 	float constant;
@@ -120,12 +146,15 @@ vec3 CalculateSpotLight(Eye eye, SpotLight light, PureColorMaterial material) {
 vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, PureColorMaterial material) {
 	vec3 color = lightCollection.ambient;
 	for (int i = 0; i < lightCollection.total.parallel; i++) {
+		// UnfoldParallel
 		color += CalculateParallelLight(eye, lightCollection.parallel[i], material);
 	}
 	for (int i = 0; i < lightCollection.total.point; i++) {
+		// UnfoldPoint
 		color += CalculatePointlLight(eye, lightCollection.point[i], material);
 	}
 	for (int i = 0; i < lightCollection.total.spot; i++) {
+		// UnfoldSpot
 		color += CalculateSpotLight(eye, lightCollection.spot[i], material);
 	}
 	return color;

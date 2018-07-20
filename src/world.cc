@@ -119,7 +119,7 @@ void World::InitScene(void) {
 	Object* man = new Hero(
 		this,
 		nullptr,
-		new TextureMaterial(PNG_PATH, PNG_PATH, 8),
+		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
 		start_transform,
 		World::character_height,
 		World::character_height
@@ -222,6 +222,7 @@ void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, i
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	} else {
 		keys_pressed[key] = (action != GLFW_RELEASE);
+		cout << "Press Callback" << endl;
 	}
 }
 
@@ -245,11 +246,10 @@ void World::ProcessInput(void) {
 		character_->ResetRotate();
 
 	if (keys_pressed[GLFW_KEY_SPACE]) {
-		#if defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER)
-		PlaySound(TEXT("D:\\code\\happy-bird\\audio\\sounds\\ding.wav"), NULL, SND_ASYNC | SND_FILENAME);
-		#endif
-		
 		character_->Jump(delta_time);
+	#if defined(ENABLE_AUDIO) && (defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER))
+		PlaySound(TEXT("./audio/sounds/ding.wav"), NULL, SND_ASYNC | SND_FILENAME);
+	#endif
 	}
 		
 }
