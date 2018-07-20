@@ -1,12 +1,12 @@
 #pragma once
 
-#include "controller_utility/controllable.h"
+#include "character.h"
 
 class Controller {
 protected:
-	Controllable &controlee_;
+	Character &controlee_;
 
 public:
 	Controller() = delete;
-	Controller(Controllable &controlee);
+	Controller(Character &controlee);
 };

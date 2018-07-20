@@ -10,8 +10,8 @@ class Character{
  	static float static_pace_;
  	float max_speed_;
  public:
- 	Character(float speed):max_speed_(speed){ };
- 	virtual ~Character(){ }
+ 	Character(float speed);
+ 	virtual ~Character();
  	virtual void Bind(Object*) = 0;
  	virtual Object* GetDelegate(void) = 0;
  	virtual void Move(bool, float) = 0;
@@ -21,18 +21,3 @@ class Character{
  	virtual void ResetRotate(void) = 0;
 };
 
-class CharacterImpl: public Character{
- protected:
- 	World* world_;
- 	Object* object_;
- public:
- 	CharacterImpl(World*, Object*, float speed = 15);
- 	~CharacterImpl();
- 	void Bind(Object* object);
- 	Object* GetDelegate(void);
- 	void Move(bool, float);
- 	void Rotate(bool, float);
- 	void Jump(float);
- 	void ResetMove(void);
-	void ResetRotate(void);
-};

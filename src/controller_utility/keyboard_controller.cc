@@ -1,25 +1,26 @@
-#include "controller_utility/keyboard_controller.h"
 #include "opengl_common.h"
+#include "controller_utility/keyboard_controller.h"
+#include "controller_utility/character.h"
 
 #include <functional>
 
 using std::bind;
 
-KeyboardController::KeyboardController(Controllable &controlee, Keyboard &keyboard): Controller(controlee) {
-	Keyboard.Register([&] (Keyboard::KeyboardState state, double time) {
+KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard): Controller(controlee) {
+	keyboard.Register([&] (Keyboard::KeyboardState state, double time) {
 		if (state[GLFW_KEY_W])
-			controlee_.MoveLongitudinally(true, time);
+			controlee_.Move(true, time);
 		else if (state[GLFW_KEY_S])
-			controlee_.MoveLongitudinally(false, time);
+			controlee_.Move(false, time);
 		else
-			controlee_->ResetLongitude();
+			controlee_.ResetMove();
 	
 		if (state[GLFW_KEY_A])
-			controlee_.MoveLatitudinally(true, time);
+			controlee_.Rotate(true, time);
 		else if (state[GLFW_KEY_D])
-			controlee_.MoveLatitudinally(false, time);
+			controlee_.Rotate(false, time);
 		else
-			controlee_.ResetLatitude();
+			controlee_.ResetRotate();
 	
 		if (state[GLFW_KEY_SPACE])
 			controlee_.Jump(time);

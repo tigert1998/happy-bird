@@ -1,3 +1,3 @@
 #include "controller_utility/controller.h"
 
-Controller::Controller(Controllable &controlee): controlee_(controlee) { }
+Controller::Controller(Character &controlee): controlee_(controlee) { }

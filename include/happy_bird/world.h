@@ -4,11 +4,10 @@
 #include "opengl_common.h"
 #include "bullet_common.h"
 #include "object.h"
-#include "character.h"
 #include "camera.h"
-#include "character.h"
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
+#include "controller_utility/keyboard_controller.h"
 #include "stage.h"
 
 #if defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER)
@@ -38,6 +37,7 @@ class World{
 	Stage stage_;
 	// controller
 	Character* character_;
+	KeyboardController *keyboard_controller_;
  public:
  	// shared
  	static bool keys_pressed[1024];

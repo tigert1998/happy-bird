@@ -7,6 +7,7 @@ using namespace std;
 #include "shader_utility/spot_light.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
+
 int World::height = 600;
 int World::width = 800;
 bool World::keys_pressed[1024];
@@ -128,6 +129,7 @@ void World::InitScene(void) {
 	);
 	objects_.push_back(man);
 	character_ = new CharacterImpl(this, man);
+	keyboard_controller_ = new KeyboardController(*character_);
 	objects_.push_back( 
 		new Sphere(
 			this, 

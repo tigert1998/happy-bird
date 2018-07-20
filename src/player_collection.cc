@@ -15,11 +15,11 @@ void PlayerCollection::PushBackHostile(Object* object) {
 	hostile_collection_.emplace_back(object);
 }
 
-void PlayerCollection::Traverse(std::function<void(std::weak_ptr)> yield, std::function<bool(Object*, Object*)> compare_function) {
-	sort(friendly_collection_.begin(), friendly_collection_.end(), [] (const shared_ptr<Object>& a, const shared_ptr<Object>& b) -> bool {
+void PlayerCollection::Traverse(std::function<void(std::weak_ptr<Object>)> yield, std::function<bool(Object*, Object*)> compare_function) {
+	sort(friendly_collection_.begin(), friendly_collection_.end(), [&] (const shared_ptr<Object>& a, const shared_ptr<Object>& b) -> bool {
 		return compare_function(a.get(), b.get());
 	});
-	sort(hostile_collection_.begin(), hostile_collection_.end(), [] (const shared_ptr<Object>& a, const shared_ptr<Object>& b) -> bool {
+	sort(hostile_collection_.begin(), hostile_collection_.end(), [&] (const shared_ptr<Object>& a, const shared_ptr<Object>& b) -> bool {
 		return compare_function(a.get(), b.get());
 	});
 	int i = 0, j = 0;

@@ -15,9 +15,9 @@ public:
 	void PushBackHostile(Object* object);
 	void PushBackFriendly(Object* object);
 	void Traverse(
-		std::function<void(std::weak_ptr)> yield,
+		std::function<void(std::weak_ptr<Object>)> yield,
 		std::function<bool(Object*, Object*)> compare_function = [] (Object* a, Object* b) {
 			return a->GetOrigin()[2] > b->GetOrigin()[2];
-		};
+		}
 	);
 };

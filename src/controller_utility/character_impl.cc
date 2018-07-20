@@ -1,20 +1,17 @@
-#include <iostream>
-using std::cout;
-using std::endl;
+#include "controller_utility/character_impl.h"
 
-#include "character.h"
-#include "world.h"
+CharacterImpl::CharacterImpl(World* world, Object* obj, float speed): Character(speed), world_(world), object_(obj) { }
 
-float Character::static_pace_(100);
+CharacterImpl::~CharacterImpl() { }
 
-CharacterImpl::CharacterImpl(World* world, Object* obj, float speed):Character(speed),world_(world), object_(obj){ }
-CharacterImpl::~CharacterImpl(){ }
-void CharacterImpl::Bind(Object* obj){
+void CharacterImpl::Bind(Object* obj) {
 	object_ = obj;
 }
-Object* CharacterImpl::GetDelegate(void){
+
+Object* CharacterImpl::GetDelegate() {
 	return object_;
 }
+
 void CharacterImpl::Move(bool forward, float step){ // position 2
 	if(!object_)return ;
 	// btTransform trans = object_->getWorldTransform();
@@ -27,6 +24,7 @@ void CharacterImpl::Move(bool forward, float step){ // position 2
 	if(v[2] < -max_speed_)v[2] = -max_speed_;
 	body->setLinearVelocity(v);
 }
+
 void CharacterImpl::Rotate(bool left, float step){
 
 	if(!object_)return ;
@@ -48,6 +46,7 @@ void CharacterImpl::Rotate(bool left, float step){
 	if (v[0] < -max_speed_) v[0] = -max_speed_;
 	body->setLinearVelocity(v);
 }
+
 void CharacterImpl::Jump(float step){
 	if(!object_)return ;
 	// btTransform trans = object_->getWorldTransform();
@@ -60,6 +59,7 @@ void CharacterImpl::Jump(float step){
 	step = 0.32;
 	body->setLinearVelocity(body->getLinearVelocity() + World::up * step * Character::static_pace_);
 }
+
 void CharacterImpl::ResetMove(void){ // Error
 	if(!object_)return ;
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_->bt_object_);
@@ -68,6 +68,7 @@ void CharacterImpl::ResetMove(void){ // Error
 	body->setLinearVelocity(btVector3(v[0],v[1],0));
 	return ;
 }
+
 void CharacterImpl::ResetRotate(void){
 	if(!object_)return ;
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_->bt_object_);
