@@ -37,7 +37,7 @@ void Stage::InitDefaultStage(void){
 	orn *= btMatrix3x3(btQuaternion(btVector3(1, 0, 0), glm::pi<float>() / 2.0));
 	ground_transform.setBasis(orn);
 	objects_.push_back(
-		std::make_shared<Wall>(
+		new Wall(
 			world_,
 			nullptr,
 			new PureColorMaterial(color::White(), color::White(), 3),
@@ -56,7 +56,7 @@ void Stage::InitDefaultStage(void){
 	wall_transform.setIdentity();
 	wall_transform.setOrigin(btVector3(box_half * 2, wallHeight / 2 , box_half));
 	objects_.push_back(
-		std::make_shared<Wall>(
+		new Wall(
 			world_, 
 			nullptr,
 			new PureColorMaterial(color::White(), color::White(), 2),
@@ -71,7 +71,7 @@ void Stage::InitDefaultStage(void){
 	box_transform.setIdentity();
 	box_transform.setOrigin(World::origin + btVector3(box_half * 2, box_half, 0));
 	objects_.push_back(
-		std::make_shared<Box>(
+	 	new Box(
 		 	world_, 
 		 	nullptr, 
 		 	new PureColorMaterial(color::White(), color::White(), 8),

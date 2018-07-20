@@ -6,6 +6,7 @@ using namespace std;
 #include "shader_utility/spot_light.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
+#include "random.h"
 int World::height = 600;
 int World::width = 800;
 bool World::keys_pressed[1024];
@@ -19,7 +20,7 @@ btVector3 World::up(0, 1, 0);
 btScalar World::character_height(8);
 btScalar World::bounding_height(100);
 
-World::World(): stage_(this) {
+World::World(): stage_(this), temp_(this) {
 	InitPhysics();
 	InitGraphics();
 	InitScene();
@@ -185,12 +186,35 @@ void World::Update(void) { // sync mesh and render
 	last_time = current_time;
 
 	bt_world_->stepSimulation(delta_time);
-	
+
+	if(Random::QueryIntRandom(0, 2000) == 0)	
+	temp_.PushBack(
+		new Particle(
+			this,
+			nullptr,
+			new PureColorMaterial(color::Red(), color::Red(), 40),
+			btVector3(Random::QueryFloatRandom(-50, 50), Random::QueryFloatRandom(-50, 50), Random::QueryFloatRandom(-50, 50)),
+			glm::vec3(0, 0, -0.02),
+			kLargeParticle | kFlameParticle | kAmbientParticle,
+			8,
+			0.07,
+			4
+		),
+		6
+	);
 	int i = 0;
 	for(auto p = stage_.begin(); p != stage_.end(); p++){
-		(*p)->Draw(camera, light_collection);
+		auto ptr = p->get().lock();
+		if(ptr){
+			ptr->Draw(camera, light_collection);
+		}
 	}
-
+	for(auto p = temp_.begin(); p != temp_.end(); p++){
+		auto ptr = p->get().lock();
+		if(ptr){
+			ptr->Draw(camera, light_collection);
+		}
+	}
 	for(auto& obj : objects_) {
 		obj->Draw(camera, light_collection);
 	}
@@ -222,7 +246,6 @@ void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, i
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	} else {
 		keys_pressed[key] = (action != GLFW_RELEASE);
-		cout << "Press Callback" << endl;
 	}
 }
 

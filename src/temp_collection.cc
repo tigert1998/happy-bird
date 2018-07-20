@@ -1,0 +1,13 @@
+#include "temp_collection.h"
+#include "object.h"
+
+void TempCollection::Update(void){
+	for(auto p = objects_.begin(); p != objects_.end(); p++){
+		if(Timer::Query(p->timer_) >= p->duration_){
+			p = objects_.erase(p);
+		}
+	}
+}
+void TempCollection::PushBack(Object* object, float duration){
+	objects_.push_back(TempWrapper(object, duration));
+}

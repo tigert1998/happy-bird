@@ -10,6 +10,7 @@
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
 #include "stage.h"
+#include "temp_collection.h"
 
 #if defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER)
 #include "audio.h"
@@ -36,6 +37,7 @@ class World{
 	// Object collections
 	std::vector<Object*> objects_;
 	Stage stage_;
+	TempCollection temp_;
 	// controller
 	Character* character_;
  public:

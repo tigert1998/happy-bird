@@ -63,32 +63,28 @@ enum ParticleFlag{
 } ;
 struct ParticleConfig{
 	// explicit assigned
-	glm::vec3 major_velocity_; // var by acceleration / random
+	glm::vec3 major_velocity; // var by acceleration / random
 	// kGravityParticle, kFlameParticle, kFloatParticle
-	glm::vec3 acceleration_; // set
+	glm::vec3 acceleration; // set
 	// kAmbientParticle, kLaserParticle
-	float variance_velocity_;
+	float variance_velocity;
 
 	// kLargeParticle, kSmallParticle, kMediumParticle
-	float major_radius_; // var by random
-	float variance_radius_;
+	float major_radius; // var by random
+	float variance_radius;
 
 	// assigned by material
-	Color major_color_; // var in range
+	Color major_color; // var in range
 	// kGradualColorParticle, kMonoColorParticle, kRandomColorParticle
-	Color delta_color_; // range delta
-	bool gradual_; // true for gradual change
+	Color delta_color; // range delta
+	bool gradual; // true for gradual change
 
-	float interval_; // one particle per interval
-
-	ParticleConfig(glm::vec3 v, Color color, float interval, int flags = 0); 
+	ParticleConfig(glm::vec3 v, Color color, int flags = 0); 
 };
 
 
 class ParticleEmitter{
 	ParticleConfig config_;
-	// time helper
-	Timer::TimingId timer_;
  public:
 	ParticleEmitter();
 	ParticleEmitter(ParticleConfig config);
@@ -103,6 +99,10 @@ class Particle: public Object{
 	std::vector<ParticleInfo>::iterator slot_;
 	std::vector<ParticleInfo> particles_;
 	ParticleEmitter emitter_;
+	float interval_; // one particle per interval
+	float duration_;	
+	Timer::TimingId interval_timer_;
+	Timer::TimingId duration_timer_;
  public:
  	Particle(
  		World* world, 
@@ -112,7 +112,8 @@ class Particle: public Object{
  		glm::vec3 velocity, 
  		int flags,
  		int amount = 20,
- 		float interval = 0.07
+ 		float interval = 0.07,
+ 		float duration = 0 // 0 for no limit
  	);
 	~Particle(){ }
 	btVector3 GetOrigin(void);
