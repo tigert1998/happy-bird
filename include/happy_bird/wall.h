@@ -12,7 +12,7 @@
 
 class World;
 
-class Wall: public DeadObject{
+class Wall: public Object{
 	static float margin_ratio_;
 	static float brick_ratio_;
 	static std::vector<float> brick_vertices_;
@@ -26,6 +26,6 @@ class Wall: public DeadObject{
 	Wall(World* world, Shader* shader, Material*, const btTransform& trans, float scaling, glm::vec3 half_extents);
 	~Wall(){ }
 	// void Draw(Camera* camera, const LightCollection* light_collection);
-	void InitBricks(const btTransform& transform);
-	// void ImportToGraphics(void);
+	void InitMesh();
+	void ImportToGraphics(void);
 };

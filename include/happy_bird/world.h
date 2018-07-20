@@ -10,6 +10,8 @@
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
 #include"audio.h"
+#include "stage.h"
+
 
 enum class MoveDirectionType {
 	kLeft, kRight, kFront, kBack
@@ -31,6 +33,7 @@ class World{
 	btSoftBodyWorldInfo bt_soft_info_;
 	// Object collections
 	std::vector<Object*> objects_;
+	Stage stage_;
 	// controller
 	Character* character_;
  public:

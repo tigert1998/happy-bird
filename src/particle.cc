@@ -9,9 +9,9 @@ using std::endl;
 #include "shader_utility/pure_color_material.h"
 
 ParticleConfig::ParticleConfig(glm::vec3 v, Color color, float interval, int intFlag): 
-	major_velocity_(v),
-	major_color_(color),
-	interval_(interval){
+		major_velocity_(v),
+		major_color_(color),
+		interval_(interval){
 	ParticleFlag flags = static_cast<ParticleFlag>(intFlag) ;
 	switch(flags & 0x03){
 		case (kGravityParticle) : // Gravity
@@ -108,45 +108,50 @@ void ParticleEmitter::Update(std::vector<ParticleInfo>::iterator& curslot, glm::
 }
 
 Particle::Particle(
-	World* world, 
-	Shader* shader, 
-	Material* material, 
-	Object* object, 
-	glm::vec3 offset,
-	glm::vec3 velocity, 
-	int flags,
-	int amount,
-	float interval
-):DeadObject(world, shader, material),
-	anchor_(object),
-	offset_(offset),
-	amount_(amount), 
-	particles_(amount), 
-	emitter_(ParticleConfig(velocity, dynamic_cast<PureColorMaterial*>(material)->diffuse(), interval, flags)){
+		World* world,
+		Shader* shader,
+		Material* material,
+		const btVector3& position,
+		glm::vec3 velocity,
+		int flags,
+		int amount,
+		float interval
+):
+		Object(world, shader, material, 4, false),
+		position_(position),
+		amount_(amount), 
+		particles_(amount), 
+		emitter_(ParticleConfig(velocity, dynamic_cast<PureColorMaterial*>(material)->diffuse(), interval, flags)){
 	assert(world_);
-	vertices_.resize(amount_ * 4);
+
+	std::cout << "InitParticle" << std::endl;
+	data_.resize(amount_ * 4);
 	if(!shader_)shader_ = new Shader(particle_vert, particle_frag);
-	InitParticles();
+	InitMesh();
+
 }
-void Particle::InitParticles(void){
-	btVector3 p = anchor_->GetOrigin();
-	glm::vec3 position = BTVector3ToGLMVec3(p) + offset_;
+btVector3 Particle::GetOrigin(void){
+	if(!anchor_){
+		return position_;
+	}
+	return Object::GetOrigin();
+}
+void Particle::InitMesh(void){
+	btVector3 p = GetOrigin();
 	for(auto slot = particles_.begin(); slot != particles_.end(); slot ++){
-		emitter_.Emit(slot,position);
+		emitter_.Emit(slot,BTVector3ToGLMVec3(p));
 	}
 	slot_ = particles_.begin();
 }
 void Particle::ImportToGraphics(){
 	glBindVertexArray(vao_); 
-	glBindBuffer(GL_ARRAY_BUFFER, position_vbo_);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(btScalar) * vertices_.size(), vertices_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(btScalar), (void*) 0);
+	// No bind ebo
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * data_.size(), data_.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
-	// point radius
-	// glBindBuffer(GL_ARRAY_BUFFER, vbos_[1]);
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(btScalar) * vertices_.size(), vertices_.data(), GL_STATIC_DRAW);
-	// glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(btScalar), (void*)0);
-	// glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) (1 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 }
@@ -157,10 +162,10 @@ void Particle::Draw(Camera* camera, const LightCollection* lights) {
 	last_time = current_time;
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update(delta_time);
-		vertices_[4*i + 0] = particles_[i].position[0];
-		vertices_[4*i + 1] = particles_[i].position[1];
-		vertices_[4*i + 2] = particles_[i].position[2];
-		vertices_[4*i + 3] = particles_[i].radius;
+		data_[4*i + 0] = particles_[i].position[0];
+		data_[4*i + 1] = particles_[i].position[1];
+		data_[4*i + 2] = particles_[i].position[2];
+		data_[4*i + 3] = particles_[i].radius;
 	}
 	ImportToGraphics();
 	shader_->Use();
@@ -177,9 +182,8 @@ void Particle::Draw(Camera* camera, const LightCollection* lights) {
 	glDrawArrays(GL_POINTS, 0, amount_);
 	glBindVertexArray(0);
 
-	btVector3 p = anchor_->GetOrigin();
-	glm::vec3 position = BTVector3ToGLMVec3(p) + offset_;
-	emitter_.Update(slot_, position);
+	btVector3 p = GetOrigin();
+	emitter_.Update(slot_, BTVector3ToGLMVec3(p));
 	if(slot_ >= particles_.end())slot_ = particles_.begin();
 }
 

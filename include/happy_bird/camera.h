@@ -5,7 +5,6 @@
 #include "bullet_common.h"
 #include "math_utility.h"
 #include "object.h"
-#include "head.h"
 #include "character.h"
 
 class Camera {
