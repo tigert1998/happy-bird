@@ -9,6 +9,7 @@
 #include "character.h"
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
+#include"audio.h"
 
 enum class MoveDirectionType {
 	kLeft, kRight, kFront, kBack

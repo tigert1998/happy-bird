@@ -5,6 +5,7 @@ using std::endl;
 #include "character.h"
 #include "world.h"
 
+
 float Character::static_pace_(100);
 
 // MUST input a ConvexShape pointer
@@ -115,6 +116,7 @@ void CharacterImpl::Jump(float step){
 	// btTransform trans = object_->getWorldTransform();
 	// btVector3 upDir = trans.getBasis()[1].normalize();
 	btRigidBody* body = dynamic_cast<btRigidBody*>(object_);
+	
 	body->setActivationState(ACTIVE_TAG);
 	btVector3 velocity = body->getLinearVelocity();
 	if(fabs(velocity[1]) > 0.1)return ; // in a jump

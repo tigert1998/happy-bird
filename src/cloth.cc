@@ -10,7 +10,7 @@ Cloth::Cloth(World* world, Shader* shader, Material* material, float attachWid, 
 	assert(world);
 	is_soft_ = true;
 	if (!shader)
-		shader_ = new Shader("shader/cloth.vert", "shader/cloth.frag");
+		shader_ = new Shader(cloth_vert, cloth_frag);
 	// Create patch //
 	btSoftBody* softBody = btSoftBodyHelpers::CreatePatch(
 		world_->bt_info(),

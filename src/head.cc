@@ -24,7 +24,7 @@ Head::Head(World* world, Shader* shader, Material* material,
 	InitMesh();
 	ImportToGraphics();
 	if (!shader) {
-		shader_ = new Shader("shader/common.vert", "shader/common.frag");
+		shader_ = new Shader(common_vert, common_frag);
 	}
 	// // Bind to new character
 	character_ = new CharacterImpl(world_, transform, bt_object_);

@@ -21,7 +21,7 @@ Sphere::Sphere(World* world, Shader* shader, Material* material, const btTransfo
 	InitMesh();
 	ImportToGraphics();
 	if(!shader){
-		shader_ = new Shader("shader/common.vert", "shader/common.frag");
+		shader_ = new Shader(common_vert, common_frag);
 	}
 }
 

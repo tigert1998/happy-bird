@@ -6,7 +6,6 @@ using namespace std;
 #include "shader_utility/spot_light.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
-
 int World::height = 600;
 int World::width = 800;
 bool World::keys_pressed[1024];
@@ -185,7 +184,7 @@ void World::InitScene(void) {
 	LivingObject* man = new Hero(
 		this,
 		nullptr,
-		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
+		new TextureMaterial(png, png, 8),
 		start_transform,
 		World::character_height,
 		World::character_height
@@ -313,5 +312,11 @@ void World::ProcessInput(void) {
 	else
 		character_->ResetRotate();
 	if (keys_pressed[GLFW_KEY_SPACE])
+	{
+		//play_audio("D:\\code\\happy-bird\\audio\\sounds\\bubble.wav");
+		PlaySound(TEXT("D:\\code\\happy-bird\\audio\\sounds\\ding.wav"), NULL, SND_ASYNC | SND_FILENAME);
 		character_->Jump(delta_time);
+		
+	}
+		
 }
