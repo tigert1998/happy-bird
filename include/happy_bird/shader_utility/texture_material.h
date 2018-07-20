@@ -3,12 +3,6 @@
 #include "shader_utility/material.h"
 #include <string>
 
-#ifndef _MSC_VER
-#define PNG_PATH "resources/hero.png"
-#else 
-#define PNG_PATH "D:\\code\\happy-bird\\resources\\hero.png"
-#endif
-
 class TextureMaterial: public Material {
 private:
 	uint32_t diffuse_texture_;

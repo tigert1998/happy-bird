@@ -126,7 +126,7 @@ Particle::Particle(
 
 	std::cout << "InitParticle" << std::endl;
 	data_.resize(amount_ * 4);
-	if(!shader_)shader_ = new Shader(particle_vert, particle_frag);
+	if(!shader_)shader_ = new Shader("shader/particle.vert", "shader/particle.frag");
 	InitMesh();
 
 }

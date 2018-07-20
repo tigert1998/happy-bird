@@ -31,4 +31,5 @@ class Stage{
 	ObjectContainer objects_;
  	void InitDungeonStage(void);
  	void InitDefaultStage(void);
+ 	// void NewStair()
 };
