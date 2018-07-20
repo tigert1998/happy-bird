@@ -127,7 +127,7 @@ Wall::Wall(
 	assert(world_);
 	std::cout << "InitWall" << std::endl;
 	if (!shader)
-		shader_ = new Shader("shader/common.vert", "shader/common.frag");
+		shader_ = new Shader("shader\\common.vert", "shader\\common.frag");
 	// initialize physics shape //
 	half_extents_[2] = scaling_ / 2;
 	bt_object_ = world_->CreateRigidBody(

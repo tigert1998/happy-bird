@@ -9,7 +9,8 @@ FileManager::FileManager(): work_path(""){
 }
 
 bool FileManager::FileExistsAt(const std::string &path) const {
-    std::ifstream is(work_path + path);
+	// std::ifstream is(work_path + path);
+	 std::ifstream is( path);
     return is.is_open();
 }
 

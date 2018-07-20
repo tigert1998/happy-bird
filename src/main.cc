@@ -10,9 +10,9 @@ int main(int argc, char** argv)
 {
 
 	World demo;
-#if defined(ENABLE_AUDIO) && (defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER))
+//#if defined(ENABLE_AUDIO) && (defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER))
 	PlaySound(TEXT("./audio/sounds/weird.wav"), NULL, SND_ASYNC | SND_FILENAME);
-#endif
+//#endif
 	demo.Run();
 
 }

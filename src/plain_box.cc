@@ -28,7 +28,7 @@ PlainBox::PlainBox(
 	ImportToGraphics();
 	// patch shader
 	if (!shader) {
-		shader_ = new Shader("shader/cloth.vert", "shader/cloth.frag");
+		shader_ = new Shader("shader\\cloth.vert", "shader\\cloth.frag");
 	}
 }
 void PlainBox::InitMesh(void){

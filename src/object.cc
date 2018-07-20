@@ -31,6 +31,7 @@ Object::~Object(){
 	glDeleteBuffers(1, &vbo_);
 	glDeleteBuffers(1, &ebo_);
 	// delete from bullet
+	// throw exception when preee ESC on vs2017
 	if(bt_object_)world_->bt_world_->removeCollisionObject(bt_object_);
 	// DeleteFromPhysics();
 	delete shader_;

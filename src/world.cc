@@ -120,7 +120,7 @@ void World::InitScene(void) {
 	Object* man = new Hero(
 		this,
 		nullptr,
-		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
+		new TextureMaterial("D:\\code\\happy-bird\\resources\\hero.png", "D:\\code\\happy-bird\\resources\\hero.png", 8),
 		start_transform,
 		World::character_height,
 		World::character_height
@@ -141,7 +141,7 @@ void World::InitScene(void) {
 	objects_.push_back(
 		new Particle(
 			this,
-			new Shader("shader/particle.vert", "shader/blood_incr.frag"),
+			new Shader("shader\\particle.vert", "shader\\blood_incr.frag"),
 			new PureColorMaterial(color::Green(), color::Green(), 40),
 			btVector3(0, 0, 0), // position
 			glm::vec3(0, 0, -0.02),
