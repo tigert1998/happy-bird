@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "color.h"
 #include "bullet_common.h" // btCollisionObject
@@ -36,7 +37,8 @@ class Object{
 	std::vector<float> data_;
 	std::vector<uint32_t> indices_;
 	// external util
-	Object* anchor_;
+	// Object* anchor_;
+	std::weak_ptr<Object> anchor_;
 	btVector3 offset_;
  private:
  	// for recursive call
@@ -56,7 +58,7 @@ class Object{
 	btTransform GetTransform(void);
 	btCollisionObject* GetBulletObject(void);
 	// for attach
-	void Attach(Object* target, const btVector3& offset); // delete from bullet
+	void Attach(std::weak_ptr<Object>, const btVector3& offset); // delete from bullet
 	// for controller
 	void ActivateControl(void); // activate bullet set
 	btVector3 GetVelocity(void);

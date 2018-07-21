@@ -6,7 +6,7 @@ PointLight::PointLight(glm::vec3 position, glm::vec3 color, float intensity, con
 	position_(position), attenuation_(attenuation), Light(color, intensity) {
 }
 
-void PointLight::Attach(Object* target){
+void PointLight::Attach(std::weak_ptr<Object> target){
 	anchor_ = target;
 }
 

@@ -15,13 +15,13 @@ SpotLight::SpotLight(
 
 glm::vec3 SpotLight::direction(void) const {
 	// override method from parallel light
-	if(anchor_){
-		return BTVector3ToGLMVec3(anchor_->GetOrigin()) - position_;
+	if(anchor_.lock()){
+		return BTVector3ToGLMVec3((anchor_.lock())->GetOrigin()) - position_;
 	}
 	return direction_;
 }
 
-void SpotLight::Attach(Object* target){
+void SpotLight::Attach(std::weak_ptr<Object> target){
 	anchor_ = target;
 }
 

@@ -158,7 +158,7 @@ Particle::Particle(
 
 }
 btVector3 Particle::GetOrigin(void){
-	if(!anchor_){
+	if(!(anchor_.lock())){
 		return position_;
 	}
 	return Object::GetOrigin();
