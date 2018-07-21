@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
+#include <functional>
+#include <vector>
 
 using std::shared_ptr;
 using std::weak_ptr;
@@ -88,7 +90,7 @@ void PlayerCollection::InitPlayerCollection(World *world_ptr) {
 	Object *object_ptr = new Hero(
 		world_ptr,
 		nullptr,
-		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
+		new TextureMaterial("D:/code/happy-bird/resources/hero.png", "D:/code/happy-bird/resources/hero.png", 8),
 		transform,
 		World::character_height,
 		World::character_height

@@ -8,8 +8,8 @@ using std::shared_ptr;
 using std::weak_ptr;
 using std::to_string;
 
-Player::Player(Object *object_ptr, Character *character_ptr, Controller *controller_ptr) {
-	object_ptr_ = shared_ptr<Object>(object_ptr);
+Player::Player(std::shared_ptr<Object> object_ptr, Character *character_ptr, Controller *controller_ptr) {
+	object_ptr_ = object_ptr;
 	character_ptr_ = shared_ptr<Character>(character_ptr);
 	controller_ptr_ = shared_ptr<Controller>(controller_ptr); 
 }
@@ -47,19 +47,20 @@ shared_ptr<Player> Player::RandomEnemyPlayer(weak_ptr<Character> target_ptr, Wor
 	static auto speed_dice = std::bind(speed_distribution, engine);
 	static auto radius_dice = std::bind(radius_distribution, engine);
 
-	auto texture_path = "resources/enemies/" + to_string(rand() % PNG_TOTAL) + ".png";
+	auto texture_path = "D:/code/happy-bird/resources/enemies/" + to_string(rand() % PNG_TOTAL) + ".png";
 	
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(World::origin + btVector3(width_dice(), World::character_height, depth_dice()));
-	auto object_ptr = new Hero(
+	auto object_ptr = shared_ptr<Hero>(
+		new Hero(
 		world_ptr,
 		nullptr,
 		new TextureMaterial(texture_path, texture_path, 8),
 		transform,
 		World::character_height,
 		World::character_height
-	);
+	));
 
 	auto character_ptr = new Character(world_ptr, object_ptr);
 	character_ptr->set_max_speed(speed_dice());

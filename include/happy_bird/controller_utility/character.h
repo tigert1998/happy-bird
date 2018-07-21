@@ -13,7 +13,7 @@ class Character {
  protected:
  	static float static_pace_;
  	World* world_;
- 	Object* object_;
+ 	std::shared_ptr<Object> object_;
  	// Config
  	float max_speed_ = 15;
  	float laser_attack_freq_ = 1;
@@ -26,11 +26,11 @@ class Character {
  	// runtime data
  	float blood_ = 10;
  public:
- 	Character(World*, Object*);
+ 	Character(World*, std::shared_ptr<Object>);
  	void set_max_speed(float max_speed);
  	~Character();
- 	void Bind(Object* object);
- 	Object* GetDelegate(void);
+ 	// void Bind(Object* object);
+ 	std::weak_ptr<Object> GetDelegate(void);
  	void Move(bool, float);
  	void Rotate(bool, float);
  	void Jump(float);

@@ -1,6 +1,7 @@
 #include "plain_box.h"
 #include "world.h"
 #include "debug_utility/log.h"
+#include "shader_utility/pure_color_material.h"
 
 #include <iostream>
 
@@ -50,7 +51,7 @@ void PlainBox::ImportToGraphics(void){
 }
 void PlainBox::Draw(Camera* camera, const LightCollection* light_collection){
 	shader_->Use();
-	shader_->SetUniform<Material>("uMaterial", *material_);
+	shader_->SetUniform<glm::vec3>("uColor", dynamic_cast<PureColorMaterial *>(material_)->diffuse());
 	shader_->SetUniform<btTransform>("uModelMatrix", GetTransform());
 	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
 	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
