@@ -37,7 +37,7 @@ void Player::set_is_disabled(bool is_disabled) {
 shared_ptr<Player> Player::RandomEnemyPlayer(weak_ptr<Character> target_ptr, World *world_ptr) {
 	static constexpr int PNG_TOTAL = 13;
 	static std::default_random_engine engine(time(nullptr));
-	static std::uniform_real_distribution<> width_distribution(40, 260); 
+	static std::uniform_real_distribution<> width_distribution(90, 260); 
 	static std::uniform_real_distribution<> depth_distribution(10, 30);
 	static std::uniform_real_distribution<> speed_distribution(7, 13);
 	static std::uniform_real_distribution<> radius_distribution(5, 20);
@@ -47,7 +47,7 @@ shared_ptr<Player> Player::RandomEnemyPlayer(weak_ptr<Character> target_ptr, Wor
 	static auto speed_dice = std::bind(speed_distribution, engine);
 	static auto radius_dice = std::bind(radius_distribution, engine);
 
-	auto texture_path = "D:/code/happy-bird/resources/enemies/" + to_string(rand() % PNG_TOTAL) + ".png";
+	auto texture_path = "resources/enemies/" + to_string(rand() % PNG_TOTAL) + ".png";
 	
 	btTransform transform;
 	transform.setIdentity();

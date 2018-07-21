@@ -142,7 +142,7 @@ void Character::BoxAttack(void){
 		[caller](std::weak_ptr<Player> player){
 			auto p = player.lock();
 			if(p && p->character_ptr().lock().get() != caller){
-				p->character_ptr().lock()->Lose(5);
+				p->character_ptr().lock()->Lose(10);
 				if(p->character_ptr().lock()->blood() <= 0){
 					p->set_is_disabled(true);
 				}
@@ -151,7 +151,7 @@ void Character::BoxAttack(void){
 	);
 }
 void Character::Lose(float amount){
-	if (object_ != nullptr) return;
+	if (!object_) return;
 	blood_ -= amount;
 	auto particle = std::make_shared<Particle>(
 		world_,
@@ -169,7 +169,7 @@ void Character::Lose(float amount){
 	);
 }
 void Character::Gain(float amount){
-	if(object_ != nullptr)return ;
+	if(!object_)return ;
 	blood_ += amount;
 	auto particle = std::make_shared<Particle>(
 		world_,
