@@ -23,5 +23,6 @@ public:
 			return a.object_ptr().lock()->GetOrigin()[2] > b.object_ptr().lock()->GetOrigin()[2];
 		}
 	);
+	void Query(glm::vec3 location, float width, float depth, std::function<void(std::weak_ptr<Player>)> yield);
 	void InitPlayerCollection(World *world_ptr);
 };

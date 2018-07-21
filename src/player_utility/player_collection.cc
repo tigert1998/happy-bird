@@ -3,11 +3,14 @@
 #include "controller_utility/keyboard_controller.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
+#include "math_utility.h"
 
 #include <algorithm>
 
 using std::shared_ptr;
 using std::weak_ptr;
+using std::max;
+using std::min;
 
 PlayerCollection::PlayerCollection() = default;
 
@@ -39,6 +42,26 @@ void PlayerCollection::Traverse(std::function<void(std::weak_ptr<Player>)> yield
 				yield(hostile_collection_[j++]);
 			}
 		}
+	}
+}
+
+void PlayerCollection::Query(glm::vec3 location, float delta_x, float delta_z, std::function<void(std::weak_ptr<Player>)> yield) {
+	for (auto player_ptr : friendly_collection_) {
+		auto player_location = BTVector3ToGLMVec3(player_ptr->object_ptr().lock()->GetOrigin());
+		if (!(location.x + min(delta_x, 0.0f) <= player_location.x && player_location.x <= location.x + max(delta_x, 0.0f)))
+			continue;
+		if (!(location.z + min(delta_z, 0.0f) <= player_location.z && player_location.z <= location.z + max(delta_z, 0.0f)))
+			continue;
+		yield(player_ptr);
+	}
+
+	for (auto player_ptr : hostile_collection_) {
+		auto player_location = BTVector3ToGLMVec3(player_ptr->object_ptr().lock()->GetOrigin());
+		if (!(location.x + min(delta_x, 0.0f) <= player_location.x && player_location.x <= location.x + max(delta_x, 0.0f)))
+			continue;
+		if (!(location.z + min(delta_z, 0.0f) <= player_location.z && player_location.z <= location.z + max(delta_z, 0.0f)))
+			continue;
+		yield(player_ptr);
 	}
 }
 
