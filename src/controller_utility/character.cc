@@ -1,4 +1,6 @@
 #include <iostream>
+#include <memory>
+
 using std::cout;
 using std::endl;
 using std::shared_ptr;
@@ -128,7 +130,7 @@ void Character::BoxAttack(void){
 	);
 }
 void Character::Lose(float amount){
-	if (!object_) return;
+	if (object_ != nullptr) return;
 	blood_ -= amount;
 	auto particle = std::make_shared<Particle>(
 		world_,
@@ -146,7 +148,7 @@ void Character::Lose(float amount){
 	);
 }
 void Character::Gain(float amount){
-	if(!object_)return ;
+	if(object_ != nullptr)return ;
 	blood_ += amount;
 	auto particle = std::make_shared<Particle>(
 		world_,
