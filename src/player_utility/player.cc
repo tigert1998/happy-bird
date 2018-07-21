@@ -26,16 +26,18 @@ weak_ptr<Controller> Player::controller_ptr() const {
 	return controller_ptr_;
 }
 
-void Player::Disable(void){
-	if(character_ptr_)character_ptr_->Disable();
-	object_ptr_ = nullptr;
-	return ;
+bool Player::is_disabled() const {
+	return is_disabled_;
+}
+ 
+void Player::set_is_disabled(bool is_disabled) {
+	is_disabled_ = is_disabled;
 }
 
 shared_ptr<Player> Player::RandomEnemyPlayer(weak_ptr<Character> target_ptr, World *world_ptr) {
 	static constexpr int PNG_TOTAL = 13;
 	static std::default_random_engine engine(time(nullptr));
-	static std::uniform_real_distribution<> width_distribution(10, 260); 
+	static std::uniform_real_distribution<> width_distribution(40, 260); 
 	static std::uniform_real_distribution<> depth_distribution(10, 30);
 	static std::uniform_real_distribution<> speed_distribution(7, 13);
 	static std::uniform_real_distribution<> radius_distribution(5, 20);

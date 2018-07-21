@@ -125,7 +125,6 @@ Wall::Wall(
 		half_extents_(half_extents), 
 		scaling_(scaling) {
 	assert(world_);
-	LOG();
 	
 	if (!shader)
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
@@ -143,7 +142,6 @@ Wall::Wall(
 
 #define kErr (0.1)
 void Wall::InitMesh(){
-	LOG();
 	btTransform baseTransform; // point to left-down corner
 	baseTransform.setIdentity();
 	baseTransform.setOrigin(btVector3(

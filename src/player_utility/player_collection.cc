@@ -1,10 +1,16 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
+
 using std::shared_ptr;
 using std::weak_ptr;
 using std::max;
 using std::min;
+using std::cout;
+using std::endl;
+using std::boolalpha;
+using std::function;
+using std::vector;
 
 #include "player_utility/player_collection.h"
 #include "controller_utility/automation_controller.h"
@@ -24,7 +30,13 @@ void PlayerCollection::PushBackHostile(shared_ptr<Player> player_ptr) {
 	hostile_collection_.emplace_back(player_ptr);
 }
 
-void PlayerCollection::Traverse(std::function<void(std::weak_ptr<Player>)> yield, std::function<bool(const Player &, const Player &)> compare_function) {
+void PlayerCollection::Traverse(function<void(weak_ptr<Player>)> yield, function<bool(const Player &, const Player &)> compare_function) {
+	vector<shared_ptr<Player>> new_hostile_collection;
+	for_each(hostile_collection_.begin(), hostile_collection_.end(), [&](shared_ptr<Player> player_ptr) {
+		if (!player_ptr->is_disabled())
+			new_hostile_collection.push_back(player_ptr);
+	});
+	hostile_collection_ = new_hostile_collection;
 	sort(friendly_collection_.begin(), friendly_collection_.end(), [&] (const shared_ptr<Player> &a, const shared_ptr<Player> &b) -> bool {
 		return compare_function(*a, *b);
 	});
@@ -60,12 +72,10 @@ void PlayerCollection::Query(glm::vec3 location, float delta_x, float delta_z, s
 
 	for (auto player_ptr : hostile_collection_) {
 		auto player_location = BTVector3ToGLMVec3(player_ptr->object_ptr().lock()->GetOrigin());
-		std::cout << "Query find enimy: " << player_location.x << ", " << player_location.z << std::endl;
 		if (!(location.x + min(delta_x, 0.0f) <= player_location.x && player_location.x <= location.x + max(delta_x, 0.0f)))
 			continue;
 		if (!(location.z + delta_z / 2.0 >= player_location.z && location.z - delta_z / 2.0 <= player_location.z))
 			continue;
-		std::cout << "Query yield" << std::endl; 
 		yield(player_ptr);
 	}
 }

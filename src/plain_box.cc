@@ -17,7 +17,6 @@ PlainBox::PlainBox(
 		half_extents_(half_extents),
 		mass_(mass) {
 	assert(world_);
-	LOG();
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		mass,
