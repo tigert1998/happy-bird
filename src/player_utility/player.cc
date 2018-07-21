@@ -26,6 +26,12 @@ weak_ptr<Controller> Player::controller_ptr() const {
 	return controller_ptr_;
 }
 
+void Player::Disable(void){
+	if(character_ptr_)character_ptr_->Disable();
+	object_ptr_ = nullptr;
+	return ;
+}
+
 shared_ptr<Player> Player::RandomEnemyPlayer(weak_ptr<Character> target_ptr, World *world_ptr) {
 	static constexpr int PNG_TOTAL = 13;
 	static std::default_random_engine engine(time(nullptr));

@@ -3,11 +3,13 @@
 #include "controller_utility/character.h"
 
 #include <functional>
+#include <iostream>
 
 using std::bind;
 
 KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard): Controller(controlee), keyboard_(keyboard) {
 	keyboard.Register([&] (Keyboard::KeyboardState state, double time) {
+		std::cout << "Enter key" << std::endl;
 		if (state[GLFW_KEY_W])
 			controlee_.Move(true, time);
 		else if (state[GLFW_KEY_S])
@@ -22,12 +24,17 @@ KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard)
 		else
 			controlee_.ResetRotate();
 
-		if (state[GLFW_KEY_F]) 
+		if (state[GLFW_KEY_F]){
+			std::cout << "Press F" << std::endl;
 			controlee_.LaserAttack();
-		if (state[GLFW_KEY_G])
+		}
+		if (state[GLFW_KEY_G]){
+			std::cout << "Press G" << std::endl;
 			controlee_.BoxAttack();
+		}
 		if (state[GLFW_KEY_SPACE])
 			controlee_.Jump(time);
+		std::cout << "After calllback" << std::endl;
 	});
 }
 

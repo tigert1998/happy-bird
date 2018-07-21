@@ -7,17 +7,17 @@
 #include "controller_utility/keyboard_controller.h"
 
 class Player {
-private:
+ private:
 	std::shared_ptr<Object> object_ptr_;
 	std::shared_ptr<Character> character_ptr_;
 	std::shared_ptr<Controller> controller_ptr_;
 
-public:
+ public:
 	Player() = delete;
 	Player(Object *object_ptr, Character *character_ptr, Controller *controller_ptr);
 	std::weak_ptr<Object> object_ptr() const;
 	std::weak_ptr<Character> character_ptr() const;
 	std::weak_ptr<Controller> controller_ptr() const;
-
+	void Disable(void);
 	static std::shared_ptr<Player> RandomEnemyPlayer(std::weak_ptr<Character> target_ptr, World *world_ptr);
 };
