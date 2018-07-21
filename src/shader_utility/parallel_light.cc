@@ -4,7 +4,7 @@ ParallelLight::ParallelLight(glm::vec3 direction, glm::vec3 color, float intensi
 	direction_(direction), Light(color, intensity) {
 }
 
-void ParallelLight::Attach(Object*){
+void ParallelLight::Attach(std::weak_ptr<Object>){
 	return ; // pass
 }
 

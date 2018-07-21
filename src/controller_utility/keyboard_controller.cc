@@ -1,6 +1,7 @@
 #include "opengl_common.h"
 #include "controller_utility/keyboard_controller.h"
 #include "controller_utility/character.h"
+#include "audio.h"
 
 #include <functional>
 #include <iostream>
@@ -31,8 +32,10 @@ KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard)
 			std::cout << "Press G" << std::endl;
 			controlee_.BoxAttack();
 		}
-		if (state[GLFW_KEY_SPACE])
+		if (state[GLFW_KEY_SPACE]){
 			controlee_.Jump(time);
+		}
+		// std::cout << "After calllback" << std::endl;
 	});
 }
 

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "opengl_common.h"
 #include "controller_utility/keyboard.h"
 
@@ -6,6 +8,8 @@ Keyboard Keyboard::shared = Keyboard();
 Keyboard::Keyboard() = default;
 
 void Keyboard::Trigger(int key, int action) {
+	std::cout << key << std::endl;
+	if(key < 0 || key >= Keyboard::kTotal)key = Keyboard::kTotal - 1;
 	key_pressed_[key] = (action != GLFW_RELEASE);
 }
 

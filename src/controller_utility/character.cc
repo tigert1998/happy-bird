@@ -8,6 +8,7 @@ using std::endl;
 #include "particle.h"
 #include "plain_box.h"
 #include "random.h"
+#include "audio.h"
 
 float Character::static_pace_(100);
 
@@ -45,8 +46,9 @@ void Character::Jump(float step){
 	if(!object_)return ;
 	object_->ActivateControl();
 	btVector3 velocity = object_->GetVelocity();
-	if(fabs(velocity[1]) > 0.1)return ; // in a jump
+	if(fabs(velocity[1]) > 0.3)return ; // in a jump
 	// ignore step
+	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/ho.wav").c_str()), 0, 0, 0);
 	step = 0.32;
 	object_->SetVelocity(velocity + World::up * step * Character::static_pace_);
 }
@@ -68,6 +70,7 @@ void Character::LaserAttack(void){
 	if(!object_)return ;
 	static Timer::TimingId laser_timer = Timer::New();
 	if(Timer::Query(laser_timer) < laser_attack_freq_)return;
+	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/laser.wav").c_str()), 0, 0, 0);
 	Timer::Pin(laser_timer);
 	world_->temp_.PushBack(
 		new Particle(
@@ -83,11 +86,28 @@ void Character::LaserAttack(void){
 		),
 		2
 	);
+	Gain(5);
+	Character* caller = this;
+	world_->player_collection_ptr_->Query(
+		BTVector3ToGLMVec3(object_->GetOrigin()),
+		laser_attack_dist_,
+		laser_attack_range_,
+		[caller](std::weak_ptr<Player> player){
+			auto p = player.lock();
+			if(p && p->character_ptr().lock().get() != caller){
+				p->character_ptr().lock()->Lose(5);
+				if(p->character_ptr().lock()->blood() <= 0){
+					p->Disable();
+				}
+			}
+		}
+	);
 }
 void Character::BoxAttack(void){
 	if(!object_)return ;
 	static Timer::TimingId box_timer = Timer::New();
 	if(Timer::Query(box_timer) < box_attack_freq_)return;
+	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/gun.wav").c_str()), 0, 0, 0);
 	Timer::Pin(box_timer);
 	btVector3 origin = object_->GetOrigin();
 	btTransform transform;
@@ -110,6 +130,7 @@ void Character::BoxAttack(void){
 			temp, 10
 		);
 	}
+	Gain(5);
 	Character* caller = this;
 	world_->player_collection_ptr_->Query(
 		BTVector3ToGLMVec3(object_->GetOrigin()),
