@@ -205,8 +205,8 @@ void World::Update(void) { // sync mesh and render
 	temp_.Update();	
 	Timer::UpdateFrame();
 	// Playing
-	static Audiofile background_audio("chimes.wav");
-	background_audio.play(6u);
+	static Audiofile background_audio("zombie.wav");
+	background_audio.play();
 	// Drawing
 	for(auto p = stage_.begin(); p != stage_.end(); p++){
 		auto ptr = p->get().lock();
@@ -261,26 +261,51 @@ void World::ProcessInput(void) {
 	float delta_time = current_time - last_time;
 	last_time = current_time;
 	if (keys_pressed[GLFW_KEY_W]) // Forward
+	{
+		Audiofile W_audio("click.wav");
+		W_audio.play();
 		character_->Move(true, delta_time);
+	}
+		
 	else if (keys_pressed[GLFW_KEY_S])
+	{
+		Audiofile S_audio("click.wav");
+		S_audio.play(); 
 		character_->Move(false, delta_time);
+	}
+		
 	else
 		character_->ResetMove();
 	if (keys_pressed[GLFW_KEY_A]) // Left
+	{
+		Audiofile A_audio("drip.wav");
+		A_audio.play(); 
 		character_->Rotate(true, delta_time);
+	}
+		
 	else if (keys_pressed[GLFW_KEY_D])
+	{
+		Audiofile D_audio("drip.wav");
+		D_audio.play(); 
 		character_->Rotate(false, delta_time);
+	}
 	else
 		character_->ResetRotate();
 
 	if(keys_pressed[GLFW_KEY_F]){
+		Audiofile F_audio("bearings.wav");
+		F_audio.play();
 		character_->LaserAttack();
 	}
 	if(keys_pressed[GLFW_KEY_G]){
+		Audiofile G_audio("bearings.wav");
+		G_audio.play();
 		character_->BoxAttack();
 	}
 
 	if (keys_pressed[GLFW_KEY_SPACE]) {
+		Audiofile space_audio("bubble2.wav");
+		space_audio.play();
 		character_->Jump(delta_time);
 	#if defined(ENABLE_AUDIO) && (defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER))
 		PlaySound(TEXT("./audio/sounds/ding.wav"), NULL, SND_ASYNC | SND_FILENAME);

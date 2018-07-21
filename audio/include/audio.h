@@ -57,7 +57,7 @@ public:
 	}
 	void play(uint32_t time)
 	{
-		;
+		mciSendString((LPCSTR)(("play " + abspath_).c_str()), 0, 0, 0);
 	}
 };
 
