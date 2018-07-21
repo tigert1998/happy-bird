@@ -37,7 +37,6 @@ class World{
 	btSoftBodySolver* bt_soft_solver_;
 	btSoftBodyWorldInfo bt_soft_info_;
 	// Object collections
-	std::vector<Object*> objects_;
 	Stage stage_;
 
 	PlayerCollection *player_collection_ptr_;

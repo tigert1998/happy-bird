@@ -3,7 +3,7 @@ FLAGS = /MTd /I./include /I./include/bullet /I./include/happy_bird /I./audio/inc
 SRC_PATH = ./src
 SRC = $(SRC_PATH)/main.cc $(SRC_PATH)/stage.cc $(SRC_PATH)/temp_collection.cc $(SRC_PATH)/camera.cc \
 $(SRC_PATH)/file_manager.cc $(SRC_PATH)/glad.c $(SRC_PATH)/object.cc \
-$(SRC_PATH)/world.cc $(SRC_PATH)/character.cc \
+$(SRC_PATH)/world.cc $(SRC_PATH)/controller_utility/character.cc \
 $(SRC_PATH)/box.cc $(SRC_PATH)/plain_box.cc $(SRC_PATH)/sphere.cc \
 $(SRC_PATH)/math_utility.cc\
 $(SRC_PATH)/particle.cc  $(SRC_PATH)/wall.cc\
@@ -13,7 +13,10 @@ $(SRC_PATH)/shader_utility/parallel_light.cc $(SRC_PATH)/shader_utility/point_li
 $(SRC_PATH)/shader_utility/attenuation.cc $(SRC_PATH)/hero.cc \
 $(SRC_PATH)/random.cc $(SRC_PATH)/timer.cc\
 $(SRC_PATH)/shader_utility/pure_color_material.cc $(SRC_PATH)/shader_utility/texture_material.cc \
-$(SRC_PATH)/debug_utility/cg_exception.cc $(SRC_PATH)/debug_utility/log.cc
+$(SRC_PATH)/debug_utility/cg_exception.cc $(SRC_PATH)/debug_utility/log.cc \
+$(SRC_PATH)/controller_utility/automation_controller.cc $(SRC_PATH)/controller_utility/controller.cc \
+$(SRC_PATH)/controller_utility/keyboard.cc $(SRC_PATH)/controller_utility/keyboard_controller.cc \
+$(SRC_PATH)/player_utility/player.cc $(SRC_PATH)/player_utility/player_collection.cc     
 
 
 # & $(CC) $(TEST_PATH)	/gtest_test.cc -o gtest $(TEST_FLAGS) & ./gtest --gtest_output=xml:gtest-report.xml

@@ -114,7 +114,7 @@ void World::InitPhysics(void) {
 void World::InitScene(void) {
 	stage_.InitStage(kDungeonStage);
 	player_collection_ptr_ = new PlayerCollection();
-	player_collection_ptr_->InitPlayerCollection(this, objects_);
+	player_collection_ptr_->InitPlayerCollection(this);
 
 	light_collection->PushBack(
 		new PointLight(
@@ -166,9 +166,6 @@ void World::Update(void) { // sync mesh and render
 		if(ptr){
 			ptr->Draw(camera, light_collection);
 		}
-	}
-	for(auto& obj : objects_) {
-		obj->Draw(camera, light_collection);
 	}
 
 	player_collection_ptr_->Traverse([delta_time] (weak_ptr<Player> player_ptr) {

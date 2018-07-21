@@ -42,7 +42,7 @@ void PlayerCollection::Traverse(std::function<void(std::weak_ptr<Player>)> yield
 	}
 }
 
-void PlayerCollection::InitPlayerCollection(World *world_ptr, std::vector<Object*>& objects) {
+void PlayerCollection::InitPlayerCollection(World *world_ptr) {
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(World::origin + btVector3(45, 40, 30));
@@ -58,17 +58,6 @@ void PlayerCollection::InitPlayerCollection(World *world_ptr, std::vector<Object
 	Character *character_ptr = new Character(world_ptr, object_ptr);
 	Controller *controller_ptr = new KeyboardController(*character_ptr);
 	world_ptr->camera->set_accompany_object(object_ptr, 120);
-
-	auto particle_ptr = new Particle(
-		world_ptr,
-		new Shader("shader/particle.vert", "shader/blood_incr.frag"),
-		new PureColorMaterial(color::Green(), color::Green(), 40),
-		btVector3(0, 0, 0),
-		glm::vec3(0, 0, -0.02),
-		kMediumParticle | kFlameParticle | kAmbientParticle | kJitterParticle
-	);
-	particle_ptr->Attach(object_ptr, btVector3(0, 3, 0));
-	objects.push_back(particle_ptr);
 
 	auto main_player_ptr = shared_ptr<Player>(new Player(object_ptr, character_ptr, controller_ptr));
 	PushBackFriendly(main_player_ptr);
