@@ -23,6 +23,8 @@ class Character {
  	float box_attack_dist_ = 100;
  	float box_attack_range_ = 100; // along depth axis
  	Color box_attack_color_ = color::Red();
+ 	// runtime data
+ 	float blood_ = 10;
  public:
  	Character(World*, Object*);
  	~Character();
@@ -37,4 +39,6 @@ class Character {
 	void BoxAttack(void);
 	void Gain(float);
 	void Lose(float);
+	void Disable(void);
+	float blood(void){return blood_;}
 };

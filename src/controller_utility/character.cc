@@ -59,6 +59,7 @@ void Character::ResetRotate(void){
 	return ;
 }
 void Character::LaserAttack(void){
+	if(!object_)return ;
 	static Timer::TimingId laser_timer = Timer::New();
 	if(Timer::Query(laser_timer) < laser_attack_freq_)return;
 	Timer::Pin(laser_timer);
@@ -78,6 +79,7 @@ void Character::LaserAttack(void){
 	);
 }
 void Character::BoxAttack(void){
+	if(!object_)return ;
 	static Timer::TimingId box_timer = Timer::New();
 	if(Timer::Query(box_timer) < box_attack_freq_)return;
 	Timer::Pin(box_timer);
@@ -102,19 +104,25 @@ void Character::BoxAttack(void){
 			temp, 10
 		);
 	}
+	Character* caller = this;
 	world_->player_collection_ptr_->Query(
 		BTVector3ToGLMVec3(object_->GetOrigin()),
 		box_attack_dist_,
 		box_attack_range_,
-		[](std::weak_ptr<Player> player){
+		[caller](std::weak_ptr<Player> player){
 			auto p = player.lock();
-			if(p){
+			if(p && p->character_ptr().lock().get() != caller){
 				p->character_ptr().lock()->Lose(5);
+				if(p->character_ptr().lock()->blood() <= 0){
+					p->Disable();
+				}
 			}
 		}
 	);
 }
 void Character::Lose(float amount){
+	if(!object_)return ;
+	blood_ -= amount;
 	auto particle = std::make_shared<Particle>(
 		world_,
 		new Shader("shader/particle.vert", "shader/blood_decr.frag"),
@@ -131,6 +139,8 @@ void Character::Lose(float amount){
 	);
 }
 void Character::Gain(float amount){
+	if(!object_)return ;
+	blood_ += amount;
 	auto particle = std::make_shared<Particle>(
 		world_,
 		new Shader("shader/particle.vert", "shader/blood_incr.frag"),
@@ -145,4 +155,7 @@ void Character::Gain(float amount){
 	world_->temp_.PushBack(
 		particle, 7
 	);
+}
+void Character::Disable(void){
+	object_ = nullptr;
 }
