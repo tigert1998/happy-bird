@@ -116,12 +116,15 @@ void World::InitScene(void) {
 	player_collection_ptr_ = new PlayerCollection();
 	player_collection_ptr_->InitPlayerCollection(this);
 
-	light_collection->PushBack(
-		new PointLight(
+	auto player = player_collection_ptr_->leader();
+	auto light = new PointLight(
 			glm::vec3(0, 15, 0),
 			glm::vec3(0, 1, 0), 0.6, 
-			Attenuation(1200)
-		)
+			Attenuation(700)
+		);
+	light->Attach(player->object_ptr().lock().get());
+	light_collection->PushBack(
+		light
 	);
 	light_collection->PushBack(
 		new ParallelLight(

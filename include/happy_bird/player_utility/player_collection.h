@@ -25,4 +25,8 @@ public:
 	);
 	void Query(glm::vec3 location, float width, float depth, std::function<void(std::weak_ptr<Player>)> yield);
 	void InitPlayerCollection(World *world_ptr);
+	std::shared_ptr<Player> leader(void){
+		if(friendly_collection_.size() <= 0)return nullptr;
+		return friendly_collection_[0];
+	}
 };

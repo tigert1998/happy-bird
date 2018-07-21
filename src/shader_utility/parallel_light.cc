@@ -4,6 +4,10 @@ ParallelLight::ParallelLight(glm::vec3 direction, glm::vec3 color, float intensi
 	direction_(direction), Light(color, intensity) {
 }
 
+void ParallelLight::Attach(Object*){
+	return ; // pass
+}
+
 LightType ParallelLight::type() const {
 	return LightType::kParallel;
 }
