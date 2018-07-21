@@ -102,6 +102,17 @@ void Character::BoxAttack(void){
 			temp, 10
 		);
 	}
+	world_->player_collection_ptr_->Query(
+		BTVector3ToGLMVec3(object_->GetOrigin()),
+		box_attack_dist_,
+		box_attack_range_,
+		[](std::weak_ptr<Player> player){
+			auto p = player.lock();
+			if(p){
+				p->character_ptr().lock()->Lose(5);
+			}
+		}
+	);
 }
 void Character::Lose(float amount){
 	auto particle = std::make_shared<Particle>(

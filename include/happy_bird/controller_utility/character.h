@@ -20,8 +20,8 @@ class Character {
  	float laser_attack_dist_ = 10;
  	Color laser_attack_color_ = color::Blue();
  	float box_attack_freq_ = 3;
- 	float box_attack_dist_ = 5;
- 	float box_attack_range_ = 5; // along depth axis
+ 	float box_attack_dist_ = 100;
+ 	float box_attack_range_ = 100; // along depth axis
  	Color box_attack_color_ = color::Red();
  public:
  	Character(World*, Object*);

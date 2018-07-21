@@ -1,3 +1,11 @@
+#include <algorithm>
+#include <memory>
+#include <iostream>
+using std::shared_ptr;
+using std::weak_ptr;
+using std::max;
+using std::min;
+
 #include "player_utility/player_collection.h"
 #include "controller_utility/automation_controller.h"
 #include "controller_utility/keyboard_controller.h"
@@ -5,12 +13,6 @@
 #include "shader_utility/texture_material.h"
 #include "math_utility.h"
 
-#include <algorithm>
-
-using std::shared_ptr;
-using std::weak_ptr;
-using std::max;
-using std::min;
 
 PlayerCollection::PlayerCollection() = default;
 
@@ -46,21 +48,24 @@ void PlayerCollection::Traverse(std::function<void(std::weak_ptr<Player>)> yield
 }
 
 void PlayerCollection::Query(glm::vec3 location, float delta_x, float delta_z, std::function<void(std::weak_ptr<Player>)> yield) {
+	delta_z = fabs(delta_z);
 	for (auto player_ptr : friendly_collection_) {
 		auto player_location = BTVector3ToGLMVec3(player_ptr->object_ptr().lock()->GetOrigin());
 		if (!(location.x + min(delta_x, 0.0f) <= player_location.x && player_location.x <= location.x + max(delta_x, 0.0f)))
 			continue;
-		if (!(location.z + min(delta_z, 0.0f) <= player_location.z && player_location.z <= location.z + max(delta_z, 0.0f)))
+		if (!(location.z + delta_z / 2.0 >= player_location.z && location.z - delta_z / 2.0 <= player_location.z))
 			continue;
 		yield(player_ptr);
 	}
 
 	for (auto player_ptr : hostile_collection_) {
 		auto player_location = BTVector3ToGLMVec3(player_ptr->object_ptr().lock()->GetOrigin());
+		std::cout << "Query find enimy: " << player_location.x << ", " << player_location.z << std::endl;
 		if (!(location.x + min(delta_x, 0.0f) <= player_location.x && player_location.x <= location.x + max(delta_x, 0.0f)))
 			continue;
-		if (!(location.z + min(delta_z, 0.0f) <= player_location.z && player_location.z <= location.z + max(delta_z, 0.0f)))
+		if (!(location.z + delta_z / 2.0 >= player_location.z && location.z - delta_z / 2.0 <= player_location.z))
 			continue;
+		std::cout << "Query yield" << std::endl; 
 		yield(player_ptr);
 	}
 }
