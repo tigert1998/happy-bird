@@ -1,7 +1,10 @@
+#include <iostream>
+
 #include "debug_utility/cg_exception.h"
 
 FileNotExistsError::FileNotExistsError(const std::string &path) {
 	error_message = "[file error] File not exists at " + path;
+	std::cout << error_message << std::endl;
 }
 
 const char *FileNotExistsError::what() const noexcept {
@@ -10,6 +13,7 @@ const char *FileNotExistsError::what() const noexcept {
 
 ShaderCompileError::ShaderCompileError(const std::string &title, const std::string &log) {
 	error_message = "[shader compile error on " + title + "] " + log;
+	std::cout << error_message << std::endl;
 }
 
 const char *ShaderCompileError::what() const noexcept {
@@ -18,6 +22,7 @@ const char *ShaderCompileError::what() const noexcept {
 
 ShaderLinkError::ShaderLinkError(const std::string &log) {
 	error_message = "[shader link error] " + log;
+	std::cout << error_message << std::endl;
 }
 
 const char *ShaderLinkError::what() const noexcept {
@@ -26,6 +31,7 @@ const char *ShaderLinkError::what() const noexcept {
 
 LoadPictureError::LoadPictureError(const std::string &path) {
 	error_message = "[picture format error] Fail to load picture at " + path;
+	std::cout << error_message << std::endl;
 }
 
 const char *LoadPictureError::what() const noexcept {
@@ -34,6 +40,7 @@ const char *LoadPictureError::what() const noexcept {
 
 AssimpError::AssimpError(const std::string &error_string) {
 	error_message = "[assimp error] " + error_string;
+	std::cout << error_message << std::endl;
 }
 
 const char *AssimpError::what() const noexcept {
@@ -42,6 +49,7 @@ const char *AssimpError::what() const noexcept {
 
 ShaderSettingError::ShaderSettingError(const std::string &name) {
 	error_message = "[shader setting error] Fail to set uniform variable " + name;
+	std::cout << error_message << std::endl;
 }
 
 const char *ShaderSettingError::what() const noexcept {

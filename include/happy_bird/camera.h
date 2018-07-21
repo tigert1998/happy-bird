@@ -5,7 +5,7 @@
 #include "bullet_common.h"
 #include "math_utility.h"
 #include "object.h"
-#include "character.h"
+#include "controller_utility/character.h"
 
 class Camera {
 public:

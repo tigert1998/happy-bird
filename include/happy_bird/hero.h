@@ -3,10 +3,10 @@
 #include "bullet_common.h" // btTransform
 #include "color.h" // Color, color::Red
 #include "object.h" // LivingObject
-#include "character.h"
 #include "camera.h"
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
+#include "controller_utility/character.h"
 
 #include <vector>
 

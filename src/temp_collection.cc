@@ -14,3 +14,6 @@ void TempCollection::Update(void){
 void TempCollection::PushBack(Object* object, float duration){
 	objects_.push_back(TempWrapper(object, duration));
 }
+void TempCollection::PushBack(std::shared_ptr<Object> object, float duration){
+	objects_.push_back(TempWrapper(object, duration));
+}

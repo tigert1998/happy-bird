@@ -4,11 +4,12 @@
 #include "opengl_common.h"
 #include "bullet_common.h"
 #include "object.h"
-#include "character.h"
 #include "camera.h"
-#include "character.h"
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
+#include "controller_utility/keyboard_controller.h"
+#include "controller_utility/automation_controller.h"
+#include "player_utility/player_collection.h"
 #include "stage.h"
 #include "temp_collection.h"
 
@@ -36,14 +37,13 @@ class World{
 	btSoftBodySolver* bt_soft_solver_;
 	btSoftBodyWorldInfo bt_soft_info_;
 	// Object collections
-	std::vector<Object*> objects_;
 	Stage stage_;
+
+	PlayerCollection *player_collection_ptr_;
 	TempCollection temp_;
-	// controller
-	Character* character_;
  public:
  	// shared
- 	static bool keys_pressed[1024];
+	static bool exit;
 	static int height, width;
 	static Camera* camera;
 	static glm::vec3 global_ambient;
@@ -66,7 +66,6 @@ class World{
 	void Run(void);
 	static void CursorPosCallback(GLFWwindow *window, double x, double y);
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
-	void ProcessInput(void);
 	btSoftRigidDynamicsWorld* bt_world(void) const ;
 	btBroadphaseInterface* bt_broadphase(void) const;
 	btSoftBodyWorldInfo& bt_info();

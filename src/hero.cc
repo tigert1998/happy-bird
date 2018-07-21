@@ -47,7 +47,7 @@ void Hero::ImportToGraphics() {
 
 Hero::Hero(World* world, Shader* shader, Material* material, const btTransform& transform, float w, float h):
 	Object(world, shader, material, 8, false), width_(w), height_(h) {
-	std::cout << "InitHero" << std::endl;
+	LOG();
 	assert(world_);
 	// initialize physics shape
 	bt_object_ = world_->CreateRigidBody(

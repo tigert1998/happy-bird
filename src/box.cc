@@ -16,7 +16,7 @@ Box::Box(
 		half_extents_(half_extents),
 		mass_(mass) {
 	assert(world_);
-	std::cout << "InitBox" << std::endl;
+	LOG();
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		mass,

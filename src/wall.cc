@@ -125,7 +125,8 @@ Wall::Wall(
 		half_extents_(half_extents), 
 		scaling_(scaling) {
 	assert(world_);
-	std::cout << "InitWall" << std::endl;
+	LOG();
+	
 	if (!shader)
 		shader_ = new Shader("shader/common.vert", "shader/common.frag");
 	// initialize physics shape //
@@ -142,7 +143,7 @@ Wall::Wall(
 
 #define kErr (0.1)
 void Wall::InitMesh(){
-	std::cout << "InitMesh" << std::endl;
+	LOG();
 	btTransform baseTransform; // point to left-down corner
 	baseTransform.setIdentity();
 	baseTransform.setOrigin(btVector3(
@@ -229,7 +230,7 @@ void Wall::InitMesh(){
 	return ;
 }
 void Wall::ImportToGraphics(void){
-	std::cout << "ImportToGraphics" << std::endl;
+	LOG();
 	glBindVertexArray(vao_);
 	// Bind indice
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);

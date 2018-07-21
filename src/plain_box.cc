@@ -1,5 +1,6 @@
 #include "plain_box.h"
 #include "world.h"
+#include "debug_utility/log.h"
 
 #include <iostream>
 
@@ -16,7 +17,7 @@ PlainBox::PlainBox(
 		half_extents_(half_extents),
 		mass_(mass) {
 	assert(world_);
-	std::cout << "InitPlainBox" << std::endl;
+	LOG();
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		mass,

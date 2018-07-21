@@ -2,12 +2,14 @@
 
 #include "light.h"
 
+class Object;
+
 class ParallelLight: virtual public Light {
-private:
+ protected:
 	glm::vec3 direction_;
-	
-public:
+ public:
 	ParallelLight(glm::vec3 direction, glm::vec3 color, float intensity);
+	void Attach(Object*);
 	LightType type() const; 
-	glm::vec3 direction() const;
+	virtual glm::vec3 direction() const;
 };

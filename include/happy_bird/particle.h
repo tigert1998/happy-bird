@@ -20,22 +20,26 @@ struct ParticleInfo{
 	glm::vec3 acceleration;
 	float radius;
 	Color color;
+	bool shrink;
 	ParticleInfo():
 		velocity(0, 0, 0),
 		position(0, 0, 0),
 		radius(1),
-		color(1, 1, 1){ }
+		color(1, 1, 1),
+		shrink(false){ }
 	ParticleInfo(
 		glm::vec3 p,
 		glm::vec3 v, 
 		glm::vec3 a = glm::vec3(0,0,0),
 		float radius = 0, 
-		Color color = color::White()):
+		Color color = color::White(),
+		bool shrink = false):
 		position(p),
 		velocity(v),
 		acceleration(a),
 		radius(radius),
-		color(color){ }
+		color(color),
+		shrink(shrink){ }
 	ParticleInfo(const ParticleInfo& rhs):
 		velocity(rhs.velocity),
 		position(rhs.position),
@@ -45,6 +49,7 @@ struct ParticleInfo{
 	void Update(float delta){
 		position += velocity * float(Timer::kFrameElapsed * 500);
 		velocity += acceleration * float(Timer::kFrameElapsed * 500);
+		if(shrink)radius -= radius * float(Timer::kFrameElapsed);
 	}
 };
 enum ParticleFlag{
@@ -66,8 +71,8 @@ enum ParticleFlag{
 	kRandomColorParticle = 0x60, // 00 for mono
 	// origin var
 	kJitterParticle = 0x80,
-	// inner force
-	kInnerParticle = 0x100
+	// Special effect
+	kMockFlame = 0x100
 } ;
 struct ParticleConfig{
 	// explicit assigned
@@ -88,7 +93,7 @@ struct ParticleConfig{
 	bool gradual; // true for gradual change
 	// external option
 	bool jitter;
-	bool inner_force;
+	bool mock_flame;
 
 	ParticleConfig(glm::vec3 v, Color color, int flags = 0); 
 };
