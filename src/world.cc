@@ -173,7 +173,8 @@ void World::Update(void) { // sync mesh and render
 
 	player_collection_ptr_->Traverse([delta_time] (weak_ptr<Player> player_ptr) {
 		player_ptr.lock()->controller_ptr().lock()->Elapse(delta_time);
-		player_ptr.lock()->object_ptr().lock()->Draw(camera, light_collection);
+		if(player_ptr.lock()->object_ptr().lock())
+			player_ptr.lock()->object_ptr().lock()->Draw(camera, light_collection);
 	});
 
 	glfwSwapBuffers(window_);
