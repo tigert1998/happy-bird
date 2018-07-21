@@ -31,6 +31,6 @@ KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard)
 	});
 }
 
-void KeyboardController::Elapse(double time) const {
+void KeyboardController::Elapse(double time) {
 	keyboard_.Elapse(time);
 }
