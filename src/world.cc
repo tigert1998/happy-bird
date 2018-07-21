@@ -119,7 +119,7 @@ void World::InitScene(void) {
 	auto player = player_collection_ptr_->leader();
 	auto light = new PointLight(
 			glm::vec3(0, 15, 0),
-			glm::vec3(0, 1, 0), 0.6, 
+			glm::vec3(0, 1, 0), 1.3, 
 			Attenuation(700)
 		);
 	light->Attach(player->object_ptr().lock().get());
@@ -134,12 +134,22 @@ void World::InitScene(void) {
 	);
 	light_collection->PushBack(
 		new SpotLight(
-			glm::vec3(0, 0, 0), 
+			glm::vec3(-10, 0, 0), 
 			glm::vec3(10, 5, 5),
 			color::White(), 
 			10,
 			Attenuation(1800),
 			glm::pi<float>() / 4
+		)
+	);
+	light_collection->PushBack(
+		new SpotLight(
+			glm::vec3(150, 40, -40),
+			glm::vec3(150, 0, 40),
+			color::Blue(),
+			35,
+			Attenuation(2000),
+			glm::pi<float>() * 0.8
 		)
 	);
 }
@@ -182,6 +192,7 @@ void World::Update(void) { // sync mesh and render
 }
 
 void World::Run(void) {
+	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/background.wav").c_str()), 0, 0, 0);
 	while (!glfwWindowShouldClose(window_)) {
 		Update();
 	}

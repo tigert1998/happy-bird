@@ -9,6 +9,7 @@
 #include "shader_utility/light.h"
 #include "shader_utility/spot_light.h"
 #include "shader_utility/parallel_light.h"
+#include "random.h"
 
 void Stage::InitStage(StageFlag flag){
 	switch(flag){
@@ -163,6 +164,28 @@ void Stage::InitDungeonStage(void){
 			0.08f
 		))
 	);
+	// Item //
+	btScalar basicItemWidth = 90;
+	btVector3 posItem;
+	btTransform transItem;
+	transItem.setIdentity();
+	Color colorItem;
+	for(int i = 0; i <= 9; i++){
+		colorItem = Color(Random::QueryFloatRandom(0,1), Random::QueryFloatRandom(0,1), Random::QueryFloatRandom(0,1));
+		posItem = btVector3(basicItemWidth + Random::QueryFloatRandom(0, 10), 7 + Random::QueryFloatRandom(-4,4), Random::QueryFloatRandom(2, depth - thickness));
+		transItem.setOrigin(posItem);
+		objects_.push_back(
+			StageWrapper(std::make_shared<Box>(
+				world_,
+				new Shader("shader/common.vert", "shader/common.frag"),
+				new PureColorMaterial(colorItem, colorItem, 2),
+				transItem,
+				glm::vec3(3,3,3),
+				5.0f
+			))
+		);
+	}
+
 	return ;
 }
 void Stage::InitDefaultStage(void){

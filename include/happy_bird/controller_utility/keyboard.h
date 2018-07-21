@@ -6,7 +6,7 @@
 
 class Keyboard {
 private:
-	static constexpr int kTotal = 350;
+	static constexpr int kTotal = 4096;
 	std::bitset<kTotal> key_pressed_;
 	std::vector<std::function<void(std::bitset<kTotal>, double)>> yields_;
 
