@@ -66,8 +66,8 @@ enum ParticleFlag{
 	kRandomColorParticle = 0x60, // 00 for mono
 	// origin var
 	kJitterParticle = 0x80,
-	// inner force
-	kInnerParticle = 0x100
+	// Special effect
+	kMockFlame = 0x100
 } ;
 struct ParticleConfig{
 	// explicit assigned
@@ -88,7 +88,7 @@ struct ParticleConfig{
 	bool gradual; // true for gradual change
 	// external option
 	bool jitter;
-	bool inner_force;
+	bool mock_flame;
 
 	ParticleConfig(glm::vec3 v, Color color, int flags = 0); 
 };

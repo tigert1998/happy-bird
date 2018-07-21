@@ -24,15 +24,15 @@ ParticleConfig::ParticleConfig(glm::vec3 v, Color color, int intFlag):
 	}
 	switch(flags & 0x0c){
 		case (kLargeParticle):
-			major_radius = 8;
-			variance_radius = 4;
+			major_radius = 12;
+			variance_radius = 6;
 			break;
 		case (kMediumParticle):
 			major_radius = 5;
 			variance_radius = 3;
 			break;
 		default:
-			major_radius = 2;
+			major_radius = 3.5;
 			variance_radius = 1;
 	}
 	switch(flags & 0x10){
@@ -61,11 +61,11 @@ ParticleConfig::ParticleConfig(glm::vec3 v, Color color, int intFlag):
 	else{
 		jitter = false;
 	}
-	if(flags & kInnerParticle){
-		inner_force = true;
+	if(flags & kMockFlame){
+		mock_flame = true;
 	}
 	else{
-		inner_force = false;
+		mock_flame = false;
 	}
 }
 
@@ -83,6 +83,24 @@ ParticleConfig::ParticleConfig(glm::vec3 v, Color color, int intFlag):
 // }
 ParticleEmitter::ParticleEmitter(ParticleConfig config):config_(config){ }
 void ParticleEmitter::Emit(std::vector<ParticleInfo>::iterator curslot, glm::vec3 p){
+	if(config_.mock_flame){
+		glm::vec3 offset(Random::QueryFloatRandom(0,1) * Random::QueryFloatRandom(0,1) * 7, 0, Random::QueryFloatRandom(0,1) * Random::QueryFloatRandom(0,1) * 7 );
+		float seed = sqrt(offset[0] / 7 + offset[1] / 7);
+		if((int)(seed * 7) % 2 == 0)offset[0] *= -1;
+		if((int)(seed * 13) % 2 == 1)offset[2] *= -1;
+		glm::vec3 position = p + offset; // near center
+		glm::vec3 v = config_.major_velocity * (1 - seed);
+		Color color = config_.major_color * ((2 - seed) * 3.0);
+		float radius = config_.major_radius * ( 2 - seed);
+		*curslot = ParticleInfo(
+			position,
+			v,
+			config_.acceleration,
+			radius,
+			color
+		);
+		return ;
+	}
 	// system("pause"); 
 	glm::vec3 v = config_.major_velocity;
 	float min_component = 0.5 + std::min(std::min(fabs(v[0]),fabs(v[1])),fabs(v[2])); // min has largest var, others small var
@@ -100,7 +118,7 @@ void ParticleEmitter::Emit(std::vector<ParticleInfo>::iterator curslot, glm::vec
 	if(!config_.gradual)factor = Random::QueryFloatRandom(0, 1);
 	color[2] += config_.delta_color[2] * factor;
 	if(config_.jitter){
-		p += glm::vec3(Random::QueryFloatRandom(-1,1), 0, Random::QueryFloatRandom(-1,1));
+		p += glm::vec3(Random::QueryFloatRandom(-3,3), 0, Random::QueryFloatRandom(-3,3));
 	}
 	*curslot = ParticleInfo(
 		p,
@@ -122,7 +140,7 @@ Particle::Particle(
 		float interval,
 		float duration
 ):
-		Object(world, shader, material, 4, false),
+		Object(world, shader, material, 7, false),
 		position_(position),
 		amount_(amount), 
 		particles_(amount), 
@@ -133,7 +151,7 @@ Particle::Particle(
 	interval_timer_ = Timer::New();
 	duration_timer_ = Timer::New();
 	std::cout << "InitParticle" << std::endl;
-	data_.resize(amount_ * 4);
+	data_.resize(amount_ * 7);
 	if(!shader_)shader_ = new Shader("shader/particle.vert", "shader/particle.frag");
 	InitMesh();
 
@@ -156,10 +174,12 @@ void Particle::ImportToGraphics(){
 	// No bind ebo
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * data_.size(), data_.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) (3 * sizeof(float)));
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*) (4 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 }
@@ -173,14 +193,17 @@ void Particle::Draw(Camera* camera, const LightCollection* lights) {
 	// last_time = current_time;
 	for(int i = 0; i < amount_; i++){
 		particles_[i].Update(delta_time);
-		data_[4*i + 0] = particles_[i].position[0];
-		data_[4*i + 1] = particles_[i].position[1];
-		data_[4*i + 2] = particles_[i].position[2];
-		data_[4*i + 3] = particles_[i].radius;
+		data_[7*i + 0] = particles_[i].position[0];
+		data_[7*i + 1] = particles_[i].position[1];
+		data_[7*i + 2] = particles_[i].position[2];
+		data_[7*i + 3] = particles_[i].radius;
+		data_[7*i + 4] = particles_[i].color[0];
+		data_[7*i + 5] = particles_[i].color[1];
+		data_[7*i + 6] = particles_[i].color[2];
 	}
 	ImportToGraphics();
 	shader_->Use();
-	shader_->SetUniform<glm::vec3>("uColor", dynamic_cast<PureColorMaterial*>(material_)->diffuse());
+	// shader_->SetUniform<glm::vec3>("uColor", dynamic_cast<PureColorMaterial*>(material_)->diffuse());
 	
 	btTransform transform;
 	transform.setIdentity();

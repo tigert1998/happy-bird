@@ -11,7 +11,7 @@ using std::endl;
 
 float Character::static_pace_(100);
 
-Character::Character(World* world, Object* obj, float speed):max_speed_(speed),world_(world), object_(obj){ }
+Character::Character(World* world, Object* obj): world_(world), object_(obj){ }
 Character::~Character(){ }
 void Character::Bind(Object* obj){
 	object_ = obj;
@@ -59,22 +59,28 @@ void Character::ResetRotate(void){
 	return ;
 }
 void Character::LaserAttack(void){
+	static Timer::TimingId laser_timer = Timer::New();
+	if(Timer::Query(laser_timer) < laser_attack_freq_)return;
+	Timer::Pin(laser_timer);
 	world_->temp_.PushBack(
 		new Particle(
 			world_,
 			nullptr,
-			new PureColorMaterial(color::Red(), color::Red(), 40),
+			new PureColorMaterial(laser_attack_color_, laser_attack_color_, 40),
 			object_->GetOrigin(),
-			glm::vec3(0.1, 0, 0),
+			glm::vec3(0.25, 0, 0),
 			kSmallParticle | kFloatParticle | kLaserParticle,
 			10,
-			0.02,
+			0.05,
 			1
 		),
 		2
 	);
 }
 void Character::BoxAttack(void){
+	static Timer::TimingId box_timer = Timer::New();
+	if(Timer::Query(box_timer) < box_attack_freq_)return;
+	Timer::Pin(box_timer);
 	btVector3 origin = object_->GetOrigin();
 	btTransform transform;
 	for(int i = 0; i < 10; i++){
@@ -83,19 +89,49 @@ void Character::BoxAttack(void){
 		Object* temp = new PlainBox(
 				world_, 
 				nullptr,
-				new PureColorMaterial(color::Red(), color::Red(), 40),
+				new PureColorMaterial(box_attack_color_, box_attack_color_, 40),
 				transform,
 				glm::vec3(0.4, 0.4, 0.4),
 				5
 			);
 		temp->ActivateControl();
 		float a = Random::QueryFloatRandom(0, 20),b = Random::QueryFloatRandom(- 30, 30);
-		cout << "New bullet: " << a << ", " << b << endl;
 		temp->SetVelocity(btVector3(60, a, b));
 		// temp->SetVelocity(btVector3(8, Random::QueryFloatRandom(-2,5), Random::QueryFloatRandom(-5, 5)));
 		world_->temp_.PushBack(
 			temp, 10
 		);
 	}
-
+}
+void Character::Lose(float amount){
+	auto particle = std::make_shared<Particle>(
+		world_,
+		new Shader("shader/particle.vert", "shader/blood_decr.frag"),
+		new PureColorMaterial(color::Red(), color::Red(), 40),
+		btVector3(0, 0, 0), // position
+		glm::vec3(0, 0.005, 0),
+		kMediumParticle | kFloatParticle | kAmbientParticle | kJitterParticle,
+		(int)(amount / 2.0),
+		1.0f
+	);
+	particle->Attach(object_, btVector3(0,3,0));
+	world_->temp_.PushBack(
+		particle, 7
+	);
+}
+void Character::Gain(float amount){
+	auto particle = std::make_shared<Particle>(
+		world_,
+		new Shader("shader/particle.vert", "shader/blood_incr.frag"),
+		new PureColorMaterial(color::Green(), color::Green(), 40),
+		btVector3(0, 0, 0), // position
+		glm::vec3(0, 0.005, 0),
+		kMediumParticle | kFloatParticle | kAmbientParticle | kJitterParticle,
+		(int)(amount / 2.0),
+		2.0f
+	);
+	particle->Attach(object_, btVector3(0,3,0));
+	world_->temp_.PushBack(
+		particle, 7
+	);
 }

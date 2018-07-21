@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <list>
 #include <memory>
 
@@ -16,6 +17,10 @@ class TempCollection{
 	 	TempWrapper(Object* naked, float duration):data_ref_(naked), duration_(duration){
 	 		timer_ = Timer::New();
 	 	}
+	 	TempWrapper(std::shared_ptr<Object> shared, float duration):data_ref_(shared), duration_(duration){
+	 		timer_ = Timer::New();
+	 	}
+	 	~TempWrapper(){	}
 	 	std::weak_ptr<Object> get(void){
 	 		return static_cast<std::weak_ptr<Object> >(data_ref_);
 	 	}
@@ -33,6 +38,7 @@ class TempCollection{
  	}
  	void Update(void);
  	void PushBack(Object* object, float duration); // second
+	void PushBack(std::shared_ptr<Object> object, float duration);
  private:
  	World* world_;
 	ObjectContainer objects_;

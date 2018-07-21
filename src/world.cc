@@ -112,11 +112,14 @@ void World::InitPhysics(void) {
 }
 
 void World::InitScene(void) {
-	stage_.InitStage(kDefaultStage);
+	// stage_.InitStage(kDefaultStage);
+	stage_.InitStage(kDungeonStage);
+	cout << "After InitStage" << endl;
 
 	btTransform start_transform;
 	start_transform.setIdentity();
-	start_transform.setOrigin( World::origin + btVector3(0, World::character_height, 0));
+	start_transform.setOrigin( World::origin + btVector3(45, 40, 30));
+	// start_transform.setOrigin( World::origin + btVector3(5, World::character_height, 5));
 	Object* man = new Hero(
 		this,
 		nullptr,
@@ -127,28 +130,29 @@ void World::InitScene(void) {
 	);
 	objects_.push_back(man);
 	character_ = new Character(this, man);
-	objects_.push_back( 
-		new Sphere(
-			this, 
-			nullptr, 
-			new PureColorMaterial(color::White(), color::White(), 3),
-			start_transform,
-			3
-		)
-	);
-	objects_.back()->Attach(man, btVector3(0,3,0));
+	// objects_.push_back( 
+	// 	new Sphere(
+	// 		this, 
+	// 		nullptr, 
+	// 		new PureColorMaterial(color::White(), color::White(), 3),
+	// 		start_transform,
+	// 		3
+	// 	)
+	// );
+	// objects_.back()->Attach(man, btVector3(0,3,0));
+
 	camera->set_accompany_object(man, 120);
-	objects_.push_back(
-		new Particle(
-			this,
-			new Shader("shader/particle.vert", "shader/blood_incr.frag"),
-			new PureColorMaterial(color::Green(), color::Green(), 40),
-			btVector3(0, 0, 0), // position
-			glm::vec3(0, 0, -0.02),
-			kMediumParticle | kFlameParticle | kAmbientParticle | kJitterParticle
-		)
-	);
-	objects_.back()->Attach(objects_[objects_.size()-2], btVector3(0,3,0));
+	// objects_.push_back(
+	// 	new Particle(
+	// 		this,
+	// 		new Shader("shader/particle.vert", "shader/blood_incr.frag"),
+	// 		new PureColorMaterial(color::Green(), color::Green(), 40),
+	// 		btVector3(0, 0, 0), // position
+	// 		glm::vec3(0, 0, -0.02),
+	// 		kMediumParticle | kFlameParticle | kAmbientParticle | kJitterParticle
+	// 	)
+	// );
+	// objects_.back()->Attach(objects_[objects_.size()-2], btVector3(0,3,0));
 
 	light_collection->PushBack(
 		new PointLight(
@@ -165,8 +169,8 @@ void World::InitScene(void) {
 	);
 	light_collection->PushBack(
 		new SpotLight(
-			glm::vec3(-25, 25, -25), 
-			glm::vec3(10, 0, 0),
+			glm::vec3(0, 0, 0), 
+			glm::vec3(10, 5, 5),
 			color::White(), 
 			10,
 			Attenuation(1800),
@@ -272,9 +276,11 @@ void World::ProcessInput(void) {
 
 	if(keys_pressed[GLFW_KEY_F]){
 		character_->LaserAttack();
+		character_->Gain(10);
 	}
 	if(keys_pressed[GLFW_KEY_G]){
 		character_->BoxAttack();
+		character_->Lose(10);
 	}
 
 	if (keys_pressed[GLFW_KEY_SPACE]) {
