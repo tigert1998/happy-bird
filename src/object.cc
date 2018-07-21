@@ -16,7 +16,6 @@ Object::Object(World* w, Shader* shader, Material* material, uint32_t stride, bo
 		shader_(shader),
 		material_(material),
 		bt_object_(nullptr),
-		anchor_(nullptr),
 		stride_(stride),
 		is_soft_(soft) {
 	// Init in Graphics
@@ -353,10 +352,10 @@ btTransform Object::GetTransform(void) {
 		btRigidBody::upcast(bt_object_)->getMotionState()->getWorldTransform(transform);
 		return transform;
 	}
-	else if (anchor_) {
+	else if (anchor_.lock()) {
 		transform.setIdentity();
 		transform.setOrigin(offset_);
-		return transform * anchor_->GetTransform();
+		return transform * (anchor_.lock())->GetTransform();
 	}
 	else {
 		transform.setIdentity();
@@ -379,7 +378,7 @@ void Object::Draw(Camera* camera, const LightCollection* light_collection){
 btCollisionObject* Object::GetBulletObject(void){
 	return bt_object_;
 }
-void Object::Attach(Object* target, const btVector3& offset){
+void Object::Attach(std::weak_ptr<Object> target, const btVector3& offset){
 	assert(!is_soft_); // soft body live by Bullet
 	anchor_ = target;
 	offset_ = offset;
