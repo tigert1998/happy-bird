@@ -90,7 +90,7 @@ void ParticleEmitter::Emit(std::vector<ParticleInfo>::iterator curslot, glm::vec
 		if((int)(seed * 13) % 2 == 1)offset[2] *= -1;
 		glm::vec3 position = p + offset; // near center
 		glm::vec3 v = config_.major_velocity * (1 - seed);
-		Color color = config_.major_color * ((2 - seed) * 3.0);
+		Color color = config_.major_color * ((2 - seed) * 3.0f);
 		float radius = config_.major_radius * ( 2 - seed);
 		*curslot = ParticleInfo(
 			position,
