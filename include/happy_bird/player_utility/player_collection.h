@@ -20,6 +20,8 @@ public:
 	void Traverse(
 		std::function<void(std::weak_ptr<Player>)> yield,
 		std::function<bool(const Player &, const Player &)> compare_function = [] (const Player &a, const Player &b) -> bool {
+			if(!a.object_ptr().lock())return false;
+			if(!b.object_ptr().lock())return true;
 			return a.object_ptr().lock()->GetOrigin()[2] > b.object_ptr().lock()->GetOrigin()[2];
 		}
 	);
