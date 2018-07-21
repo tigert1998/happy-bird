@@ -10,5 +10,5 @@ private:
 public:
 	KeyboardController() = delete;
 	KeyboardController(Character &controlee, Keyboard &keyboard = Keyboard::shared);
-	void Elapse(double time) const;
+	void Elapse(double time);
 };

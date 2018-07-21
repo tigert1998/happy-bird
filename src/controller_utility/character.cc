@@ -12,7 +12,13 @@ using std::endl;
 float Character::static_pace_(100);
 
 Character::Character(World* world, Object* obj): world_(world), object_(obj){ }
+
 Character::~Character(){ }
+
+void Character::set_max_speed(float max_speed) {
+	max_speed_ = max_speed;
+}
+
 void Character::Bind(Object* obj){
 	object_ = obj;
 }

@@ -25,6 +25,7 @@ class Character {
  	Color box_attack_color_ = color::Red();
  public:
  	Character(World*, Object*);
+ 	void set_max_speed(float max_speed);
  	~Character();
  	void Bind(Object* object);
  	Object* GetDelegate(void);
