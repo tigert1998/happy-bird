@@ -10,6 +10,7 @@ using namespace std;
 int World::height = 600;
 int World::width = 800;
 bool World::keys_pressed[1024];
+bool World::exit = false;
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
 LightCollection* World::light_collection = new LightCollection(glm::vec3(0, 0, 0));
@@ -249,6 +250,7 @@ void World::CursorPosCallback(GLFWwindow *window, double x, double y) {
 
 void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		World::exit = true;
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	} else {
 		keys_pressed[key] = (action != GLFW_RELEASE);

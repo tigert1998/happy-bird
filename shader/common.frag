@@ -2,32 +2,6 @@
 
 const float zero = 0.00000001;
 
-#define UnfoldParallelSingle(n) if(i == n){ \
-	color += CalculateParallelLight(eye, lightCollection.parallel[n], material);\
-}
-#define UnfoldParallel	UnfoldParallelSingle(0)\
-	UnfoldParallelSingle(1)\
-	UnfoldParallelSingle(2)\
-	UnfoldParallelSingle(3)\
-	UnfoldParallelSingle(4)
-#define UnfoldPointSingle(n) if(i == n){ \
-	color += CalculatePointLight(eye, lightCollection.point[n], material);\
-}
-#define UnfoldPoint	UnfoldPointSingle(0)\
-	UnfoldPointSingle(1)\
-	UnfoldPointSingle(2)\
-	UnfoldPointSingle(3)\
-	UnfoldPointSingle(4)
-#define UnfoldSpotSingle(n) if(i == n){ \
-	color += CalculateSpotLight(eye, lightCollection.spot[n], material);\
-}
-#define UnfoldSpot	UnfoldSpotSingle(0)\
-	UnfoldSpotSingle(1)\
-	UnfoldSpotSingle(2)\
-	UnfoldSpotSingle(3)\
-	UnfoldSpotSingle(4)
-
-
 struct Attenuation {
 	float range;
 	float constant;
@@ -66,9 +40,9 @@ struct LightCollectionTotal {
 struct LightCollection {
 	vec3 ambient;
 	LightCollectionTotal total;
-	ParallelLight parallel[1];
-	PointLight point[1];
-	SpotLight spot[1];
+	ParallelLight parallel[4];
+	PointLight point[4];
+	SpotLight spot[4];
 };
 
 struct PureColorMaterial {
@@ -90,7 +64,7 @@ in vec3 vNormal;
 
 out vec4 fragColor;
 
-vec3 CalculatePointlLight(Eye eye, PointLight light, PureColorMaterial material) {
+vec3 CalculatePointLight(Eye eye, PointLight light, PureColorMaterial material) {
 	vec3 lightDirection = normalize(light.position - vPosition);
 	float diffuseFactor = max(dot(vNormal, lightDirection), 0.0) * light.intensity;
 
@@ -146,16 +120,46 @@ vec3 CalculateSpotLight(Eye eye, SpotLight light, PureColorMaterial material) {
 vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, PureColorMaterial material) {
 	vec3 color = lightCollection.ambient;
 	for (int i = 0; i < lightCollection.total.parallel; i++) {
-		// UnfoldParallel
-		color += CalculateParallelLight(eye, lightCollection.parallel[i], material);
+		if(i == 0){
+			color += CalculateParallelLight(eye, lightCollection.parallel[0], material);
+		}
+		if(i == 1){
+			color += CalculateParallelLight(eye, lightCollection.parallel[1], material);
+		}
+		if(i == 2){
+			color += CalculateParallelLight(eye, lightCollection.parallel[2], material);
+		}
+		if(i == 3){
+			color += CalculateParallelLight(eye, lightCollection.parallel[3], material);
+		}
 	}
 	for (int i = 0; i < lightCollection.total.point; i++) {
-		// UnfoldPoint
-		color += CalculatePointlLight(eye, lightCollection.point[i], material);
+		if(i == 0){
+			color += CalculatePointLight(eye, lightCollection.point[0], material);
+		}
+		if(i == 1){
+			color += CalculatePointLight(eye, lightCollection.point[1], material);
+		}
+		if(i == 2){
+			color += CalculatePointLight(eye, lightCollection.point[2], material);
+		}
+		if(i == 3){
+			color += CalculatePointLight(eye, lightCollection.point[3], material);
+		}
 	}
 	for (int i = 0; i < lightCollection.total.spot; i++) {
-		// UnfoldSpot
-		color += CalculateSpotLight(eye, lightCollection.spot[i], material);
+		if(i == 0){
+			color += CalculateSpotLight(eye, lightCollection.spot[0], material);
+		}
+		if(i == 1){
+			color += CalculateSpotLight(eye, lightCollection.spot[1], material);
+		}
+		if(i == 2){
+			color += CalculateSpotLight(eye, lightCollection.spot[2], material);
+		}
+		if(i == 3){
+			color += CalculateSpotLight(eye, lightCollection.spot[3], material);
+		}
 	}
 	return color;
 }

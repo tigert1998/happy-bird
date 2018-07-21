@@ -44,6 +44,7 @@ class World{
  public:
  	// shared
  	static bool keys_pressed[1024];
+ 	static bool exit;
 	static int height, width;
 	static Camera* camera;
 	static glm::vec3 global_ambient;

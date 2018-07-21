@@ -21,6 +21,15 @@ void Stage::InitStage(StageFlag flag){
 	}
 }
 void Stage::InitDungeonStage(void){
+	// Safe bound
+	btTransform bounding;
+	bounding.setIdentity();
+	bounding.setOrigin(btVector3(0, 0, -10));
+	world_->CreateRigidBody(
+		0,
+		bounding,
+		new btBoxShape(btVector3(500, 500, 1))
+	);
 	// Ground aka Wall //
 	btScalar thickness = 5;
 	btScalar depth = 40;
