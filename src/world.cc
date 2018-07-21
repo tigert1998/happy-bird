@@ -122,7 +122,7 @@ void World::InitScene(void) {
 			glm::vec3(0, 1, 0), 1.3, 
 			Attenuation(700)
 		);
-	light->Attach(player->object_ptr().lock().get());
+	light->Attach(player->object_ptr());
 	light_collection->PushBack(
 		light
 	);

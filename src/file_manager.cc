@@ -4,12 +4,12 @@ const FileManager FileManager::shared = FileManager();
 
 FileManager::FileManager(): work_path(""){
     if(!FileExistsAt(work_path + "shader/common.frag")){
-        work_path = "D:\\code\\happy-bird\\";
+        work_path = "D:/code/happy-bird/";
     }
 }
 
 bool FileManager::FileExistsAt(const std::string &path) const {
-    std::ifstream is(work_path + path);
+    std::ifstream is(path);
     return is.is_open();
 }
 

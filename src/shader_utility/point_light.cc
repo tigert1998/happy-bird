@@ -15,7 +15,7 @@ LightType PointLight::type() const {
 }
 
 glm::vec3 PointLight::position() const {
-	if(anchor_)return BTVector3ToGLMVec3(anchor_->GetOrigin());
+	if (anchor_.lock()) return BTVector3ToGLMVec3(anchor_.lock()->GetOrigin());
 	return position_;
 }
 

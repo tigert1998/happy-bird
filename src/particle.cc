@@ -149,6 +149,7 @@ Particle::Particle(
 		duration_(duration),
 		emitter_(ParticleConfig(velocity, dynamic_cast<PureColorMaterial*>(material)->diffuse(), flags)){
 	assert(world_);
+	bt_object_ = nullptr;
 	LOG();
 	interval_timer_ = Timer::New();
 	duration_timer_ = Timer::New();

@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
+#include <functional>
+#include <vector>
 
 using std::shared_ptr;
 using std::weak_ptr;
@@ -85,17 +87,17 @@ void PlayerCollection::InitPlayerCollection(World *world_ptr) {
 	transform.setIdentity();
 	transform.setOrigin(World::origin + btVector3(45, 40, 30));
 
-	Object *object_ptr = new Hero(
+	auto object_ptr = shared_ptr<Object>(new Hero(
 		world_ptr,
 		nullptr,
-		new TextureMaterial("resources/hero.png", "resources/hero.png", 8),
+		new TextureMaterial("D:/code/happy-bird/resources/hero.png", "D:/code/happy-bird/resources/hero.png", 8),
 		transform,
 		World::character_height,
 		World::character_height
-	);
+	));
 	Character *character_ptr = new Character(world_ptr, object_ptr);
 	Controller *controller_ptr = new KeyboardController(*character_ptr);
-	world_ptr->camera->set_accompany_object(object_ptr, 120);
+	world_ptr->camera->set_accompany_object(object_ptr.get(), 120);
 
 	auto main_player_ptr = shared_ptr<Player>(new Player(object_ptr, character_ptr, controller_ptr));
 	PushBackFriendly(main_player_ptr);

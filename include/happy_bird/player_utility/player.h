@@ -15,7 +15,7 @@ class Player {
 
  public:
 	Player() = delete;
-	Player(Object *object_ptr, Character *character_ptr, Controller *controller_ptr);
+	Player(std::shared_ptr<Object> object_ptr, Character *character_ptr, Controller *controller_ptr);
 	std::weak_ptr<Object> object_ptr() const;
 	std::weak_ptr<Character> character_ptr() const;
 	std::weak_ptr<Controller> controller_ptr() const;

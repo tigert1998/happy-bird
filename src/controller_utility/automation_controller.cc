@@ -10,8 +10,8 @@ AutomationController::AutomationController(Character &controlee, Character &targ
 }
 
 void AutomationController::Elapse(double time) {
-	auto controlee_position = BTVector3ToGLMVec3(controlee_.GetDelegate()->GetOrigin());
-	auto target_position = BTVector3ToGLMVec3(target_.GetDelegate()->GetOrigin());
+	auto controlee_position = BTVector3ToGLMVec3(controlee_.GetDelegate().lock()->GetOrigin());
+	auto target_position = BTVector3ToGLMVec3(target_.GetDelegate().lock()->GetOrigin());
 	auto distance = glm::distance(controlee_position, target_position);
 
 	if (distance <= 4) {

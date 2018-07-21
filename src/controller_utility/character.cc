@@ -1,6 +1,9 @@
 #include <iostream>
+#include <memory>
+
 using std::cout;
 using std::endl;
+using std::shared_ptr;
 
 #include "controller_utility/character.h"
 #include "world.h"
@@ -12,7 +15,7 @@ using std::endl;
 
 float Character::static_pace_(100);
 
-Character::Character(World* world, Object* obj): world_(world), object_(obj){ }
+Character::Character(World* world, shared_ptr<Object> obj): world_(world), object_(obj){ }
 
 Character::~Character(){ }
 
@@ -20,10 +23,10 @@ void Character::set_max_speed(float max_speed) {
 	max_speed_ = max_speed;
 }
 
-void Character::Bind(Object* obj){
-	object_ = obj;
-}
-Object* Character::GetDelegate(void){
+// void Character::Bind(Object* obj){
+	// object_ = obj;
+// }
+std::weak_ptr<Object> Character::GetDelegate(void){
 	return object_;
 }
 void Character::Move(bool forward, float step){ // position 2
@@ -97,7 +100,7 @@ void Character::LaserAttack(void){
 			if(p && p->character_ptr().lock().get() != caller){
 				p->character_ptr().lock()->Lose(5);
 				if(p->character_ptr().lock()->blood() <= 0){
-					p->Disable();
+					p->set_is_disabled(true);
 				}
 			}
 		}
@@ -148,7 +151,7 @@ void Character::BoxAttack(void){
 	);
 }
 void Character::Lose(float amount){
-	if (!object_) return;
+	if (object_ != nullptr) return;
 	blood_ -= amount;
 	auto particle = std::make_shared<Particle>(
 		world_,
@@ -166,7 +169,7 @@ void Character::Lose(float amount){
 	);
 }
 void Character::Gain(float amount){
-	if(!object_)return ;
+	if(object_ != nullptr)return ;
 	blood_ += amount;
 	auto particle = std::make_shared<Particle>(
 		world_,

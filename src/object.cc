@@ -16,7 +16,6 @@ Object::Object(World* w, Shader* shader, Material* material, uint32_t stride, bo
 		shader_(shader),
 		material_(material),
 		bt_object_(nullptr),
-		anchor_(nullptr),
 		stride_(stride),
 		is_soft_(soft) {
 	// Init in Graphics
