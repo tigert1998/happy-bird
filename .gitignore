@@ -20,3 +20,4 @@ glad.c
 glad_win.c
 include/stb
 happy_bird_win32.exp
+audio/sounds/zombie.wav
