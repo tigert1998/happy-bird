@@ -6,7 +6,7 @@
 #include "camera.h"
 #include "shader_utility/shader.h"
 #include "shader_utility/light_collection.h"
-#include "controller_utility/character_impl.h"
+#include "controller_utility/character.h"
 
 #include <vector>
 

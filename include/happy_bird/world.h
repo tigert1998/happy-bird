@@ -11,6 +11,7 @@
 #include "controller_utility/automation_controller.h"
 #include "player_utility/player_collection.h"
 #include "stage.h"
+#include "temp_collection.h"
 
 #if defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER)
 #include "audio.h"
@@ -21,7 +22,8 @@ enum class MoveDirectionType {
 };
 
 class World{
-	friend class Object;
+	friend Object;
+	friend Character;
  protected:
  	// OpenGL util
 	GLFWwindow* window_;
@@ -37,7 +39,9 @@ class World{
 	// Object collections
 	std::vector<Object*> objects_;
 	Stage stage_;
+
 	PlayerCollection *player_collection_ptr_;
+	TempCollection temp_;
  public:
  	// shared
 	static int height, width;

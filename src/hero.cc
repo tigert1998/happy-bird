@@ -56,7 +56,7 @@ Hero::Hero(World* world, Shader* shader, Material* material, const btTransform& 
 		new btBoxShape(btVector3(width_ / 2, height_ / 2, thickness_ / 2))
 	);
 	if (!shader) {
-		shader_ = new Shader(hero_vert, hero_frag);
+		shader_ = new Shader("shader/hero.vert", "shader/hero.frag");
 	}
 	// create mesh
 	InitMesh(); // rigid mesh + texture

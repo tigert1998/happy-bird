@@ -7,6 +7,7 @@ using namespace std;
 #include "shader_utility/spot_light.h"
 #include "shader_utility/pure_color_material.h"
 #include "shader_utility/texture_material.h"
+#include "random.h"
 
 using std::shared_ptr;
 
@@ -22,7 +23,7 @@ btVector3 World::up(0, 1, 0);
 btScalar World::character_height(8);
 btScalar World::bounding_height(100);
 
-World::World(): stage_(this) {
+World::World(): stage_(this), temp_(this) {
 	InitPhysics();
 	InitGraphics();
 	InitScene();
@@ -150,11 +151,21 @@ void World::Update(void) { // sync mesh and render
 
 	bt_world_->stepSimulation(delta_time);
 
-	int i = 0;
-	for(auto p = stage_.begin(); p != stage_.end(); p++){
-		(*p)->Draw(camera, light_collection);
-	}
+	temp_.Update();	
+	Timer::UpdateFrame();
 
+	for(auto p = stage_.begin(); p != stage_.end(); p++){
+		auto ptr = p->get().lock();
+		if(ptr){
+			ptr->Draw(camera, light_collection);
+		}
+	}
+	for(auto p = temp_.begin(); p != temp_.end(); p++){
+		auto ptr = p->get().lock();
+		if(ptr){
+			ptr->Draw(camera, light_collection);
+		}
+	}
 	for(auto& obj : objects_) {
 		obj->Draw(camera, light_collection);
 	}

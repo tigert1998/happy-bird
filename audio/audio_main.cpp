@@ -1,21 +1,19 @@
-#include<audio.h>
-#include<AL/alut.h>
-#include<al.h>
-//#include<alc.h>
-//#include<efx.h>
-//#include<efx-creative.h>
-//#include<EFX-Util.h>
-//#include<xram.h>
+//#include<audio.h>
+//#include<amp.h>
+#include<thread>
+#include<windows.h>
+#include "mmsystem.h"//导入声音头文件
+#pragma comment(lib,"winmm.lib")//导入声音头文件库 
 
 
-void playUtil(const char *fileName)
+/*void playUtil(const char *fileName)
 {
 	ALuint buffer;
 	ALuint source;
 	ALenum error;
 	ALint status;
 	Sleep(2);
-	/* Create an AL buffer from the given sound file. */
+	//Create an AL buffer from the given sound file. 
 	buffer = alutCreateBufferFromFile(fileName);
 	if (buffer == AL_NONE)
 	{
@@ -25,12 +23,12 @@ void playUtil(const char *fileName)
 		exit(EXIT_FAILURE);
 	}
 
-	/* Generate a single source, attach the buffer to it and start playing. */
+	//Generate a single source, attach the buffer to it and start playing. 
 	alGenSources(1, &source);
 	alSourcei(source, AL_BUFFER, buffer);
 	alSourcePlay(source);
 
-	/* Normally nothing should go wrong above, but one never knows... */
+	// Normally nothing should go wrong above, but one never knows... 
 	error = alGetError();
 	if (error != ALUT_ERROR_NO_ERROR)
 	{
@@ -69,4 +67,6 @@ void play_audio(std::string s)
 	delete[] plt;
 }
 
+
+*/
 

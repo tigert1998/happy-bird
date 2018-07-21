@@ -46,7 +46,7 @@ shared_ptr<Player> Player::RandomEnemyPlayer(weak_ptr<Character> target_ptr, Wor
 		World::character_height
 	);
 
-	auto character_ptr = new CharacterImpl(world_ptr, object_ptr);
+	auto character_ptr = new Character(world_ptr, object_ptr);
 	auto controller_ptr = new AutomationController(*character_ptr, *target_ptr.lock());
 
 	return shared_ptr<Player>(new Player(object_ptr, character_ptr, controller_ptr));

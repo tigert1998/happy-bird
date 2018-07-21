@@ -1,10 +1,10 @@
-#include "box.h"
+#include "plain_box.h"
 #include "world.h"
 
 #include <iostream>
 
 // Plain Object
-Box::Box(
+PlainBox::PlainBox(
 		World* world,
 		Shader* shader,
 		Material* material,
@@ -16,7 +16,7 @@ Box::Box(
 		half_extents_(half_extents),
 		mass_(mass) {
 	assert(world_);
-	LOG();
+	std::cout << "InitPlainBox" << std::endl;
 	// initialize physics shape //
 	bt_object_ = world_->CreateRigidBody(
 		mass,
@@ -28,13 +28,13 @@ Box::Box(
 	ImportToGraphics();
 	// patch shader
 	if (!shader) {
-		shader_ = new Shader("shader/common.vert", "shader/common.frag");
+		shader_ = new Shader("shader/cloth.vert", "shader/cloth.frag");
 	}
 }
-void Box::InitMesh(void){
+void PlainBox::InitMesh(void){
 	Object::InitRigidMesh();
 }
-void Box::ImportToGraphics(void){
+void PlainBox::ImportToGraphics(void){
 	glBindVertexArray(vao_);
 	// Bind indice
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
@@ -45,9 +45,16 @@ void Box::ImportToGraphics(void){
 	// Basic Attrib: vertex coords
 	glVertexAttribPointer(0, 3, GL_FLOAT, false, stride_ * sizeof(float), (void *) 0);
 	glEnableVertexAttribArray(0);
-	// Normal attrib
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, stride_ * sizeof(float), (void *) (3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
 	// Unbind vao
+	glBindVertexArray(0);
+}
+void PlainBox::Draw(Camera* camera, const LightCollection* light_collection){
+	shader_->Use();
+	shader_->SetUniform<Material>("uMaterial", *material_);
+	shader_->SetUniform<btTransform>("uModelMatrix", GetTransform());
+	shader_->SetUniform<glm::mat4>("uViewMatrix", camera->view_matrix());
+	shader_->SetUniform<glm::mat4>("uProjectionMatrix", camera->projection_matrix());
+	glBindVertexArray(vao_);
+	glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

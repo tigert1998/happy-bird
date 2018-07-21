@@ -55,17 +55,17 @@ void PlayerCollection::InitPlayerCollection(World *world_ptr) {
 		World::character_height,
 		World::character_height
 	);
-	Character *character_ptr = new CharacterImpl(world_ptr, object_ptr);
+	Character *character_ptr = new Character(world_ptr, object_ptr);
 	Controller *controller_ptr = new KeyboardController(*character_ptr);
 	world_ptr->camera->set_accompany_object(object_ptr, 120);
 
 	auto particle_ptr = new Particle(
 		world_ptr,
-		nullptr,
-		new PureColorMaterial(color::Red(), color::Red(), 40),
+		new Shader("shader/particle.vert", "shader/blood_incr.frag"),
+		new PureColorMaterial(color::Green(), color::Green(), 40),
 		btVector3(0, 0, 0),
 		glm::vec3(0, 0, -0.02),
-		kLargeParticle | kFlameParticle | kAmbientParticle
+		kMediumParticle | kFlameParticle | kAmbientParticle | kJitterParticle
 	);
 	particle_ptr->Attach(object_ptr, btVector3(0, 3, 0));
 

@@ -21,7 +21,11 @@ KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard)
 			controlee_.Rotate(false, time);
 		else
 			controlee_.ResetRotate();
-	
+
+		if (state[GLFW_KEY_F]) 
+			controlee_.LaserAttack();
+		if (state[GLFW_KEY_G])
+			controlee_.BoxAttack();
 		if (state[GLFW_KEY_SPACE])
 			controlee_.Jump(time);
 	});

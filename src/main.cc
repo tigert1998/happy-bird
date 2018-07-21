@@ -10,7 +10,9 @@ int main(int argc, char** argv)
 {
 
 	World demo;
-	//PlaySound(TEXT("D:\\code\\happy-bird\\audio\\sounds\\bubble.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+#if defined(ENABLE_AUDIO) && (defined (__WIN32) || defined (__WIN64) || defined (_MSC_VER))
+	PlaySound(TEXT("./audio/sounds/weird.wav"), NULL, SND_ASYNC | SND_FILENAME);
+#endif
 	demo.Run();
 
 }

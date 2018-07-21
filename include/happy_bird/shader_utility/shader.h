@@ -7,26 +7,7 @@
 #include "file_manager.h"
 #include "opengl_common.h"
 #include "bullet_common.h"
-
-#ifndef _MSC_VER
-#define cloth_vert "shader/cloth.vert"
-#define cloth_frag "shader/cloth.frag"
-#define common_vert "shader/common.vert"
-#define common_frag "shader/common.frag"
-#define hero_vert "shader/hero.vert"
-#define hero_frag "shader/hero.frag"
-#define particle_vert "shader/particle.vert"
-#define particle_frag "shader/particle.frag"
-#else 
-#define cloth_vert "D:\\code\\happy-bird\\shader\\cloth.vert"
-#define cloth_frag "D:\\code\\happy-bird\\shader\\cloth.frag"
-#define common_vert "D:\\code\\happy-bird\\shader\\common.vert"
-#define common_frag "D:\\code\\happy-bird\\shader\\common.frag"
-#define hero_vert "D:\\code\\happy-bird\\shader\\hero.vert"
-#define hero_frag "D:\\code\\happy-bird\\shader\\hero.frag"
-#define particle_vert "D:\\code\\happy-bird\\shader\\particle.vert"
-#define particle_frag "D:\\code\\happy-bird\\shader\\particle.frag"
-#endif
+#include "file_manager.h"
 
 class Shader {
 public:

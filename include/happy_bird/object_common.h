@@ -7,3 +7,4 @@
 #include "particle.h"
 #include "wall.h"
 #include "hero.h"
+#include "plain_box.h"

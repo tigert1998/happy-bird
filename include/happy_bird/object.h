@@ -19,7 +19,6 @@ class CharacterImpl;
 class Object{
 	friend World;
 	friend Character;
-	friend CharacterImpl;
  protected:
 	// Bullet physical world reference
 	World* world_;
