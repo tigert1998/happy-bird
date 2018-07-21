@@ -9,7 +9,6 @@ using std::bind;
 
 KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard): Controller(controlee), keyboard_(keyboard) {
 	keyboard.Register([&] (Keyboard::KeyboardState state, double time) {
-		std::cout << "Enter key" << std::endl;
 		if (state[GLFW_KEY_W])
 			controlee_.Move(true, time);
 		else if (state[GLFW_KEY_S])
@@ -34,7 +33,6 @@ KeyboardController::KeyboardController(Character &controlee, Keyboard &keyboard)
 		}
 		if (state[GLFW_KEY_SPACE])
 			controlee_.Jump(time);
-		std::cout << "After calllback" << std::endl;
 	});
 }
 

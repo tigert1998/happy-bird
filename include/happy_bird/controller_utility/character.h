@@ -40,6 +40,5 @@ class Character {
 	void BoxAttack(void);
 	void Gain(float);
 	void Lose(float);
-	void Disable(void);
 	float blood(void){return blood_;}
 };
