@@ -13,10 +13,10 @@ private:
 	PatrolDirection patrol_direction_;
 	Character &target_;
 	std::shared_ptr<glm::vec3> patrol_ptr_;
-	static const float patrol_radius_;
+	float patrol_radius_;
 
 public:
 	AutomationController() = delete;
-	AutomationController(Character &controlee, Character &target);
+	AutomationController(Character &controlee, Character &target, float patrol_radius = 10);
 	void Elapse(double time);
 };
