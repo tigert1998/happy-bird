@@ -23,5 +23,5 @@ public:
 			return a.object_ptr().lock()->GetOrigin()[2] > b.object_ptr().lock()->GetOrigin()[2];
 		}
 	);
-	void InitPlayerCollection(World *world_ptr);
+	void InitPlayerCollection(World *world_ptr, std::vector<Object*>& objects);
 };

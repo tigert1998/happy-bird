@@ -113,7 +113,7 @@ void World::InitPhysics(void) {
 void World::InitScene(void) {
 	stage_.InitStage(kDefaultStage);
 	player_collection_ptr_ = new PlayerCollection();
-	player_collection_ptr_->InitPlayerCollection(this);
+	player_collection_ptr_->InitPlayerCollection(this, objects_);
 
 	light_collection->PushBack(
 		new PointLight(

@@ -42,7 +42,7 @@ void PlayerCollection::Traverse(std::function<void(std::weak_ptr<Player>)> yield
 	}
 }
 
-void PlayerCollection::InitPlayerCollection(World *world_ptr) {
+void PlayerCollection::InitPlayerCollection(World *world_ptr, std::vector<Object*>& objects) {
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(World::origin + btVector3(0, World::character_height, -World::character_height));
@@ -68,6 +68,7 @@ void PlayerCollection::InitPlayerCollection(World *world_ptr) {
 		kMediumParticle | kFlameParticle | kAmbientParticle | kJitterParticle
 	);
 	particle_ptr->Attach(object_ptr, btVector3(0, 3, 0));
+	objects.push_back(particle_ptr);
 
 	auto main_player_ptr = shared_ptr<Player>(new Player(object_ptr, character_ptr, controller_ptr));
 	PushBackFriendly(main_player_ptr);
