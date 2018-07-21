@@ -19,7 +19,9 @@ class Stage{
 		friend Stage;
 		std::shared_ptr<Object> data_ref_;
 	 public:
+	 	StageWrapper(std::shared_ptr<Object> shared): data_ref_(shared){ }
 	 	StageWrapper(Object* naked): data_ref_(naked){ }
+	 	~StageWrapper(){ }
 	 	std::weak_ptr<Object> get(void){
 	 		return static_cast<std::weak_ptr<Object> >(data_ref_);
 	 	}

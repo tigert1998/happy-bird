@@ -13,6 +13,7 @@ using std::shared_ptr;
 
 int World::height = 600;
 int World::width = 800;
+bool World::exit = false;
 
 Camera* World::camera = new Camera(glm::vec3(25, 51, 25), (double) World::width / (double) World::height);
 LightCollection* World::light_collection = new LightCollection(glm::vec3(0, 0, 0));
@@ -111,7 +112,7 @@ void World::InitPhysics(void) {
 }
 
 void World::InitScene(void) {
-	stage_.InitStage(kDefaultStage);
+	stage_.InitStage(kDungeonStage);
 	player_collection_ptr_ = new PlayerCollection();
 	player_collection_ptr_->InitPlayerCollection(this, objects_);
 
@@ -130,8 +131,8 @@ void World::InitScene(void) {
 	);
 	light_collection->PushBack(
 		new SpotLight(
-			glm::vec3(-25, 25, -25), 
-			glm::vec3(10, 0, 0),
+			glm::vec3(0, 0, 0), 
+			glm::vec3(10, 5, 5),
 			color::White(), 
 			10,
 			Attenuation(1800),
@@ -201,6 +202,7 @@ void World::CursorPosCallback(GLFWwindow *window, double x, double y) {
 void World::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode) {
 	Keyboard::shared.Trigger(key, action);
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		World::exit = true;
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 }

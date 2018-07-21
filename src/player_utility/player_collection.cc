@@ -45,7 +45,7 @@ void PlayerCollection::Traverse(std::function<void(std::weak_ptr<Player>)> yield
 void PlayerCollection::InitPlayerCollection(World *world_ptr, std::vector<Object*>& objects) {
 	btTransform transform;
 	transform.setIdentity();
-	transform.setOrigin(World::origin + btVector3(0, World::character_height, -World::character_height));
+	transform.setOrigin(World::origin + btVector3(45, 40, 30));
 
 	Object *object_ptr = new Hero(
 		world_ptr,

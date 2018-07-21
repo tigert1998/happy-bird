@@ -40,9 +40,9 @@ struct LightCollectionTotal {
 struct LightCollection {
 	vec3 ambient;
 	LightCollectionTotal total;
-	ParallelLight parallel[1];
-	PointLight point[1];
-	SpotLight spot[1];
+	ParallelLight parallel[4];
+	PointLight point[4];
+	SpotLight spot[4];
 };
 
 struct TextureMaterial {
@@ -65,7 +65,7 @@ in vec2 vTexCoord;
 
 out vec4 fragColor;
 
-vec3 CalculatePointlLight(Eye eye, PointLight light, TextureMaterial material) {
+vec3 CalculatePointLight(Eye eye, PointLight light, TextureMaterial material) {
 	vec3 lightDirection = normalize(light.position - vPosition);
 	float diffuseFactor = max(dot(vNormal, lightDirection), 0.0) * light.intensity;
 
@@ -121,13 +121,46 @@ vec3 CalculateSpotLight(Eye eye, SpotLight light, TextureMaterial material) {
 vec3 CalculateFragmentColor(Eye eye, LightCollection lightCollection, TextureMaterial material) {
 	vec3 color = lightCollection.ambient;
 	for (int i = 0; i < lightCollection.total.parallel; i++) {
-		color += CalculateParallelLight(eye, lightCollection.parallel[i], material);
+		if(i == 0){
+			color += CalculateParallelLight(eye, lightCollection.parallel[0], material);
+		}
+		if(i == 1){
+			color += CalculateParallelLight(eye, lightCollection.parallel[1], material);
+		}
+		if(i == 2){
+			color += CalculateParallelLight(eye, lightCollection.parallel[2], material);
+		}
+		if(i == 3){
+			color += CalculateParallelLight(eye, lightCollection.parallel[3], material);
+		}
 	}
 	for (int i = 0; i < lightCollection.total.point; i++) {
-		color += CalculatePointlLight(eye, lightCollection.point[i], material);
+		if(i == 0){
+			color += CalculatePointLight(eye, lightCollection.point[0], material);
+		}
+		if(i == 1){
+			color += CalculatePointLight(eye, lightCollection.point[1], material);
+		}
+		if(i == 2){
+			color += CalculatePointLight(eye, lightCollection.point[2], material);
+		}
+		if(i == 3){
+			color += CalculatePointLight(eye, lightCollection.point[3], material);
+		}
 	}
 	for (int i = 0; i < lightCollection.total.spot; i++) {
-		color += CalculateSpotLight(eye, lightCollection.spot[i], material);
+		if(i == 0){
+			color += CalculateSpotLight(eye, lightCollection.spot[0], material);
+		}
+		if(i == 1){
+			color += CalculateSpotLight(eye, lightCollection.spot[1], material);
+		}
+		if(i == 2){
+			color += CalculateSpotLight(eye, lightCollection.spot[2], material);
+		}
+		if(i == 3){
+			color += CalculateSpotLight(eye, lightCollection.spot[3], material);
+		}
 	}
 	return color * 5;
 }

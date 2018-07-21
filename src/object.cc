@@ -26,12 +26,13 @@ Object::Object(World* w, Shader* shader, Material* material, uint32_t stride, bo
 }
 
 Object::~Object(){
+	// cout << __func__ << endl;
 	// delete from Graphics
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &vbo_);
 	glDeleteBuffers(1, &ebo_);
 	// delete from bullet
-	if(bt_object_)world_->bt_world_->removeCollisionObject(bt_object_);
+	if(bt_object_ && world_ && world_->bt_world_ && !World::exit)world_->bt_world_->removeCollisionObject(bt_object_);
 	// DeleteFromPhysics();
 	delete shader_;
 	delete bt_object_;

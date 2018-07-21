@@ -44,6 +44,7 @@ class World{
 	TempCollection temp_;
  public:
  	// shared
+	static bool exit;
 	static int height, width;
 	static Camera* camera;
 	static glm::vec3 global_ambient;
