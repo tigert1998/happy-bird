@@ -82,7 +82,7 @@ void Character::LaserAttack(void){
 			new PureColorMaterial(laser_attack_color_, laser_attack_color_, 40),
 			object_->GetOrigin(),
 			glm::vec3(0.25, 0, 0),
-			kSmallParticle | kFloatParticle | kLaserParticle,
+			kMediumParticle | kFloatParticle | kLaserParticle,
 			10,
 			0.05,
 			1

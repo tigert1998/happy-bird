@@ -17,15 +17,15 @@ class Character {
  	// Config
  	float max_speed_ = 15;
  	float laser_attack_freq_ = 1;
- 	float laser_attack_dist_ = 10;
- 	float laser_attack_range_ = 5;
+ 	float laser_attack_dist_ = 100;
+ 	float laser_attack_range_ = 7;
  	Color laser_attack_color_ = color::Blue();
  	float box_attack_freq_ = 3;
- 	float box_attack_dist_ = 50;
+ 	float box_attack_dist_ = 30;
  	float box_attack_range_ = 20; // along depth axis
  	Color box_attack_color_ = color::Red();
  	// runtime data
- 	float blood_ = 10;
+ 	float blood_ = 40;
  public:
  	Character(World*, std::shared_ptr<Object>);
  	void set_max_speed(float max_speed);
