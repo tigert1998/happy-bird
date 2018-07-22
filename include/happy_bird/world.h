@@ -38,7 +38,6 @@ class World{
 	btSoftBodyWorldInfo bt_soft_info_;
 	// Object collections
 	Stage stage_;
-
 	PlayerCollection *player_collection_ptr_;
 	TempCollection temp_;
  public:
