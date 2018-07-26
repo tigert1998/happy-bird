@@ -1,11 +1,11 @@
-#happy-bird音效控制 实验分报告 
+# happy-bird音效控制 实验分报告 
 
 ## 袁谱博
 
 
 ### 方案1 OpenAL（未被采用）
 
-```OpenAL```  是一个开源的音频硬件-软件接口库。该接口库中的函数允许程序员指定对象和操作，产生高质量的音频输出，特别能是在听众周围的声源营造3D排列的多声道输出效果。 `OpenAL` API旨在跨平台的实现且易于使用，其函数命名风格与语法均类似于`OpenGL`。
+`OpenAL`是一个开源的音频硬件-软件接口库。该接口库中的函数允许程序员指定对象和操作，产生高质量的音频输出，特别能是在听众周围的声源营造`3D`排列的多声道输出效果。`OpenAL API`旨在跨平台的实现且易于使用，其函数命名风格与语法均类似于`OpenGL`。
 
 在本项目中使用的函数声明如下：
 
@@ -423,7 +423,7 @@ void alcDestroyContext(
 
 ### 方案2 WinAPI
 
-使用`Windows`内置函数，`palySound` 和 `mciSendString` 函数实现播放wav文件。
+使用`Windows`内置函数，`palySound` 和 `mciSendString` 函数实现播放`wav`文件。
 
 `playSound`函数原型如下：
 ```cpp

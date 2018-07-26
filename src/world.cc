@@ -192,7 +192,9 @@ void World::Update(void) { // sync mesh and render
 }
 
 void World::Run(void) {
+	#if defined(_MSC_VER) || defined(__WIN32) || defined(__WIN64)
 	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/background.wav").c_str()), 0, 0, 0);
+	#endif
 	while (!glfwWindowShouldClose(window_)) {
 		Update();
 	}

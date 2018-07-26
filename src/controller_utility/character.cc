@@ -11,7 +11,9 @@ using std::shared_ptr;
 #include "particle.h"
 #include "plain_box.h"
 #include "random.h"
+#if defined(_MSC_VER) || defined(__WIN32) || defined(__WIN64)
 #include "audio.h"
+#endif
 
 float Character::static_pace_(100);
 
@@ -51,7 +53,9 @@ void Character::Jump(float step){
 	btVector3 velocity = object_->GetVelocity();
 	if(fabs(velocity[1]) > 0.3)return ; // in a jump
 	// ignore step
+	#if defined(_MSC_VER) || defined(__WIN32) || defined(__WIN64)
 	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/ho.wav").c_str()), 0, 0, 0);
+	#endif
 	step = 0.32;
 	object_->SetVelocity(velocity + World::up * step * Character::static_pace_);
 }
@@ -73,7 +77,9 @@ void Character::LaserAttack(void){
 	if(!object_)return ;
 	static Timer::TimingId laser_timer = Timer::New();
 	if(Timer::Query(laser_timer) < laser_attack_freq_)return;
+	#if defined(_MSC_VER) || defined(__WIN32) || defined(__WIN64)
 	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/laser.wav").c_str()), 0, 0, 0);
+	#endif
 	Timer::Pin(laser_timer);
 	world_->temp_.PushBack(
 		new Particle(
@@ -110,7 +116,9 @@ void Character::BoxAttack(void){
 	if(!object_)return ;
 	static Timer::TimingId box_timer = Timer::New();
 	if(Timer::Query(box_timer) < box_attack_freq_)return;
+	#if defined(_MSC_VER) || defined(__WIN32) || defined(__WIN64)
 	mciSendString((LPCSTR)((std::string("play ") + "resources/sound/gun.wav").c_str()), 0, 0, 0);
+	#endif
 	Timer::Pin(box_timer);
 	btVector3 origin = object_->GetOrigin();
 	btTransform transform;
