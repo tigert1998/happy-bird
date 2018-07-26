@@ -1,19 +1,15 @@
+#happy-bird音效控制 实验分报告 
+
+## 袁谱博
 
 
-#happy-bird 音效控制 实验分报告 
+### 方案1 OpenAL（未被采用）
 
-## YuanPubo
-
-
-方案1 OpenAL（未被采用）
-
-```OpenAL```  是一个开源的音频硬件-软件接口库。该接口库中的函数允许程序员指定对象和操作，产生高质量的音频输出，特别能是在听众周围的声源营造3D排列的多声道输出效果。 OpenAL API旨在跨平台的实现且易于使用，其函数命名风格与语法均类似于OpenGL。
+```OpenAL```  是一个开源的音频硬件-软件接口库。该接口库中的函数允许程序员指定对象和操作，产生高质量的音频输出，特别能是在听众周围的声源营造3D排列的多声道输出效果。 `OpenAL` API旨在跨平台的实现且易于使用，其函数命名风格与语法均类似于`OpenGL`。
 
 在本项目中使用的函数声明如下：
 
-
-
-```
+```cpp
 void alGenBuffers( 
       ALsizei n,  
       ALuint *buffers      
@@ -418,50 +414,34 @@ void alcSuspendContext(
 void alcDestroyContext(  
       ALCcontext *context  
 ); 
-
-
 ```
 
+ 除此之外，`OpenAL`还开发出了拓展库`ALUT`，对`OpenAL`的底层操作进行了封装。
 
 
- 除此之外，OpenAL 还开发出了拓展库ALUT，对OpenAL 的底层操作进行了封装。
+使用`OpenAL`实现游戏音效效果是我们最初考虑的方案。然而最后该方案没有调试成功，未被采用。
 
+### 方案2 WinAPI
 
-使用OpenAL实现游戏音效效果是我们最初考虑的方案。然而最后该方案没有调试成功，未被采用。
+使用`Windows`内置函数，`palySound` 和 `mciSendString` 函数实现播放wav文件。
 
-
-
-方案2 WinAPI
-
- 
-
-使用Windows内置函数，palySound 和 mciSendString 函数实现播放wav文件。
-
- 
-
-playSound 函数原型如下：
-```
+`playSound`函数原型如下：
+```cpp
 BOOL PlaySound(
    LPCTSTR pszSound,
    HMODULE hmod,
    DWORD   fdwSound
 );
 ```
-然而该函数的调用会阻塞对图像的渲染，即在播放音乐时画面会静止，而mciSendString 则避开了这一问题。
+然而该函数的调用会阻塞对图像的渲染，即在播放音乐时画面会静止，而`mciSendString` 则避开了这一问题。 
 
- 
+如果要向`mciSendString`传递`std::string::c_str()`方法得到的字符串，需在`VS2017`中取消使用`unicode`的的选项，并使用强制转换`LPCSTR`。
 
-如果要向mciSendString 传递 std::string::c_str() 方法得到的字符串，需在VS2017 中取消使用unicode的的选项，并使用强制转换 LPCSTR。
+注意二者的使用都应`#include<windows.h>`，对于`mciSendString`函数， 还应`include<mmsystem.h>`并导入库：`#pragma comment<lib."winmm.lib">` 。
 
-注意二者的使用都应```#include<windows.h>```  ,对于 ```mciSendString```  函数， 还应 ```include<mmsystem.h>```  ,
+`mciSendString`函数原型如下：
 
-并导入库：```#pragma comment<lib."winmm.lib">``` 
-
- 
-
-```mciSendString```  函数原型如下：
-
-```
+```cpp
 MCIERROR mciSendString(
    LPCTSTR lpszCommand,
    LPTSTR  lpszReturnString,
@@ -470,14 +450,7 @@ MCIERROR mciSendString(
 );
 ```
 
+在`Windows`系统下实现计算`wav`格式文件，只需读取`wav`文件头，根据小端格式读取`wav`文件大小，声道数，编码方式以及频率。我们在每一帧的渲染中测试播放条件，如果满足则进行函数的播放。
 
+经测试，此方案可正常实现游戏中的音效效果。但美中不足是无法在`Unix`平台下使用。
 
-
-
-在Windows系统下实现计算wav格式文件，只需读取wav文件头，根据小端格式读取wav文件大小，声道数，编码方式以及频率。我们在每一帧的渲染中测试播放条件，如果满足则进行函数的播放。
-
-经测试，此方案可正常实现游戏中的音效效果。但美中不足是无法在 Unix 平台下使用。
-
-
-
- 
