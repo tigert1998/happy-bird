@@ -1,3 +1,7 @@
+| 作者   | 学号       |
+| ------ | ---------- |
+| 唐小虎 | 3160103866 |
+
 # `GLSL`着色器类
 
 ## 接口
@@ -214,3 +218,35 @@ public:
 ```
 
 自动机控制器不依赖于键盘或是鼠标等外设，它会绑定一个被控制者`controlee`，它的目标角色（即攻击对象）`target`以及一个巡逻半径。当角色在视角之外的时候，怪物就会按照特定的巡逻半径周期性巡逻，否则就会追着攻击对象跑。
+
+# 玩家池（包括`NPC`和主角）
+
+```cpp
+class PlayerCollection {
+private:
+	std::vector<std::shared_ptr<Player>> hostile_collection_, friendly_collection_;
+
+public:
+	PlayerCollection();
+	void PushBackHostile(std::shared_ptr<Player> player_ptr);
+	void PushBackFriendly(std::shared_ptr<Player> player_ptr);
+	void Traverse(
+		std::function<void(std::weak_ptr<Player>)> yield,
+		std::function<bool(const Player &, const Player &)> compare_function = [] (const Player &a, const Player &b) -> bool {
+			if(!a.object_ptr().lock())return false;
+			if(!b.object_ptr().lock())return true;
+			return a.object_ptr().lock()->GetOrigin()[2] > b.object_ptr().lock()->GetOrigin()[2];
+		}
+	);
+	void Query(glm::vec3 location, float width, float depth, std::function<void(std::weak_ptr<Player>)> yield);
+	void InitPlayerCollection(World *world_ptr);
+	std::shared_ptr<Player> leader();
+};
+```
+
+- `PlayerCollection::PlayerCollection()`默认会构建一个空的玩家池。
+- `void PlayerCollection::PushBackHostile(shared_ptr<Player>)`会往敌人中添加一个玩家。
+- `void PlayerCollection::PushBackFriendly(shared_ptr<Player>)`会往我方添加一个玩家（通常只有主角一个人）。
+- 由于渲染上的一些限制（比如说由于我们的角色贴图是`png`格式带透明度的，渲染的时候一定要先渲染远处的角色再渲染近处的角色），我们在遍历角色池的时候可能必须要按照一定的顺序。所以我们设计了这样的遍历接口`void Traverse(function<void(std::weak_ptr<Player>)>, function<bool(const Player &, const Player &)>`。这个接口会按照`compare_function`提供的排序顺序依次给出角色池中的角色。
+- 另外，在判定受攻击的角色对象时，我们需要查询角色池中属于特定区域的角色。而`void Query(glm::vec3, float, float, function<void(std::weak_ptr<Player>)>)`会帮我们做好这些工作。
+- `shared_ptr<Player> leader()`的作用是返回主角。
