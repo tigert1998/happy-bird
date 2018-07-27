@@ -14,6 +14,8 @@ It tells a story of a lonely bird man, travelling through land of darkness in pu
 
 * New designed level: style from four seasons
 
+![demo](docs/screenshots/pic1.png)
+
 ## Blueprint
 
 * Phase 1: 2D game logic
